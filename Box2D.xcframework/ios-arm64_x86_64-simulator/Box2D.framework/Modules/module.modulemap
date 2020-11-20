@@ -1,0 +1,11 @@
+framework module Box2D {
+  umbrella header "Box2D.h"
+
+  export *
+  module * { export * }
+}
+
+module Box2D.Swift {
+    header "Box2D-Swift.h"
+    requires objc
+}
