@@ -22,6 +22,8 @@
 		114341F52604CA14007F9891 /* Hull.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114341E72604CA14007F9891 /* Hull.swift */; };
 		114341F62604CA14007F9891 /* ConvexHull.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114341E82604CA14007F9891 /* ConvexHull.swift */; };
 		114341F72604CA14007F9891 /* PolygonConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114341E92604CA14007F9891 /* PolygonConverter.swift */; };
+		117D391E262221DF00E4B3A8 /* Level.lvl in Resources */ = {isa = PBXBuildFile; fileRef = 117D391D262221DF00E4B3A8 /* Level.lvl */; };
+		117D39212622221D00E4B3A8 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11271CE8260207560042D3A3 /* Level.swift */; };
 		11A03B6D25D9CD9400DFF7C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11A03B6C25D9CD9400DFF7C3 /* LaunchScreen.storyboard */; };
 		11A03B7325DA88A400DFF7C3 /* Missle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A03B7225DA88A400DFF7C3 /* Missle.swift */; };
 		11A03B7C25DA8C7300DFF7C3 /* ControlPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A03B7B25DA8C7300DFF7C3 /* ControlPad.swift */; };
@@ -58,6 +60,7 @@
 		114341E72604CA14007F9891 /* Hull.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hull.swift; sourceTree = "<group>"; };
 		114341E82604CA14007F9891 /* ConvexHull.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConvexHull.swift; sourceTree = "<group>"; };
 		114341E92604CA14007F9891 /* PolygonConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonConverter.swift; sourceTree = "<group>"; };
+		117D391D262221DF00E4B3A8 /* Level.lvl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Level.lvl; sourceTree = "<group>"; };
 		11A03B6C25D9CD9400DFF7C3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		11A03B7225DA88A400DFF7C3 /* Missle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missle.swift; sourceTree = "<group>"; };
 		11A03B7B25DA8C7300DFF7C3 /* ControlPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPad.swift; sourceTree = "<group>"; };
@@ -138,6 +141,14 @@
 			path = ConcaveHull;
 			sourceTree = "<group>";
 		};
+		117D391C262221CE00E4B3A8 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				117D391D262221DF00E4B3A8 /* Level.lvl */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
 		11A03B7725DA88AA00DFF7C3 /* Unit */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,6 +210,7 @@
 			isa = PBXGroup;
 			children = (
 				11A56D0225DA923500E6B1E1 /* Category.swift */,
+				117D391C262221CE00E4B3A8 /* Resource */,
 				11A03B7825DA88B200DFF7C3 /* Scene */,
 				11A03B7925DA890300DFF7C3 /* Terrain */,
 				11A03B7725DA88AA00DFF7C3 /* Unit */,
@@ -315,6 +327,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				117D391E262221DF00E4B3A8 /* Level.lvl in Resources */,
 				11D113B725D9A7B60063F332 /* Assets.xcassets in Resources */,
 				11A03B6D25D9CD9400DFF7C3 /* LaunchScreen.storyboard in Resources */,
 			);
@@ -355,6 +368,7 @@
 				11D113F925D9C2030063F332 /* Wall.swift in Sources */,
 				11A56D0325DA923500E6B1E1 /* Category.swift in Sources */,
 				11A03B7325DA88A400DFF7C3 /* Missle.swift in Sources */,
+				117D39212622221D00E4B3A8 /* Level.swift in Sources */,
 				11D113AA25D9A7B60063F332 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -543,7 +557,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.ZobbleBobble";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.ZobbleBobble;
 				PRODUCT_NAME = ZobbleBobble;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -564,7 +578,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.ZobbleBobble";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.ZobbleBobble;
 				PRODUCT_NAME = ZobbleBobble;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;

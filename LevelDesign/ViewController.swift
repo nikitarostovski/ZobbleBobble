@@ -58,6 +58,8 @@ class ViewController: NSViewController {
     @IBOutlet weak var itemExitButton: NSButton!
     @IBOutlet weak var itemCheckpointButton: NSButton!
     
+    @IBOutlet weak var saveButton: NSButton!
+    
     @IBOutlet weak var drawView: DebugDrawView! {
         didSet {
             drawView.delegate = self
@@ -76,6 +78,20 @@ class ViewController: NSViewController {
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
+        }
+    }
+    
+    @IBAction func saveTap(_ sender: Any) {
+        let homePath = FileManager.default.homeDirectoryForCurrentUser
+        let desktopPath = homePath.appendingPathComponent("Dev/Projects/ZobbleBobble/ZobbleBobble iOS/Resource")
+        let filePath = desktopPath.appendingPathComponent("Level.lvl")
+        
+        guard let unicodeString = level.save() else { print("Can not make json"); return }
+        
+        do {
+            try unicodeString.write(to: filePath, atomically: false, encoding: .utf8)
+        } catch {
+            print("Can not write file")
         }
     }
     

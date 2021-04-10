@@ -32,24 +32,26 @@ class GameScene: SKScene {
         cameraScale = 1
         removeAllChildren()
         
+        guard let levelURL = Bundle.main.url(forResource: "Level", withExtension: "lvl"),
+              let levelData = try? Data(contentsOf: levelURL),
+              let level = Level.load(json: levelData)
+        else {
+            return
+        }
         // terrain
         let terrainSize = CGSize(width: min(size.width, size.height),
                                  height: min(size.width, size.height))
         
-        let generatedData = MatrixGenerator.generate(size: matrixSize, unitCount: 3)
-        let matrix = generatedData.0
-        let spawnPoints = generatedData.1
-        
-        var polygons = PolygonConverter.makeWalls(from: matrix)
-        polygons = polygons.map { $0.map { CGPoint(x: $0.x * terrainSize.width, y: $0.y * terrainSize.height) } }
+        let polygons = level.polygons.map { $0.map { CGPoint(x: $0.x * terrainSize.width / level.width,
+                                                             y: $0.y * terrainSize.height / level.height) } }
         terrain = Terrain(polygons: polygons)
-        
         addChild(terrain)
         
+        
         // units
-        for pt in spawnPoints {
-            let unit = Unit.make(at: CGPoint(x: CGFloat(pt.0) / CGFloat(matrixSize) * terrainSize.width,
-                                             y: CGFloat(pt.1) / CGFloat(matrixSize) * terrainSize.height))
+        for pt in [level.playerPosition!] {
+            let unit = Unit.make(at: CGPoint(x: pt.x * terrainSize.width / level.width,
+                                             y: pt.y * terrainSize.height / level.height))
             addChild(unit)
             player = unit
         }

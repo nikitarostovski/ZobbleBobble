@@ -808,6 +808,17 @@
                                             <action selector="itemCheckpointTap:" target="XfG-lQ-9wD" id="Lsq-y3-cUy"/>
                                         </connections>
                                     </button>
+                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GX7-sl-S2g">
+                                        <rect key="frame" x="158" y="13" width="64" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIR-CX-s2s">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="saveTap:" target="XfG-lQ-9wD" id="dom-Wa-Vvm"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="240" id="h21-tC-DaJ"/>
@@ -833,6 +844,7 @@
                         <outlet property="itemPlayerButton" destination="M3i-zP-HDo" id="bpF-JH-UxU"/>
                         <outlet property="polygonRadioButton" destination="ghY-6L-ewF" id="8YS-OJ-H6N"/>
                         <outlet property="rectangleRadioButton" destination="7Am-bW-cva" id="pev-Z9-72n"/>
+                        <outlet property="saveButton" destination="GX7-sl-S2g" id="YHI-JJ-jCN"/>
                         <outlet property="wallChanceTextField" destination="tfX-nb-tkN" id="RCU-HS-VHV"/>
                         <outlet property="widthTextField" destination="N5w-GI-CgL" id="j8R-gz-GyC"/>
                     </connections>
