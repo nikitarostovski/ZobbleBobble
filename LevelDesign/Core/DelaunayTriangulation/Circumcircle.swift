@@ -8,9 +8,9 @@
 
 /// Represents a circle which intersects a set of 3 points
 internal struct Circumcircle: Hashable {
-    let point1: Point
-    let point2: Point
-    let point3: Point
+    let point1: TPoint
+    let point2: TPoint
+    let point3: TPoint
     let x: Double
     let y: Double
     let rsqr: Double

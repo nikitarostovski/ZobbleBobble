@@ -35,7 +35,7 @@ final class MatrixGenerator {
     
     
     static func generate(width: Int, height: Int, unitCount: Int, wallChance: Float) -> (Matrix, [(Int, Int)]) {
-        return (makeBox(width: width, height: height), [])
+//        return (makeBox(width: width, height: height), [])
         var result = randomCave(width: width, height: height, wallChance: wallChance)
         
 //        let unitPositions = spawnPoints(in: result, width: width, height: height, count: unitCount)

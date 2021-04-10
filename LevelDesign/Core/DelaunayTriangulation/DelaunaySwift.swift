@@ -7,7 +7,7 @@
 //
 
 /// Generates a supertraingle containing all other triangles
-internal func supertriangle(_ points: [Point]) -> [Point] {
+internal func supertriangle(_ points: [TPoint]) -> [TPoint] {
     var xmin = Double(Int32.max)
     var ymin = Double(Int32.max)
     var xmax = -Double(Int32.max)
@@ -27,14 +27,14 @@ internal func supertriangle(_ points: [Point]) -> [Point] {
     let ymid = ymin + dy * 0.5
     
     return [
-        Point(x: xmid - 20 * dmax, y: ymid - dmax),
-        Point(x: xmid, y: ymid + 20 * dmax),
-        Point(x: xmid + 20 * dmax, y: ymid - dmax)
+        TPoint(x: xmid - 20 * dmax, y: ymid - dmax),
+        TPoint(x: xmid, y: ymid + 20 * dmax),
+        TPoint(x: xmid + 20 * dmax, y: ymid - dmax)
     ]
 }
 
 /// Calculate the intersecting circumcircle for a set of 3 points
-internal func circumcircle(_ i: Point, j: Point, k: Point) -> Circumcircle {
+internal func circumcircle(_ i: TPoint, j: TPoint, k: TPoint) -> Circumcircle {
     let x1 = i.x
     let y1 = i.y
     let x2 = j.x
@@ -83,10 +83,10 @@ internal func circumcircle(_ i: Point, j: Point, k: Point) -> Circumcircle {
 }
 
 /// Deduplicate a collection of edges
-internal func dedup(_ edges: [Point]) -> [Point] {
+internal func dedup(_ edges: [TPoint]) -> [TPoint] {
     
     var e = edges
-    var a: Point?, b: Point?, m: Point?, n: Point?
+    var a: TPoint?, b: TPoint?, m: TPoint?, n: TPoint?
     
     var j = e.count
     while j > 0 {
@@ -113,7 +113,7 @@ internal func dedup(_ edges: [Point]) -> [Point] {
     return e
 }
 
-public func triangulate(_ points: [Point]) -> [Triangle] {
+public func triangulate(_ points: [TPoint]) -> [Triangle] {
     
     var _points = Array(Set.init(points))
     
@@ -124,7 +124,7 @@ public func triangulate(_ points: [Point]) -> [Triangle] {
     let n = _points.count
     var open = [Circumcircle]()
     var completed = [Circumcircle]()
-    var edges = [Point]()
+    var edges = [TPoint]()
     
     /* Make an array of indices into the point array, sorted by the
     * points' x-position. */
@@ -198,11 +198,11 @@ public func triangulate(_ points: [Point]) -> [Triangle] {
     * building a list of triplets that represent triangles. */
     completed += open
     
-    let ignored: Set<Point> = [_points[n], _points[n + 1], _points[n + 2]]
+    let ignored: Set<TPoint> = [_points[n], _points[n + 1], _points[n + 2]]
     
     let results = completed.compactMap { (circumCircle) -> Triangle? in
         
-        let current: Set<Point> = [circumCircle.point1, circumCircle.point2, circumCircle.point3]
+        let current: Set<TPoint> = [circumCircle.point1, circumCircle.point2, circumCircle.point3]
         let intersection = ignored.intersection(current)
         if intersection.count > 0 {
             return nil

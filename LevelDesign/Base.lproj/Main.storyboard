@@ -734,7 +734,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ChR-ck-Ier">
-                                        <rect key="frame" x="13" y="189" width="214" height="32"/>
+                                        <rect key="frame" x="13" y="268" width="214" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="push" title="Generate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="M8m-wc-e22">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -745,7 +745,7 @@
                                         </connections>
                                     </button>
                                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tfX-nb-tkN">
-                                        <rect key="frame" x="20" y="299" width="48" height="21"/>
+                                        <rect key="frame" x="20" y="378" width="48" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="XuB-4p-pem">
                                             <font key="font" metaFont="system"/>
@@ -754,7 +754,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7Am-bW-cva">
-                                        <rect key="frame" x="18" y="261" width="87" height="18"/>
+                                        <rect key="frame" x="18" y="340" width="87" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="radio" title="Rectangle" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="lyZ-gU-Pi2">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -765,7 +765,7 @@
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ghY-6L-ewF">
-                                        <rect key="frame" x="18" y="235" width="75" height="18"/>
+                                        <rect key="frame" x="18" y="314" width="75" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="radio" title="Polygon" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="5J8-Bd-4Z9">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -773,6 +773,39 @@
                                         </buttonCell>
                                         <connections>
                                             <action selector="polygonModeSelect:" target="XfG-lQ-9wD" id="OXb-jC-yZS"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eQK-gc-3h5">
+                                        <rect key="frame" x="18" y="223" width="45" height="22"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="radio" title="Exit" bezelStyle="regularSquare" imagePosition="left" inset="2" id="UoH-ni-G6t">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="itemExitTap:" target="XfG-lQ-9wD" id="qTW-om-gEZ"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M3i-zP-HDo">
+                                        <rect key="frame" x="71" y="223" width="60" height="22"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="radio" title="Player" bezelStyle="regularSquare" imagePosition="left" inset="2" id="0t1-CP-uz1">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="itemPlayerTap:" target="XfG-lQ-9wD" id="q2O-L1-Mjh"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yzi-aR-8PR">
+                                        <rect key="frame" x="18" y="189" width="96" height="22"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="radio" title="Checkpoint" bezelStyle="regularSquare" imagePosition="left" inset="2" id="anh-vB-Lt8">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="itemCheckpointTap:" target="XfG-lQ-9wD" id="Lsq-y3-cUy"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -795,6 +828,9 @@
                         <outlet property="drawView" destination="N6E-Vd-YGw" id="LRb-DH-slf"/>
                         <outlet property="generateButton" destination="ChR-ck-Ier" id="97G-il-hmw"/>
                         <outlet property="heightTextField" destination="R5v-I5-gZT" id="QbL-GT-pvs"/>
+                        <outlet property="itemCheckpointButton" destination="yzi-aR-8PR" id="ltB-jm-OXg"/>
+                        <outlet property="itemExitButton" destination="eQK-gc-3h5" id="MSh-n0-7pc"/>
+                        <outlet property="itemPlayerButton" destination="M3i-zP-HDo" id="bpF-JH-UxU"/>
                         <outlet property="polygonRadioButton" destination="ghY-6L-ewF" id="8YS-OJ-H6N"/>
                         <outlet property="rectangleRadioButton" destination="7Am-bW-cva" id="pev-Z9-72n"/>
                         <outlet property="wallChanceTextField" destination="tfX-nb-tkN" id="RCU-HS-VHV"/>

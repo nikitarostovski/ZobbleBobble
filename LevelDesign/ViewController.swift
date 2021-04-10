@@ -13,15 +13,37 @@ class ViewController: NSViewController {
         case rectangle
         case polygon
     }
+    
+    enum SelectionMode {
+        case none
+        case player
+        case exit
+        case checkpoint
+    }
 
-    private var width = 32
-    private var height = 64
+    private var width = 48
+    private var height = 48
     private var wallChance: Float = 0.48
-    private var decompositionMode: PolygonDecompositionStrategy = .polygon
+    private var decompositionMode: PolygonDecompositionStrategy = .rectangle
     
     var level = Level() {
         didSet {
             drawView.draw(level: level)
+        }
+    }
+    
+    var selectionMode: SelectionMode = .none {
+        didSet {
+            itemPlayerButton.state = .off
+            itemExitButton.state = .off
+            itemCheckpointButton.state = .off
+            
+            switch selectionMode {
+            case .exit: itemExitButton.state = .on
+            case .player: itemPlayerButton.state = .on
+            case .checkpoint: itemCheckpointButton.state = .on
+            default: break
+            }
         }
     }
     
@@ -32,7 +54,15 @@ class ViewController: NSViewController {
     @IBOutlet weak var rectangleRadioButton: NSButton!
     @IBOutlet weak var polygonRadioButton: NSButton!
     
-    @IBOutlet weak var drawView: DebugDrawView!
+    @IBOutlet weak var itemPlayerButton: NSButton!
+    @IBOutlet weak var itemExitButton: NSButton!
+    @IBOutlet weak var itemCheckpointButton: NSButton!
+    
+    @IBOutlet weak var drawView: DebugDrawView! {
+        didSet {
+            drawView.delegate = self
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +76,30 @@ class ViewController: NSViewController {
     override var representedObject: Any? {
         didSet {
             // Update the view, if already loaded.
+        }
+    }
+    
+    @IBAction func itemPlayerTap(_ sender: Any) {
+        if selectionMode == .player {
+            selectionMode = .none
+        } else {
+            selectionMode = .player
+        }
+    }
+    
+    @IBAction func itemExitTap(_ sender: Any) {
+        if selectionMode == .exit {
+            selectionMode = .none
+        } else {
+            selectionMode = .exit
+        }
+    }
+    
+    @IBAction func itemCheckpointTap(_ sender: Any) {
+        if selectionMode == .checkpoint {
+            selectionMode = .none
+        } else {
+            selectionMode = .checkpoint
         }
     }
     
@@ -81,5 +135,33 @@ class ViewController: NSViewController {
         polygons = polygons.map { $0.map { CGPoint(x: $0.x * CGFloat(width), y: $0.y * CGFloat(height)) } }
         
         self.level = Level(polygons: polygons)
+    }
+}
+
+
+extension ViewController: DebugDrawViewInteractionDelegate {
+    
+    func didTap(at point: CGPoint) {
+        let convertedPoint = CGPoint(x: point.x * CGFloat(width),
+                                     y: point.y * CGFloat(height))
+        switch selectionMode {
+        case .none:
+            break
+        case .player:
+            if level.playerPosition == nil {
+                level.playerPosition = convertedPoint
+            } else {
+                level.playerPosition = nil
+            }
+        case .exit:
+            if level.exitPosition == nil {
+                level.exitPosition = convertedPoint
+            } else {
+                level.exitPosition = nil
+            }
+        case .checkpoint:
+            level.checkpoints.append(convertedPoint)
+        }
+        drawView.update()
     }
 }

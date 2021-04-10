@@ -6,7 +6,7 @@
 //  Copyright © 2016 zero. All rights reserved.
 //
 
-public struct Point: Hashable {
+public struct TPoint: Hashable {
     
     public let x: Double
     public let y: Double

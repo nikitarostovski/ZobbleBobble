@@ -14,6 +14,11 @@ class Level {
     var width: CGFloat = 0
     var height: CGFloat = 0
     
+    var playerPosition: CGPoint?
+    var exitPosition: CGPoint?
+    
+    var checkpoints = [CGPoint]()
+    
     var polygons = [Polygon]() {
         didSet {
             updateSize()

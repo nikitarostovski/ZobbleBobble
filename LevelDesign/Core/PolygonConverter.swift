@@ -15,7 +15,9 @@ final class PolygonConverter {
     }
     
     static func makePolygons(from matrix: Matrix, width: Int, height: Int) -> [Polygon] {
-        return makePolygonWalls(from: matrix, width: width, height: height)
+        let w = makeRectWalls(from: matrix, width: width, height: height)
+        let p = makePolygonWalls(from: matrix, width: width, height: height)
+        return w + p
     }
     
     // MARK: - Private
@@ -86,27 +88,47 @@ final class PolygonConverter {
                     }
                 }
             }
-            if island.count > 2 {
-                islands.append(island)
+            islands.append(island)
+        }
+        
+        var islandsCovered = [[Polygon]]()
+        for island in islands {
+            var islandCovered = [Polygon]()
+            for polygon in island {
+                islandCovered.append([
+                    CGPoint(x: CGFloat(polygon.x), y: CGFloat(polygon.y)),
+                    CGPoint(x: CGFloat(polygon.x) + 1, y: CGFloat(polygon.y)),
+                    CGPoint(x: CGFloat(polygon.x) + 1, y: CGFloat(polygon.y) + 1),
+                    CGPoint(x: CGFloat(polygon.x), y: CGFloat(polygon.y) + 1)
+                ])
             }
+            islandsCovered.append(islandCovered)
         }
         
         var walls = [Polygon]()
-        for island in islands {
+        print("___ \(islands.count)")
+        for island in islandsCovered {
             guard island.count > 0 else { continue }
-            var polygon: Polygon
-            if false, let first = island.first {
-                polygon = [
-                    CGPoint(x: CGFloat(first.x), y: CGFloat(first.y)),
-                    CGPoint(x: CGFloat(first.x) + 1, y: CGFloat(first.y)),
-                    CGPoint(x: CGFloat(first.x) + 1, y: CGFloat(first.y) + 1),
-                    CGPoint(x: CGFloat(first.x), y: CGFloat(first.y) + 1)
-                ]
-            } else {
-                polygon = island.map { CGPoint(x: $0.x, y: $0.y) }
-            }
-            polygon = polygon.map { CGPoint(x: $0.x / CGFloat(width), y: $0.y / CGFloat(height)) }
+            print("new island")
+            let i = island.flatMap { $0 }.map { [Double($0.x), Double($0.y)] }
+            
+            let h = Hull(concavity: 0.5)
+            guard let hullResult = h.hull(i, nil) as? [[Double]] else { return [] }
+            
+            
+            
+            let polygon = hullResult.map { CGPoint(x: CGFloat($0[0]) / CGFloat(width), y: CGFloat($0[1]) / CGFloat(height)) }
+            
             walls.append(polygon)
+            
+//            for p in polygon {
+//                print(p)
+//            }
+            
+//            var polygon = getBoudns(of: island)
+            
+//            polygon = polygon.map { CGPoint(x: $0.x / CGFloat(width), y: $0.y / CGFloat(height)) }
+//            walls.append(polygon)
             
             
 //            island.forEach {
@@ -131,15 +153,15 @@ final class PolygonConverter {
     
     private static func getTriangles(of polygon: Polygon) -> [Polygon] {
         var result = [Polygon]()
-        let triangles = triangulate(polygon.map { Point(x: Double($0.x), y: Double($0.y)) })
-        for triangle in triangles {
-            let points: Polygon = [
-                triangle.point1,
-                triangle.point2,
-                triangle.point3
-            ].map { CGPoint(x: $0.x, y: $0.y) }
-            result.append(points)
-        }
+//        let triangles = triangulate(polygon.map { TPoint(x: Double($0.x), y: Double($0.y)) })
+//        for triangle in triangles {
+//            let points: Polygon = [
+//                triangle.point1,
+//                triangle.point2,
+//                triangle.point3
+//            ].map { CGPoint(x: $0.x, y: $0.y) }
+//            result.append(points)
+//        }
         return result
     }
     

@@ -9,13 +9,13 @@
 /// A simple struct representing 3 points
 public struct Triangle: Hashable {
     
-    public init(point1: Point, point2: Point, point3: Point) {
+    public init(point1: TPoint, point2: TPoint, point3: TPoint) {
         self.point1 = point1
         self.point2 = point2
         self.point3 = point3
     }
     
-    public let point1: Point
-    public let point2: Point
-    public let point3: Point
+    public let point1: TPoint
+    public let point2: TPoint
+    public let point3: TPoint
 }
