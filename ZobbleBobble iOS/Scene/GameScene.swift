@@ -9,10 +9,9 @@ import SpriteKit
 
 class GameScene: SKScene {
     
-    private let matrixSize = 32
-    
     let sceneCamera = SKCameraNode()
     
+    let contactProcessor = ContactProcessor()
     var terrain: Terrain!
     var player: Unit!
     
@@ -28,7 +27,6 @@ class GameScene: SKScene {
     }
     
     func resetScene() {
-        physicsWorld.contactDelegate = self
         previousCameraScale = CGFloat()
         cameraScale = 1
         removeAllChildren()
@@ -64,22 +62,10 @@ class GameScene: SKScene {
         //        sceneCamera.setScale(1.05)
         
         // physics
+        physicsWorld.contactDelegate = contactProcessor
         physicsWorld.gravity = .zero
         //        physicsWorld.speed = 1.2
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
-    }
-}
-
-extension GameScene: SKPhysicsContactDelegate {
-    
-    func didBegin(_ contact: SKPhysicsContact) {
-        print(contact.collisionImpulse)
-        if contact.collisionImpulse > 0.05 {
-            if let wall = (contact.bodyA.node as? Wall) ?? (contact.bodyB.node as? Wall) {
-                let impulse = CGVector(dx: contact.contactNormal.dx * contact.collisionImpulse, dy: contact.contactNormal.dy * contact.collisionImpulse)
-                wall.explode(impulse: impulse)
-            }
-        }
     }
 }
 

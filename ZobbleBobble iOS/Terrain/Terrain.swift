@@ -28,10 +28,18 @@ class Terrain: SKNode {
         
         super.init()
         
-        walls.forEach { addChild($0) }
+        walls.forEach { $0.terrain = self; addChild($0) }
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func replace(wall: Wall, with walls: [Wall]) {
+        wall.destroy()
+        self.walls.removeAll(where: { $0 === wall })
+        self.walls.append(contentsOf: walls)
+
+        walls.forEach { $0.terrain = self; addChild($0) }
     }
 }
