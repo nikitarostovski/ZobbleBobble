@@ -24,6 +24,7 @@ class Missle: SKShapeNode {
         
         body.categoryBitMask = Category.missle.rawValue
         body.collisionBitMask = Category.wall.rawValue
+        body.contactTestBitMask = Category.wall.rawValue
         
         physicsBody = body
     }

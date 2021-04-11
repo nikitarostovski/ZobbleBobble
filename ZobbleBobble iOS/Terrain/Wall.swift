@@ -29,7 +29,12 @@ class Wall: SKShapeNode {
         
         body.categoryBitMask = Category.wall.rawValue
         body.collisionBitMask = Category.unit.rawValue
+        body.contactTestBitMask = Category.missle.rawValue
         
         physicsBody = body
+    }
+    
+    public func explode(impulse: CGVector) {
+        
     }
 }
