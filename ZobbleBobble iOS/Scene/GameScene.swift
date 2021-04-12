@@ -38,8 +38,8 @@ class GameScene: SKScene {
             return
         }
         // terrain
-        let terrainSize = CGSize(width: min(size.width, size.height),
-                                 height: min(size.width, size.height))
+        let terrainSize = CGSize(width: min(size.width, size.height) * 3,
+                                 height: min(size.width, size.height) * 3)
         
         let polygons = level.polygons.map { $0.map { CGPoint(x: $0.x * terrainSize.width / level.width,
                                                              y: $0.y * terrainSize.height / level.height) } }

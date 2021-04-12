@@ -25,6 +25,29 @@
 		114341F72604CA14007F9891 /* PolygonConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114341E92604CA14007F9891 /* PolygonConverter.swift */; };
 		117D391E262221DF00E4B3A8 /* Level.lvl in Resources */ = {isa = PBXBuildFile; fileRef = 117D391D262221DF00E4B3A8 /* Level.lvl */; };
 		117D39212622221D00E4B3A8 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11271CE8260207560042D3A3 /* Level.swift */; };
+		117D39D726234C9A00E4B3A8 /* FortuneSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39BE26234C9A00E4B3A8 /* FortuneSite.swift */; };
+		117D39D826234C9A00E4B3A8 /* VEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39BF26234C9A00E4B3A8 /* VEdge.swift */; };
+		117D39D926234C9A00E4B3A8 /* HashSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C026234C9A00E4B3A8 /* HashSet.swift */; };
+		117D39DA26234C9A00E4B3A8 /* VPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C126234C9A00E4B3A8 /* VPoint.swift */; };
+		117D39DB26234C9A00E4B3A8 /* BorderInfoAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C226234C9A00E4B3A8 /* BorderInfoAggregator.swift */; };
+		117D39DC26234C9A00E4B3A8 /* MinHeap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C326234C9A00E4B3A8 /* MinHeap.swift */; };
+		117D39DD26234C9A00E4B3A8 /* FortuneCircleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C426234C9A00E4B3A8 /* FortuneCircleEvent.swift */; };
+		117D39DE26234C9A00E4B3A8 /* FortuneEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C526234C9A00E4B3A8 /* FortuneEvent.swift */; };
+		117D39DF26234C9A00E4B3A8 /* FortuneSiteEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C626234C9A00E4B3A8 /* FortuneSiteEvent.swift */; };
+		117D39E026234C9A00E4B3A8 /* RBTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C726234C9A00E4B3A8 /* RBTree.swift */; };
+		117D39E126234C9A00E4B3A8 /* BeachLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39C826234C9A00E4B3A8 /* BeachLine.swift */; };
+		117D39E226234C9A00E4B3A8 /* PolygonCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CA26234C9A00E4B3A8 /* PolygonCalculation.swift */; };
+		117D39E326234C9A00E4B3A8 /* ParabolaMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CB26234C9A00E4B3A8 /* ParabolaMath.swift */; };
+		117D39E426234C9A00E4B3A8 /* Approx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CC26234C9A00E4B3A8 /* Approx.swift */; };
+		117D39E526234C9A00E4B3A8 /* ClipRectInternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CD26234C9A00E4B3A8 /* ClipRectInternal.swift */; };
+		117D39E626234C9A00E4B3A8 /* ClipBorderEdgeCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CE26234C9A00E4B3A8 /* ClipBorderEdgeCalculation.swift */; };
+		117D39E726234C9A00E4B3A8 /* FortunesAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39CF26234C9A00E4B3A8 /* FortunesAlgorithm.swift */; };
+		117D39E826234C9A00E4B3A8 /* LineSegmentIntersection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D026234C9A00E4B3A8 /* LineSegmentIntersection.swift */; };
+		117D39E926234C9A00E4B3A8 /* Edge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D226234C9A00E4B3A8 /* Edge.swift */; };
+		117D39EA26234C9A00E4B3A8 /* Voronoi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D326234C9A00E4B3A8 /* Voronoi.swift */; };
+		117D39EB26234C9A00E4B3A8 /* SitePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D426234C9A00E4B3A8 /* SitePoint.swift */; };
+		117D39EC26234C9A00E4B3A8 /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D526234C9A00E4B3A8 /* Site.swift */; };
+		117D39ED26234C9A00E4B3A8 /* ClipRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117D39D626234C9A00E4B3A8 /* ClipRect.swift */; };
 		11A03B6D25D9CD9400DFF7C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11A03B6C25D9CD9400DFF7C3 /* LaunchScreen.storyboard */; };
 		11A03B7325DA88A400DFF7C3 /* Missle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A03B7225DA88A400DFF7C3 /* Missle.swift */; };
 		11A03B7C25DA8C7300DFF7C3 /* ControlPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A03B7B25DA8C7300DFF7C3 /* ControlPad.swift */; };
@@ -63,6 +86,29 @@
 		114341E82604CA14007F9891 /* ConvexHull.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConvexHull.swift; sourceTree = "<group>"; };
 		114341E92604CA14007F9891 /* PolygonConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonConverter.swift; sourceTree = "<group>"; };
 		117D391D262221DF00E4B3A8 /* Level.lvl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Level.lvl; sourceTree = "<group>"; };
+		117D39BE26234C9A00E4B3A8 /* FortuneSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneSite.swift; sourceTree = "<group>"; };
+		117D39BF26234C9A00E4B3A8 /* VEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VEdge.swift; sourceTree = "<group>"; };
+		117D39C026234C9A00E4B3A8 /* HashSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashSet.swift; sourceTree = "<group>"; };
+		117D39C126234C9A00E4B3A8 /* VPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPoint.swift; sourceTree = "<group>"; };
+		117D39C226234C9A00E4B3A8 /* BorderInfoAggregator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderInfoAggregator.swift; sourceTree = "<group>"; };
+		117D39C326234C9A00E4B3A8 /* MinHeap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MinHeap.swift; sourceTree = "<group>"; };
+		117D39C426234C9A00E4B3A8 /* FortuneCircleEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneCircleEvent.swift; sourceTree = "<group>"; };
+		117D39C526234C9A00E4B3A8 /* FortuneEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneEvent.swift; sourceTree = "<group>"; };
+		117D39C626234C9A00E4B3A8 /* FortuneSiteEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneSiteEvent.swift; sourceTree = "<group>"; };
+		117D39C726234C9A00E4B3A8 /* RBTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBTree.swift; sourceTree = "<group>"; };
+		117D39C826234C9A00E4B3A8 /* BeachLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeachLine.swift; sourceTree = "<group>"; };
+		117D39CA26234C9A00E4B3A8 /* PolygonCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonCalculation.swift; sourceTree = "<group>"; };
+		117D39CB26234C9A00E4B3A8 /* ParabolaMath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParabolaMath.swift; sourceTree = "<group>"; };
+		117D39CC26234C9A00E4B3A8 /* Approx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Approx.swift; sourceTree = "<group>"; };
+		117D39CD26234C9A00E4B3A8 /* ClipRectInternal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipRectInternal.swift; sourceTree = "<group>"; };
+		117D39CE26234C9A00E4B3A8 /* ClipBorderEdgeCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipBorderEdgeCalculation.swift; sourceTree = "<group>"; };
+		117D39CF26234C9A00E4B3A8 /* FortunesAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortunesAlgorithm.swift; sourceTree = "<group>"; };
+		117D39D026234C9A00E4B3A8 /* LineSegmentIntersection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineSegmentIntersection.swift; sourceTree = "<group>"; };
+		117D39D226234C9A00E4B3A8 /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
+		117D39D326234C9A00E4B3A8 /* Voronoi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Voronoi.swift; sourceTree = "<group>"; };
+		117D39D426234C9A00E4B3A8 /* SitePoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SitePoint.swift; sourceTree = "<group>"; };
+		117D39D526234C9A00E4B3A8 /* Site.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
+		117D39D626234C9A00E4B3A8 /* ClipRect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipRect.swift; sourceTree = "<group>"; };
 		11A03B6C25D9CD9400DFF7C3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		11A03B7225DA88A400DFF7C3 /* Missle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missle.swift; sourceTree = "<group>"; };
 		11A03B7B25DA8C7300DFF7C3 /* ControlPad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPad.swift; sourceTree = "<group>"; };
@@ -151,6 +197,68 @@
 			path = Resource;
 			sourceTree = "<group>";
 		};
+		117D39BB26234C9A00E4B3A8 /* Voronoi */ = {
+			isa = PBXGroup;
+			children = (
+				117D39BC26234C9A00E4B3A8 /* Internal */,
+				117D39D126234C9A00E4B3A8 /* Public */,
+			);
+			path = Voronoi;
+			sourceTree = "<group>";
+		};
+		117D39BC26234C9A00E4B3A8 /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				117D39BD26234C9A00E4B3A8 /* Structures */,
+				117D39C926234C9A00E4B3A8 /* Static */,
+			);
+			path = Internal;
+			sourceTree = "<group>";
+		};
+		117D39BD26234C9A00E4B3A8 /* Structures */ = {
+			isa = PBXGroup;
+			children = (
+				117D39BE26234C9A00E4B3A8 /* FortuneSite.swift */,
+				117D39BF26234C9A00E4B3A8 /* VEdge.swift */,
+				117D39C026234C9A00E4B3A8 /* HashSet.swift */,
+				117D39C126234C9A00E4B3A8 /* VPoint.swift */,
+				117D39C226234C9A00E4B3A8 /* BorderInfoAggregator.swift */,
+				117D39C326234C9A00E4B3A8 /* MinHeap.swift */,
+				117D39C426234C9A00E4B3A8 /* FortuneCircleEvent.swift */,
+				117D39C526234C9A00E4B3A8 /* FortuneEvent.swift */,
+				117D39C626234C9A00E4B3A8 /* FortuneSiteEvent.swift */,
+				117D39C726234C9A00E4B3A8 /* RBTree.swift */,
+				117D39C826234C9A00E4B3A8 /* BeachLine.swift */,
+			);
+			path = Structures;
+			sourceTree = "<group>";
+		};
+		117D39C926234C9A00E4B3A8 /* Static */ = {
+			isa = PBXGroup;
+			children = (
+				117D39CA26234C9A00E4B3A8 /* PolygonCalculation.swift */,
+				117D39CB26234C9A00E4B3A8 /* ParabolaMath.swift */,
+				117D39CC26234C9A00E4B3A8 /* Approx.swift */,
+				117D39CD26234C9A00E4B3A8 /* ClipRectInternal.swift */,
+				117D39CE26234C9A00E4B3A8 /* ClipBorderEdgeCalculation.swift */,
+				117D39CF26234C9A00E4B3A8 /* FortunesAlgorithm.swift */,
+				117D39D026234C9A00E4B3A8 /* LineSegmentIntersection.swift */,
+			);
+			path = Static;
+			sourceTree = "<group>";
+		};
+		117D39D126234C9A00E4B3A8 /* Public */ = {
+			isa = PBXGroup;
+			children = (
+				117D39D226234C9A00E4B3A8 /* Edge.swift */,
+				117D39D326234C9A00E4B3A8 /* Voronoi.swift */,
+				117D39D426234C9A00E4B3A8 /* SitePoint.swift */,
+				117D39D526234C9A00E4B3A8 /* Site.swift */,
+				117D39D626234C9A00E4B3A8 /* ClipRect.swift */,
+			);
+			path = Public;
+			sourceTree = "<group>";
+		};
 		11A03B7725DA88AA00DFF7C3 /* Unit */ = {
 			isa = PBXGroup;
 			children = (
@@ -174,6 +282,7 @@
 		11A03B7925DA890300DFF7C3 /* Terrain */ = {
 			isa = PBXGroup;
 			children = (
+				117D39BB26234C9A00E4B3A8 /* Voronoi */,
 				11D113FC25D9C2390063F332 /* Terrain.swift */,
 				11D113F825D9C2030063F332 /* Wall.swift */,
 			);
@@ -365,14 +474,37 @@
 			files = (
 				11D113F525D9C1F70063F332 /* Unit.swift in Sources */,
 				11D113F125D9C0810063F332 /* GameViewController.swift in Sources */,
+				117D39DB26234C9A00E4B3A8 /* BorderInfoAggregator.swift in Sources */,
 				11206CB0262328A10039D545 /* ContactProcessor.swift in Sources */,
 				11D113FD25D9C2390063F332 /* Terrain.swift in Sources */,
+				117D39DA26234C9A00E4B3A8 /* VPoint.swift in Sources */,
 				11A03B7C25DA8C7300DFF7C3 /* ControlPad.swift in Sources */,
+				117D39E726234C9A00E4B3A8 /* FortunesAlgorithm.swift in Sources */,
+				117D39E926234C9A00E4B3A8 /* Edge.swift in Sources */,
+				117D39EB26234C9A00E4B3A8 /* SitePoint.swift in Sources */,
 				11D113ED25D9C0330063F332 /* GameScene.swift in Sources */,
 				11D113F925D9C2030063F332 /* Wall.swift in Sources */,
+				117D39E326234C9A00E4B3A8 /* ParabolaMath.swift in Sources */,
 				11A56D0325DA923500E6B1E1 /* Category.swift in Sources */,
+				117D39E226234C9A00E4B3A8 /* PolygonCalculation.swift in Sources */,
+				117D39E026234C9A00E4B3A8 /* RBTree.swift in Sources */,
+				117D39E126234C9A00E4B3A8 /* BeachLine.swift in Sources */,
+				117D39D726234C9A00E4B3A8 /* FortuneSite.swift in Sources */,
+				117D39DF26234C9A00E4B3A8 /* FortuneSiteEvent.swift in Sources */,
+				117D39ED26234C9A00E4B3A8 /* ClipRect.swift in Sources */,
+				117D39E526234C9A00E4B3A8 /* ClipRectInternal.swift in Sources */,
 				11A03B7325DA88A400DFF7C3 /* Missle.swift in Sources */,
+				117D39E426234C9A00E4B3A8 /* Approx.swift in Sources */,
+				117D39DD26234C9A00E4B3A8 /* FortuneCircleEvent.swift in Sources */,
+				117D39E826234C9A00E4B3A8 /* LineSegmentIntersection.swift in Sources */,
+				117D39DE26234C9A00E4B3A8 /* FortuneEvent.swift in Sources */,
+				117D39DC26234C9A00E4B3A8 /* MinHeap.swift in Sources */,
+				117D39D826234C9A00E4B3A8 /* VEdge.swift in Sources */,
+				117D39EA26234C9A00E4B3A8 /* Voronoi.swift in Sources */,
+				117D39E626234C9A00E4B3A8 /* ClipBorderEdgeCalculation.swift in Sources */,
 				117D39212622221D00E4B3A8 /* Level.swift in Sources */,
+				117D39D926234C9A00E4B3A8 /* HashSet.swift in Sources */,
+				117D39EC26234C9A00E4B3A8 /* Site.swift in Sources */,
 				11D113AA25D9A7B60063F332 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

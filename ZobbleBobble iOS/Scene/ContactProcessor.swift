@@ -11,10 +11,10 @@ class ContactProcessor: NSObject, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact) {
 //        print(contact.collisionImpulse)
+        
         if contact.collisionImpulse > 0.05 {
             if let wall = (contact.bodyA.node as? Wall) ?? (contact.bodyB.node as? Wall) {
-                let impulse = CGVector(dx: contact.contactNormal.dx * contact.collisionImpulse, dy: contact.contactNormal.dy * contact.collisionImpulse)
-                wall.explode(impulse: impulse)
+                wall.explode(impulse: contact.collisionImpulse, normal: contact.contactNormal, contactPoint: contact.contactPoint)
             }
         }
     }
