@@ -137,16 +137,18 @@ class ViewController: NSViewController {
             decompositionMode = .polygon
         }
         
-        let generatedData = MatrixGenerator.generate(width: width, height: height, unitCount: 3, wallChance: wallChance)
-        let matrix = generatedData.0
+//        let generatedData = MatrixGenerator.generate(width: width, height: height, unitCount: 3, wallChance: wallChance)
+//        let matrix = generatedData.0
         
         var polygons: [Polygon]
-        switch decompositionMode {
-        case .rectangle:
-            polygons = PolygonConverter.makeRects(from: matrix, width: width, height: height)
-        case .polygon:
-            polygons = PolygonConverter.makePolygons(from: matrix, width: width, height: height)
-        }
+//        switch decompositionMode {
+//        case .rectangle:
+//            polygons = PolygonConverter.makeRects(from: matrix, width: width, height: height)
+//        case .polygon:
+//            polygons = PolygonConverter.makePolygons(from: matrix, width: width, height: height)
+//        }
+        
+        polygons = MapGenerator.make(width: width, height: height, unitCount: 3, wallChance: wallChance)
         
         polygons = polygons.map { $0.map { CGPoint(x: $0.x * CGFloat(width), y: $0.y * CGFloat(height)) } }
         
