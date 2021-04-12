@@ -20,28 +20,12 @@ class Level: Codable {
     
     var checkpoints = [CGPoint]()
     
-    var polygons = [Polygon]() {
-        didSet {
-            updateSize()
-        }
-    }
+    var polygons = [Polygon]()
     
-    init(polygons: [Polygon] = []) {
+    init(width: CGFloat, height: CGFloat, polygons: [Polygon] = []) {
+        self.width = width
+        self.height = height
         self.polygons = polygons
-        updateSize()
-    }
-    
-    private func updateSize() {
-        var w: CGFloat = 0
-        var h: CGFloat = 0
-        
-        self.polygons.forEach {
-            w = max(w, $0.max(by: { $0.x > $1.x })?.x ?? 0)
-            h = max(h, $0.max(by: { $0.y > $1.y })?.y ?? 0)
-        }
-        
-        self.width = w + 1
-        self.height = h + 1
     }
     
     static func load(json: Data) -> Self? {

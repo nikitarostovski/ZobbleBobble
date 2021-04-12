@@ -76,6 +76,32 @@
 		11B5167E262436D80005E5B3 /* ClipRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B51651262436D80005E5B3 /* ClipRect.swift */; };
 		11B5167F262436D80005E5B3 /* ClipRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B51651262436D80005E5B3 /* ClipRect.swift */; };
 		11B51683262437100005E5B3 /* MapGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B51682262437100005E5B3 /* MapGenerator.swift */; };
+		11B5169426244A790005E5B3 /* Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168726244A790005E5B3 /* Clipper.swift */; };
+		11B5169526244A790005E5B3 /* Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168726244A790005E5B3 /* Clipper.swift */; };
+		11B5169626244A790005E5B3 /* SwiftClipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168826244A790005E5B3 /* SwiftClipper.swift */; };
+		11B5169726244A790005E5B3 /* SwiftClipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168826244A790005E5B3 /* SwiftClipper.swift */; };
+		11B5169826244A790005E5B3 /* Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168926244A790005E5B3 /* Offsetter.swift */; };
+		11B5169926244A790005E5B3 /* Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168926244A790005E5B3 /* Offsetter.swift */; };
+		11B5169A26244A790005E5B3 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168A26244A790005E5B3 /* Rect.swift */; };
+		11B5169B26244A790005E5B3 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168A26244A790005E5B3 /* Rect.swift */; };
+		11B5169C26244A790005E5B3 /* Path+Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168B26244A790005E5B3 /* Path+Clipper.swift */; };
+		11B5169D26244A790005E5B3 /* Path+Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168B26244A790005E5B3 /* Path+Clipper.swift */; };
+		11B5169E26244A790005E5B3 /* Path+Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168C26244A790005E5B3 /* Path+Offsetter.swift */; };
+		11B5169F26244A790005E5B3 /* Path+Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168C26244A790005E5B3 /* Path+Offsetter.swift */; };
+		11B516A026244A790005E5B3 /* ClipperBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168D26244A790005E5B3 /* ClipperBase.swift */; };
+		11B516A126244A790005E5B3 /* ClipperBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168D26244A790005E5B3 /* ClipperBase.swift */; };
+		11B516A226244A790005E5B3 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168E26244A790005E5B3 /* Point.swift */; };
+		11B516A326244A790005E5B3 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168E26244A790005E5B3 /* Point.swift */; };
+		11B516A426244A790005E5B3 /* Defines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168F26244A790005E5B3 /* Defines.swift */; };
+		11B516A526244A790005E5B3 /* Defines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5168F26244A790005E5B3 /* Defines.swift */; };
+		11B516A626244A790005E5B3 /* PolyNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169026244A790005E5B3 /* PolyNode.swift */; };
+		11B516A726244A790005E5B3 /* PolyNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169026244A790005E5B3 /* PolyNode.swift */; };
+		11B516A826244A790005E5B3 /* OutRec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169126244A790005E5B3 /* OutRec.swift */; };
+		11B516A926244A790005E5B3 /* OutRec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169126244A790005E5B3 /* OutRec.swift */; };
+		11B516AA26244A790005E5B3 /* Path+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169226244A790005E5B3 /* Path+Geometry.swift */; };
+		11B516AB26244A790005E5B3 /* Path+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169226244A790005E5B3 /* Path+Geometry.swift */; };
+		11B516AC26244A790005E5B3 /* TEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169326244A790005E5B3 /* TEdge.swift */; };
+		11B516AD26244A790005E5B3 /* TEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169326244A790005E5B3 /* TEdge.swift */; };
 		11D113AA25D9A7B60063F332 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D113A925D9A7B60063F332 /* AppDelegate.swift */; };
 		11D113B725D9A7B60063F332 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11D113A125D9A7B60063F332 /* Assets.xcassets */; };
 		11D113ED25D9C0330063F332 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D113EC25D9C0330063F332 /* GameScene.swift */; };
@@ -138,6 +164,19 @@
 		11B51650262436D80005E5B3 /* Site.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
 		11B51651262436D80005E5B3 /* ClipRect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipRect.swift; sourceTree = "<group>"; };
 		11B51682262437100005E5B3 /* MapGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapGenerator.swift; sourceTree = "<group>"; };
+		11B5168726244A790005E5B3 /* Clipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clipper.swift; sourceTree = "<group>"; };
+		11B5168826244A790005E5B3 /* SwiftClipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftClipper.swift; sourceTree = "<group>"; };
+		11B5168926244A790005E5B3 /* Offsetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Offsetter.swift; sourceTree = "<group>"; };
+		11B5168A26244A790005E5B3 /* Rect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rect.swift; sourceTree = "<group>"; };
+		11B5168B26244A790005E5B3 /* Path+Clipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Clipper.swift"; sourceTree = "<group>"; };
+		11B5168C26244A790005E5B3 /* Path+Offsetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Offsetter.swift"; sourceTree = "<group>"; };
+		11B5168D26244A790005E5B3 /* ClipperBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipperBase.swift; sourceTree = "<group>"; };
+		11B5168E26244A790005E5B3 /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
+		11B5168F26244A790005E5B3 /* Defines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Defines.swift; sourceTree = "<group>"; };
+		11B5169026244A790005E5B3 /* PolyNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolyNode.swift; sourceTree = "<group>"; };
+		11B5169126244A790005E5B3 /* OutRec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutRec.swift; sourceTree = "<group>"; };
+		11B5169226244A790005E5B3 /* Path+Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Geometry.swift"; sourceTree = "<group>"; };
+		11B5169326244A790005E5B3 /* TEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TEdge.swift; sourceTree = "<group>"; };
 		11D113A125D9A7B60063F332 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11D113A625D9A7B60063F332 /* ZobbleBobble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZobbleBobble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11D113A925D9A7B60063F332 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -313,6 +352,26 @@
 			path = Public;
 			sourceTree = "<group>";
 		};
+		11B5168626244A790005E5B3 /* SwiftClipper */ = {
+			isa = PBXGroup;
+			children = (
+				11B5168726244A790005E5B3 /* Clipper.swift */,
+				11B5168826244A790005E5B3 /* SwiftClipper.swift */,
+				11B5168926244A790005E5B3 /* Offsetter.swift */,
+				11B5168A26244A790005E5B3 /* Rect.swift */,
+				11B5168B26244A790005E5B3 /* Path+Clipper.swift */,
+				11B5168C26244A790005E5B3 /* Path+Offsetter.swift */,
+				11B5168D26244A790005E5B3 /* ClipperBase.swift */,
+				11B5168E26244A790005E5B3 /* Point.swift */,
+				11B5168F26244A790005E5B3 /* Defines.swift */,
+				11B5169026244A790005E5B3 /* PolyNode.swift */,
+				11B5169126244A790005E5B3 /* OutRec.swift */,
+				11B5169226244A790005E5B3 /* Path+Geometry.swift */,
+				11B5169326244A790005E5B3 /* TEdge.swift */,
+			);
+			path = SwiftClipper;
+			sourceTree = "<group>";
+		};
 		11D1139825D9A7B50063F332 = {
 			isa = PBXGroup;
 			children = (
@@ -326,6 +385,7 @@
 		11D1139D25D9A7B50063F332 /* ZobbleBobble Shared */ = {
 			isa = PBXGroup;
 			children = (
+				11B5168626244A790005E5B3 /* SwiftClipper */,
 				11B51636262436D80005E5B3 /* Voronoi */,
 				11271CE7260207420042D3A3 /* Model */,
 				11D113A125D9A7B60063F332 /* Assets.xcassets */,
@@ -479,10 +539,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				11B51659262436D80005E5B3 /* VPoint.swift in Sources */,
+				11B516AD26244A790005E5B3 /* TEdge.swift in Sources */,
 				11271CE9260207560042D3A3 /* Level.swift in Sources */,
+				11B516A526244A790005E5B3 /* Defines.swift in Sources */,
 				11B5165F262436D80005E5B3 /* FortuneCircleEvent.swift in Sources */,
 				114341EF2604CA14007F9891 /* Format.swift in Sources */,
+				11B5169F26244A790005E5B3 /* Path+Offsetter.swift in Sources */,
+				11B5169D26244A790005E5B3 /* Path+Clipper.swift in Sources */,
 				114341F62604CA14007F9891 /* ConvexHull.swift in Sources */,
+				11B5169B26244A790005E5B3 /* Rect.swift in Sources */,
 				11271CD8260206F70042D3A3 /* ViewController.swift in Sources */,
 				11B51661262436D80005E5B3 /* FortuneEvent.swift in Sources */,
 				11B51679262436D80005E5B3 /* Voronoi.swift in Sources */,
@@ -492,14 +557,19 @@
 				11B51653262436D80005E5B3 /* FortuneSite.swift in Sources */,
 				11271CEF26020BA50042D3A3 /* DebugDrawView.swift in Sources */,
 				11B51669262436D80005E5B3 /* PolygonCalculation.swift in Sources */,
+				11B516AB26244A790005E5B3 /* Path+Geometry.swift in Sources */,
 				11B51657262436D80005E5B3 /* HashSet.swift in Sources */,
 				11271CD6260206F70042D3A3 /* AppDelegate.swift in Sources */,
 				114341F22604CA14007F9891 /* Intersect.swift in Sources */,
 				11B5167B262436D80005E5B3 /* SitePoint.swift in Sources */,
 				114341F02604CA14007F9891 /* HullHelper.swift in Sources */,
+				11B516A126244A790005E5B3 /* ClipperBase.swift in Sources */,
 				11B51655262436D80005E5B3 /* VEdge.swift in Sources */,
+				11B5169926244A790005E5B3 /* Offsetter.swift in Sources */,
 				11B5165D262436D80005E5B3 /* MinHeap.swift in Sources */,
+				11B5169526244A790005E5B3 /* Clipper.swift in Sources */,
 				11B5167D262436D80005E5B3 /* Site.swift in Sources */,
+				11B516A726244A790005E5B3 /* PolyNode.swift in Sources */,
 				11B51665262436D80005E5B3 /* RBTree.swift in Sources */,
 				11B5166F262436D80005E5B3 /* ClipRectInternal.swift in Sources */,
 				11B51675262436D80005E5B3 /* LineSegmentIntersection.swift in Sources */,
@@ -511,9 +581,12 @@
 				11B51677262436D80005E5B3 /* Edge.swift in Sources */,
 				11B51667262436D80005E5B3 /* BeachLine.swift in Sources */,
 				11B5167F262436D80005E5B3 /* ClipRect.swift in Sources */,
+				11B516A926244A790005E5B3 /* OutRec.swift in Sources */,
 				11B5165B262436D80005E5B3 /* BorderInfoAggregator.swift in Sources */,
 				11B5166D262436D80005E5B3 /* Approx.swift in Sources */,
+				11B516A326244A790005E5B3 /* Point.swift in Sources */,
 				11B51671262436D80005E5B3 /* ClipBorderEdgeCalculation.swift in Sources */,
+				11B5169726244A790005E5B3 /* SwiftClipper.swift in Sources */,
 				114341F52604CA14007F9891 /* Hull.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -522,6 +595,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11B516AA26244A790005E5B3 /* Path+Geometry.swift in Sources */,
 				11B51672262436D80005E5B3 /* FortunesAlgorithm.swift in Sources */,
 				11B5167A262436D80005E5B3 /* SitePoint.swift in Sources */,
 				11B51666262436D80005E5B3 /* BeachLine.swift in Sources */,
@@ -530,32 +604,44 @@
 				11D113F125D9C0810063F332 /* GameViewController.swift in Sources */,
 				11206CB0262328A10039D545 /* ContactProcessor.swift in Sources */,
 				11B5165A262436D80005E5B3 /* BorderInfoAggregator.swift in Sources */,
+				11B5169426244A790005E5B3 /* Clipper.swift in Sources */,
 				11D113FD25D9C2390063F332 /* Terrain.swift in Sources */,
 				11B51676262436D80005E5B3 /* Edge.swift in Sources */,
 				11B51678262436D80005E5B3 /* Voronoi.swift in Sources */,
 				11B51660262436D80005E5B3 /* FortuneEvent.swift in Sources */,
+				11B516AC26244A790005E5B3 /* TEdge.swift in Sources */,
+				11B5169626244A790005E5B3 /* SwiftClipper.swift in Sources */,
 				11B51670262436D80005E5B3 /* ClipBorderEdgeCalculation.swift in Sources */,
+				11B516A626244A790005E5B3 /* PolyNode.swift in Sources */,
 				11A03B7C25DA8C7300DFF7C3 /* ControlPad.swift in Sources */,
+				11B5169C26244A790005E5B3 /* Path+Clipper.swift in Sources */,
 				11B51668262436D80005E5B3 /* PolygonCalculation.swift in Sources */,
 				11B51658262436D80005E5B3 /* VPoint.swift in Sources */,
 				11D113ED25D9C0330063F332 /* GameScene.swift in Sources */,
+				11B516A026244A790005E5B3 /* ClipperBase.swift in Sources */,
 				11D113F925D9C2030063F332 /* Wall.swift in Sources */,
 				11B5165E262436D80005E5B3 /* FortuneCircleEvent.swift in Sources */,
 				11B5166E262436D80005E5B3 /* ClipRectInternal.swift in Sources */,
 				11B51652262436D80005E5B3 /* FortuneSite.swift in Sources */,
 				11A56D0325DA923500E6B1E1 /* Category.swift in Sources */,
+				11B516A426244A790005E5B3 /* Defines.swift in Sources */,
+				11B5169E26244A790005E5B3 /* Path+Offsetter.swift in Sources */,
 				11B5165C262436D80005E5B3 /* MinHeap.swift in Sources */,
 				11A03B7325DA88A400DFF7C3 /* Missle.swift in Sources */,
+				11B5169826244A790005E5B3 /* Offsetter.swift in Sources */,
 				11B5166A262436D80005E5B3 /* ParabolaMath.swift in Sources */,
 				11B51662262436D80005E5B3 /* FortuneSiteEvent.swift in Sources */,
+				11B516A226244A790005E5B3 /* Point.swift in Sources */,
 				11B5167C262436D80005E5B3 /* Site.swift in Sources */,
 				11B5167E262436D80005E5B3 /* ClipRect.swift in Sources */,
 				11B51674262436D80005E5B3 /* LineSegmentIntersection.swift in Sources */,
 				11B51654262436D80005E5B3 /* VEdge.swift in Sources */,
 				11B51656262436D80005E5B3 /* HashSet.swift in Sources */,
 				11B51664262436D80005E5B3 /* RBTree.swift in Sources */,
+				11B5169A26244A790005E5B3 /* Rect.swift in Sources */,
 				117D39212622221D00E4B3A8 /* Level.swift in Sources */,
 				11D113AA25D9A7B60063F332 /* AppDelegate.swift in Sources */,
+				11B516A826244A790005E5B3 /* OutRec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

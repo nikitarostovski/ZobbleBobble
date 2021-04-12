@@ -71,7 +71,6 @@ class Wall: SKShapeNode {
     
     
     private func splitPolygon(_ polygon: Polygon) -> [Polygon] {
-        
         let vpoints = polygon.map { SitePoint<Void>(point: SIMD2<Double>(x: Double($0.x), y: Double($0.y))) }
         
         let minX = polygon.min(by: { $0.x < $1.x })?.x ?? 0
@@ -90,6 +89,14 @@ class Wall: SKShapeNode {
             return site.polygonVertices.map { CGPoint(x: $0.x, y: $0.y) }
         }
         
-        return polygons
+        
+        var clippedPolygons = [Polygon]()
+        let superPolygon = self.polygon
+        for polygon in polygons {
+            guard let intersections  = superPolygon?.intersection(polygon) else { continue }
+            clippedPolygons.append(contentsOf: intersections)
+        }
+        
+        return clippedPolygons
     }
 }

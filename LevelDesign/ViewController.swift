@@ -26,7 +26,7 @@ class ViewController: NSViewController {
     private var wallChance: Float = 0.48
     private var decompositionMode: PolygonDecompositionStrategy = .rectangle
     
-    var level = Level() {
+    var level = Level(width: 0, height: 0) {
         didSet {
             drawView.draw(level: level)
         }
@@ -83,7 +83,7 @@ class ViewController: NSViewController {
     
     @IBAction func saveTap(_ sender: Any) {
         let homePath = FileManager.default.homeDirectoryForCurrentUser
-        let desktopPath = homePath.appendingPathComponent("Dev/Projects/ZobbleBobble/ZobbleBobble iOS/Resource")
+        let desktopPath = homePath.appendingPathComponent("Desktop/ZobbleBobble/ZobbleBobble iOS/Resource")
         let filePath = desktopPath.appendingPathComponent("Level.lvl")
         
         guard let unicodeString = level.save() else { print("Can not make json"); return }
@@ -150,9 +150,9 @@ class ViewController: NSViewController {
         
         polygons = MapGenerator.make(width: width, height: height, unitCount: 3, wallChance: wallChance)
         
-        polygons = polygons.map { $0.map { CGPoint(x: $0.x * CGFloat(width), y: $0.y * CGFloat(height)) } }
+//        polygons = polygons.map { $0.map { CGPoint(x: $0.x * CGFloat(width), y: $0.y * CGFloat(height)) } }
         
-        self.level = Level(polygons: polygons)
+        self.level = Level(width: CGFloat(width), height: CGFloat(height), polygons: polygons)
     }
 }
 
