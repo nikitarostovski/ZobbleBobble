@@ -13,12 +13,12 @@ class Terrain: SKNode {
     
     var walls: [Wall]
     
-    init(polygons: [Polygon]) {
+    init(cells: [Cell]) {
         var walls = [Wall]()
-        polygons.indices.forEach { i in
-            var p = polygons[i]
-            p.append(p.first!)
-            let wall = Wall.make(from: &p)
+        cells.indices.forEach { i in
+//            var p = cells[i].polygon
+//            p.append(p.first!)
+            let wall = Wall.make(from: cells[i])
             walls.append(wall)
         }
         self.walls = walls

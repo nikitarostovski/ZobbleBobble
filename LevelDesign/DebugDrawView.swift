@@ -61,9 +61,10 @@ class DebugDrawView: NSView {
         
         context.setStrokeColor(CGColor.black)
         context.setLineWidth(1)
-        context.setFillColor(NSColor.red.withAlphaComponent(0.5).cgColor)
         
-        for p in level.polygons {
+        for cell in level.cells {
+            context.setFillColor(NSColor(red: cell.color.r, green: cell.color.g, blue: cell.color.b, alpha: 0.5).cgColor)
+            let p = cell.polygon
             guard p.count > 2 else { continue }
             let cp = p + [p.first!]
             let np = cp.map { CGPoint(x: $0.x * bounds.width / level.width,

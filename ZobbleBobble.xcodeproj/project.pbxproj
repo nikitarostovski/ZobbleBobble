@@ -102,6 +102,8 @@
 		11B516AB26244A790005E5B3 /* Path+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169226244A790005E5B3 /* Path+Geometry.swift */; };
 		11B516AC26244A790005E5B3 /* TEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169326244A790005E5B3 /* TEdge.swift */; };
 		11B516AD26244A790005E5B3 /* TEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5169326244A790005E5B3 /* TEdge.swift */; };
+		11B516BF262489AC0005E5B3 /* Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B516BE262489AC0005E5B3 /* Cell.swift */; };
+		11B516C0262489AC0005E5B3 /* Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B516BE262489AC0005E5B3 /* Cell.swift */; };
 		11D113AA25D9A7B60063F332 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D113A925D9A7B60063F332 /* AppDelegate.swift */; };
 		11D113B725D9A7B60063F332 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11D113A125D9A7B60063F332 /* Assets.xcassets */; };
 		11D113ED25D9C0330063F332 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D113EC25D9C0330063F332 /* GameScene.swift */; };
@@ -177,6 +179,7 @@
 		11B5169126244A790005E5B3 /* OutRec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutRec.swift; sourceTree = "<group>"; };
 		11B5169226244A790005E5B3 /* Path+Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Geometry.swift"; sourceTree = "<group>"; };
 		11B5169326244A790005E5B3 /* TEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TEdge.swift; sourceTree = "<group>"; };
+		11B516BE262489AC0005E5B3 /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cell.swift; sourceTree = "<group>"; };
 		11D113A125D9A7B60063F332 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11D113A625D9A7B60063F332 /* ZobbleBobble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZobbleBobble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11D113A925D9A7B60063F332 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -225,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				11271CE8260207560042D3A3 /* Level.swift */,
+				11B516BE262489AC0005E5B3 /* Cell.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -543,6 +547,7 @@
 				11271CE9260207560042D3A3 /* Level.swift in Sources */,
 				11B516A526244A790005E5B3 /* Defines.swift in Sources */,
 				11B5165F262436D80005E5B3 /* FortuneCircleEvent.swift in Sources */,
+				11B516C0262489AC0005E5B3 /* Cell.swift in Sources */,
 				114341EF2604CA14007F9891 /* Format.swift in Sources */,
 				11B5169F26244A790005E5B3 /* Path+Offsetter.swift in Sources */,
 				11B5169D26244A790005E5B3 /* Path+Clipper.swift in Sources */,
@@ -600,6 +605,7 @@
 				11B5167A262436D80005E5B3 /* SitePoint.swift in Sources */,
 				11B51666262436D80005E5B3 /* BeachLine.swift in Sources */,
 				11B5166C262436D80005E5B3 /* Approx.swift in Sources */,
+				11B516BF262489AC0005E5B3 /* Cell.swift in Sources */,
 				11D113F525D9C1F70063F332 /* Unit.swift in Sources */,
 				11D113F125D9C0810063F332 /* GameViewController.swift in Sources */,
 				11206CB0262328A10039D545 /* ContactProcessor.swift in Sources */,
@@ -824,7 +830,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4DZU58EZPK;
 				INFOPLIST_FILE = "ZobbleBobble iOS/Other/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -845,7 +851,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4DZU58EZPK;
 				INFOPLIST_FILE = "ZobbleBobble iOS/Other/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

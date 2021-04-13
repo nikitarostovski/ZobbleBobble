@@ -20,6 +20,7 @@ class Missle: SKShapeNode {
     private func setupPhysics(radius: CGFloat) {
         let body = SKPhysicsBody(circleOfRadius: radius)
         body.isDynamic = true
+        body.affectedByGravity = false
         body.friction = 100
         
         body.categoryBitMask = Category.missle.rawValue

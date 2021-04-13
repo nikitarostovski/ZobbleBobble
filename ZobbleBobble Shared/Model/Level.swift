@@ -20,12 +20,12 @@ class Level: Codable {
     
     var checkpoints = [CGPoint]()
     
-    var polygons = [Polygon]()
+    var cells = [Cell]()
     
-    init(width: CGFloat, height: CGFloat, polygons: [Polygon] = []) {
+    init(width: CGFloat, height: CGFloat, cells: [Cell] = []) {
         self.width = width
         self.height = height
-        self.polygons = polygons
+        self.cells = cells
     }
     
     static func load(json: Data) -> Self? {

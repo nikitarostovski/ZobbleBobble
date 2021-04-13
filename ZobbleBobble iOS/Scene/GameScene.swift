@@ -41,9 +41,17 @@ class GameScene: SKScene {
         let terrainSize = CGSize(width: min(size.width, size.height) * 3,
                                  height: min(size.width, size.height) * 3)
         
-        let polygons = level.polygons.map { $0.map { CGPoint(x: $0.x * terrainSize.width / level.width,
-                                                             y: $0.y * terrainSize.height / level.height) } }
-        terrain = Terrain(polygons: polygons)
+        let cells = level.cells.map { (cell: Cell) -> Cell in
+            let newPolygon = cell.polygon.map {
+                CGPoint(x: $0.x * terrainSize.width / level.width,
+                        y: $0.y * terrainSize.height / level.height)
+            }
+            var newCell = cell
+            newCell.polygon = newPolygon
+            return newCell
+        }
+//        let cells = level.cells
+        terrain = Terrain(cells: cells)
         addChild(terrain)
         
         
@@ -63,7 +71,8 @@ class GameScene: SKScene {
         
         // physics
         physicsWorld.contactDelegate = contactProcessor
-        physicsWorld.gravity = .zero
+        
+        physicsWorld.gravity = CGVector(dx: 0, dy: -4)
         //        physicsWorld.speed = 1.2
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
     }

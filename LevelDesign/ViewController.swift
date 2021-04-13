@@ -148,11 +148,11 @@ class ViewController: NSViewController {
 //            polygons = PolygonConverter.makePolygons(from: matrix, width: width, height: height)
 //        }
         
-        polygons = MapGenerator.make(width: width, height: height, unitCount: 3, wallChance: wallChance)
+        let cells = MapGenerator.make(width: width, height: height, unitCount: 3, wallChance: wallChance)
         
 //        polygons = polygons.map { $0.map { CGPoint(x: $0.x * CGFloat(width), y: $0.y * CGFloat(height)) } }
         
-        self.level = Level(width: CGFloat(width), height: CGFloat(height), polygons: polygons)
+        self.level = Level(width: CGFloat(width), height: CGFloat(height), cells: cells)
     }
 }
 

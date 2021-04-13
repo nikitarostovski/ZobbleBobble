@@ -9,7 +9,7 @@ import Foundation
 
 final class MapGenerator {
     
-    static func make(width: Int, height: Int, unitCount: Int, wallChance: Float) -> [Polygon] {
+    static func make(width: Int, height: Int, unitCount: Int, wallChance: Float) -> [Cell] {
         
         let displacementStep: CGFloat = 0.4
         
@@ -65,14 +65,18 @@ final class MapGenerator {
                                          maxY: Double(height))
         
         let result = Voronoi.runFortunesAlgorithm(sitePoints: vpoints, clipRect: clipRect, options: [.makeSitePolygonVertices, .makeEdgesOnClipRectBorders], randomlyOffsetSiteLocationsBy: nil)
-        let polygons = result.sites.compactMap { site -> Polygon? in
+        let cells = result.sites.compactMap { site -> Cell? in
             if site.userData == true {
-                return site.polygonVertices.map { CGPoint(x: $0.x, y: $0.y) }
+                let polygon = site.polygonVertices.map { CGPoint(x: $0.x, y: $0.y) }
+                
+                var cell = Cell(center: CGPoint(x: site.point.x, y: site.point.y))
+                cell.polygon = polygon
+                return cell
             }
             return nil
         }
         
-        return polygons
+        return cells
     }
     
     
