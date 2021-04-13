@@ -29,4 +29,8 @@ class Missle: SKShapeNode {
         
         physicsBody = body
     }
+    
+    func explode() {
+        removeFromParent()
+    }
 }

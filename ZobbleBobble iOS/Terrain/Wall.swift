@@ -75,29 +75,27 @@ class Wall: SKShapeNode {
     }
     
     public func explode(impulse: CGFloat, normal: CGVector, contactPoint: CGPoint) {
-        if physicsBody?.isDynamic ?? false { return }
-        guard let terrain = terrain, let polygon = cell?.polygon else { return }
+        let impulse = CGVector(dx: normal.dx * impulse, dy: normal.dy * impulse)
         
-        let newPolygons = splitPolygon(polygon)
+        guard let physicsBody = physicsBody,
+              let terrain = terrain,
+              let cells = cell?.split(impulse: impulse, point: contactPoint),
+              !physicsBody.isDynamic
+        else {
+            return
+        }
         
-        let walls = newPolygons.map { p -> Wall in
-            
-            var cell = Cell(center: p.centroid)
-            cell.polygon = p
+        let walls = cells.map { (cell) -> Wall in
             let wall = Self.make(from: cell)
             wall.physicsBody?.isDynamic = true
-//            wall.physicsBody?.density = 0.1
-//            wall.fillColor = .yellow
             wall.strokeColor = .red
             return wall
         }
         
         terrain.replace(wall: self, with: walls)
         
-        let imp = CGVector(dx: normal.dx * impulse,
-                           dy: normal.dy * impulse)
         walls.forEach {
-            $0.physicsBody?.applyImpulse(imp, at: contactPoint)
+            $0.physicsBody?.applyImpulse(impulse, at: contactPoint)
             $0.startMonitoring()
         }
     }
@@ -105,70 +103,5 @@ class Wall: SKShapeNode {
     public func destroy() {
         physicsBody = nil
         removeFromParent()
-    }
-    
-    
-    private func splitPolygon(_ polygon: Polygon) -> [Polygon] {
-//        let vpoints = polygon.map { SitePoint<Void>(point: SIMD2<Double>(x: Double($0.x), y: Double($0.y))) }
-        
-        
-        let minX = polygon.min(by: { $0.x < $1.x })?.x ?? 0
-        let minY = polygon.min(by: { $0.y < $1.y })?.y ?? 0
-        let maxX = polygon.max(by: { $0.x < $1.x })?.x ?? 0
-        let maxY = polygon.max(by: { $0.y < $1.y })?.y ?? 0
-        
-        
-        let clipRect = ClipRect.minMaxXY(minX: Double(minX),
-                                         minY: Double(minY),
-                                         maxX: Double(maxX),
-                                         maxY: Double(maxY))
-        
-        
-        var points = [CGPoint]()
-        
-        let pointStep: CGFloat = min(maxX - minX, maxY - minY) / 2
-        let displacementStep: CGFloat = pointStep / 2
-        
-        for x in stride(from: minX, to: maxX, by: pointStep) {
-            for y in stride(from: minY, to: maxY, by: pointStep) {
-                let xmin: CGFloat = CGFloat(x) - displacementStep
-                let ymin: CGFloat = CGFloat(y) - displacementStep
-                let xmax: CGFloat = CGFloat(x) + displacementStep
-                let ymax: CGFloat = CGFloat(y) + displacementStep
-                
-                let stepX = xmax - xmin
-                let stepY = ymax - ymin
-                
-                let dx: CGFloat = CGFloat(arc4random() % UInt32(stepX * 100)) / 100
-                let dy: CGFloat = CGFloat(arc4random() % UInt32(stepY * 100)) / 100
-                
-                let newCenterX = xmin + dx
-                let newCenterY = ymin + dy
-                
-                points.append(CGPoint(x: newCenterX, y: newCenterY))
-            }
-        }
-        let vpoints = points.map { SitePoint<Void>(point: SIMD2<Double>(x: Double($0.x), y: Double($0.y))) }
-        
-        
-        let result = Voronoi.runFortunesAlgorithm(sitePoints: vpoints, clipRect: clipRect, options: [.makeSitePolygonVertices, .makeEdgesOnClipRectBorders], randomlyOffsetSiteLocationsBy: nil)
-        let polygons = result.sites.map { site -> Polygon in
-            return site.polygonVertices.map { CGPoint(x: $0.x, y: $0.y) }
-        }
-        
-        
-        var clippedPolygons = [Polygon]()
-        let superPolygon = self.cell?.polygon
-        for polygon in polygons {
-            guard var intersections  = superPolygon?.intersection(polygon) else { continue }
-            intersections = intersections.filter { $0.count >= 3 }
-            clippedPolygons.append(contentsOf: intersections)
-        }
-        
-        clippedPolygons = clippedPolygons.map { $0 + [$0[0]] }
-        area fix needed:
-        clippedPolygons = clippedPolygons.filter { $0.area < -50 }
-        
-        return clippedPolygons
     }
 }
