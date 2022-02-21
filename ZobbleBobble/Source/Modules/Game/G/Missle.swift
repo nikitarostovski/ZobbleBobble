@@ -35,9 +35,16 @@ class Missle: SKShapeNode {
         self.fillColor = .yellow
         self.strokeColor = .clear
         
-        self.physicsBody = SKPhysicsBody(polygonFrom: path)
-        self.physicsBody?.mass = 0.05
-        physicsBody?.isDynamic = true
+        let body = SKPhysicsBody(polygonFrom: path)
+        body.isDynamic = true
+        body.mass = 0.05
+        
+        body.categoryBitMask = Category.missle.rawValue
+        body.collisionBitMask = Category.terrain.rawValue | Category.core.rawValue
+        body.contactTestBitMask = Category.terrain.rawValue
+        
+        
+        self.physicsBody = body
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -81,7 +88,6 @@ class Missle: SKShapeNode {
         }
         
         affectedChunks.forEach { chunk in
-            guard chunk.type != .core else { return }
             guard !chunksToRemove.contains(chunk) else { return }
             let newPolygons = chunk.globalPolygon.difference(from: destructionArea)
 
@@ -104,6 +110,8 @@ class Missle: SKShapeNode {
             guard chunk.type == .terrain else { return }
             guard !chunksToRemove.contains(chunk) else { return }
             
+            let dist = chunk.material.minSplitDistance
+            
             var dynamicChunks = chunk.globalPolygon.intersection(with: destructionArea)
             let staticChunks = chunk.globalPolygon.difference(from: destructionArea)
             
@@ -112,15 +120,20 @@ class Missle: SKShapeNode {
             }
             
             dynamicChunks = dynamicChunks.flatMap { chunk in
-                return chunk.split(minDistance: 10)
+                return chunk.split(minDistance: dist)
             }
             
             let newStaticChunks = staticChunks.map { polygon in
-                return Chunk(world: self.world, globalPolygon: polygon, material: chunk.material, type: .terrain)
+                Chunk(world: self.world, globalPolygon: polygon, material: chunk.material, type: .terrain)
             }
             
-            let newDynamicChunks = dynamicChunks.map { polygon in
-                return Chunk(world: self.world, globalPolygon: polygon, material: chunk.material, type: .fragment)
+            let newDynamicChunks: [Chunk] = dynamicChunks.map { polygon in
+                let c = Chunk(world: self.world, globalPolygon: polygon, material: chunk.material, type: .fragment)
+                if let oldBody = chunk.physicsBody {
+                    c.physicsBody?.angularVelocity = oldBody.angularVelocity
+                    c.physicsBody?.velocity = oldBody.velocity
+                }
+                return c
             }
             
             chunksToRemove.append(chunk)

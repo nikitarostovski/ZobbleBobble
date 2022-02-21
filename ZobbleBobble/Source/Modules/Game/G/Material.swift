@@ -26,6 +26,17 @@ class Material {
         }
     }
     
+    var minSplitDistance: CGFloat {
+        switch type {
+        case .sand:
+            return 4
+        case .rock:
+            return 12
+        case .obsidian:
+            return .greatestFiniteMagnitude
+        }
+    }
+    
     init(type: MaterialType) {
         self.type = type
     }

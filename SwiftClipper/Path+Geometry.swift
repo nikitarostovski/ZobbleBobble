@@ -38,21 +38,21 @@ extension Path {
         return distance
     }
     
-    public var centroid:CGPoint {
-        var center = CGPoint.zero
-        let polygonArea = area
-        for index in 0...self.count-1 {
-            let vertice = self[index]
-            let verticeNext = self[(index+1) % self.count]
-            center.x += (vertice.x+verticeNext.x) * (vertice.x * verticeNext.y - verticeNext.x * vertice.y)
-            center.y += (vertice.y+verticeNext.y) * (vertice.x * verticeNext.y - verticeNext.x * vertice.y)
-        }
-        
-        center.x /= polygonArea*6
-        center.y /= polygonArea*6
-        
-        return center
-    }
+//    public var centroid:CGPoint {
+//        var center = CGPoint.zero
+//        let polygonArea = area
+//        for index in 0...self.count-1 {
+//            let vertice = self[index]
+//            let verticeNext = self[(index+1) % self.count]
+//            center.x += (vertice.x+verticeNext.x) * (vertice.x * verticeNext.y - verticeNext.x * vertice.y)
+//            center.y += (vertice.y+verticeNext.y) * (vertice.x * verticeNext.y - verticeNext.x * vertice.y)
+//        }
+//        
+//        center.x /= polygonArea*6
+//        center.y /= polygonArea*6
+//        
+//        return center
+//    }
     
     public var orientation: Bool {
         return self.area >= 0

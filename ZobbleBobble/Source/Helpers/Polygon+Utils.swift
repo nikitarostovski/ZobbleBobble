@@ -41,11 +41,11 @@ extension Polygon {
         return sum / 2
     }
     
-    func centroid() -> CGPoint? {
-        if isEmpty { return nil }
+    func centroid() -> CGPoint {
+        if isEmpty { return .zero }
         
         let area = area()
-        if area == 0 { return nil }
+        if area == 0 { return .zero }
         
         var sumPoint: CGPoint = .zero
         

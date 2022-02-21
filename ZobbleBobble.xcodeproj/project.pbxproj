@@ -72,6 +72,7 @@
 		112EFBC427944D7400494CA0 /* GridPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBC027944D7400494CA0 /* GridPoint.swift */; };
 		115DFA8D279868BC00B09FF2 /* WeaponPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115DFA8C279868BC00B09FF2 /* WeaponPickerView.swift */; };
 		115DFA8F27986A1100B09FF2 /* WeaponButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115DFA8E27986A1100B09FF2 /* WeaponButton.swift */; };
+		1160DE7C27BB8CC400A8B473 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1160DE7B27BB8CC400A8B473 /* Core.swift */; };
 		1196A57D27B2E26300150DE0 /* Missle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1196A57C27B2E26300150DE0 /* Missle.swift */; };
 		1196A58827B4252300150DE0 /* Weapon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1196A58727B4252300150DE0 /* Weapon.swift */; };
 		11FCBA6F27A45BD700A25665 /* BaseChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FCBA6E27A45BD700A25665 /* BaseChunk.swift */; };
@@ -197,6 +198,7 @@
 		115DFA8E27986A1100B09FF2 /* WeaponButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponButton.swift; sourceTree = "<group>"; };
 		115DFA9027987E4100B09FF2 /* BazookaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BazookaNode.swift; sourceTree = "<group>"; };
 		115DFA9427987EE100B09FF2 /* RocketNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RocketNode.swift; sourceTree = "<group>"; };
+		1160DE7B27BB8CC400A8B473 /* Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 		1196A57C27B2E26300150DE0 /* Missle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missle.swift; sourceTree = "<group>"; };
 		1196A58727B4252300150DE0 /* Weapon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapon.swift; sourceTree = "<group>"; };
 		11A4F7DA279C82DD005E7FEC /* GunNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunNode.swift; sourceTree = "<group>"; };
@@ -538,6 +540,7 @@
 			children = (
 				1196A58027B4227000150DE0 /* Collision */,
 				11FCBA9727A5D06B00A25665 /* World.swift */,
+				1160DE7B27BB8CC400A8B473 /* Core.swift */,
 				11FCBA9927A5D08200A25665 /* Chunk.swift */,
 				11FCBA9B27A5D0AE00A25665 /* Material.swift */,
 				11FCBA9D27A5D81000A25665 /* Player.swift */,
@@ -750,6 +753,7 @@
 				115DFA8F27986A1100B09FF2 /* WeaponButton.swift in Sources */,
 				1126C1D727778E1800C26BEC /* Polygon.swift in Sources */,
 				1126C1D22777711B00C26BEC /* Const.swift in Sources */,
+				1160DE7C27BB8CC400A8B473 /* Core.swift in Sources */,
 				1126C232277A206C00C26BEC /* GameScene.swift in Sources */,
 				1196A58827B4252300150DE0 /* Weapon.swift in Sources */,
 				11FCBA9A27A5D08200A25665 /* Chunk.swift in Sources */,

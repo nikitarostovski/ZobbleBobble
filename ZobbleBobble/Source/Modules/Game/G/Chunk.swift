@@ -8,7 +8,6 @@
 import SpriteKit
 
 enum ChunkType {
-    case core
     case terrain
     case fragment
 }
@@ -25,7 +24,7 @@ class Chunk: SKShapeNode {
     }
     
     init(world: World, globalPolygon: Polygon, material: Material, type: ChunkType) {
-        let position = globalPolygon.centroid
+        let position = globalPolygon.centroid()
         self.world = world
         self.material = material
         self.type = type
@@ -40,19 +39,28 @@ class Chunk: SKShapeNode {
         self.position = position
         self.strokeColor = .clear
         self.fillColor = material.color.withAlphaComponent(0.2)
+//        
+//        let c = SKShapeNode(circleOfRadius: 2)
+//        c.fillColor = .green
+//        addChild(c)
         
         // Physics
         let body = SKPhysicsBody(polygonFrom: path)
+        body.isDynamic = true
+        body.restitution = 0.6
+//        body.linearDamping = 0
+//        body.angularDamping = 0
         
-        body.isDynamic = true//type != .core
-        body.friction = 0
-        body.linearDamping = 0
-        body.restitution = 0
-        body.categoryBitMask = Category.terrain.rawValue
-        body.collisionBitMask = Category.unit.rawValue | Category.terrain.rawValue
-//        if state != .dynamic {
+        switch type {
+        case .terrain:
+            body.categoryBitMask = Category.terrain.rawValue
+            body.collisionBitMask = Category.fragment.rawValue
             body.contactTestBitMask = Category.missle.rawValue
-//        }
+        case .fragment:
+            body.categoryBitMask = Category.fragment.rawValue
+            body.collisionBitMask = Category.unit.rawValue | Category.terrain.rawValue | Category.fragment.rawValue
+            body.contactTestBitMask = Category.fragment.rawValue
+        }
         self.physicsBody = body
         
         
@@ -70,7 +78,7 @@ class Chunk: SKShapeNode {
     
     func link(with node: SKNode, at world: SKPhysicsWorld) {
         guard let bodyA = physicsBody, let bodyB = node.physicsBody else { return }
-        let anchor = scene?.convertPoint(fromView: position) ?? position
+        let anchor = CGPoint.zero//scene?.convertPoint(fromView: position) ?? position
         let joint = SKPhysicsJointFixed.joint(withBodyA: bodyA, bodyB: bodyB, anchor: anchor)
         world.add(joint)
     }

@@ -28,6 +28,8 @@ final class GameScene: SKScene {
         let cameraScale = 2 * Const.planetRadius / sceneWidth
         sceneCamera.xScale = cameraScale
         sceneCamera.yScale = cameraScale
+        
+        world.cleanUp()
     }
     
     func startFire() {

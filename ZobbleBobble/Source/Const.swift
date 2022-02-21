@@ -11,6 +11,7 @@ enum Const {
     static let screenHalfSize: CGFloat = 150
     static let planetRadius: CGFloat = 100
     static let coreRadius: CGFloat = 25
+    static let chunkRemoveRadius: CGFloat = 150
     
     static let playerOrbitMultiplier: CGFloat = 1.5
     
