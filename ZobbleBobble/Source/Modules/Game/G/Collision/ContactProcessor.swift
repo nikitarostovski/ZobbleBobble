@@ -20,8 +20,11 @@ final class ContactProcessor: NSObject {
 
 extension ContactProcessor: SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
-        guard let missle = (contact.bodyA.node as? Missle) ?? (contact.bodyB.node as? Missle) else { return }
-        missle.processCollision(at: contact.contactPoint, impulse: contact.collisionImpulse)
+//        guard let missle = (contact.bodyA.node as? Missle) ?? (contact.bodyB.node as? Missle) else { return }
+//        missle.processCollision(at: contact.contactPoint, impulse: contact.collisionImpulse)
+        
+        
+        
 //        switch missle.type {
 //        case .bullet, .rocket:
 //            

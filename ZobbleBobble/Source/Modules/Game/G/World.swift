@@ -6,191 +6,89 @@
 //
 
 import SpriteKit
+import ZobbleCore
+import ZobblePhysics
 
 final class World: SKNode {
-    var coreAnchor: SKNode!
-    var core: Core!
-    var chunks = [Chunk]()
-    var player: Player!
+    private let particleRadius: CGFloat = 10
+    
+    var world: ZPWorld
+    
+    private var levelNode: LevelNode!
     
     var cameraCenter: CGPoint {
-        CGPoint(
-            x: player.position.x,
-            y: player.position.y / 2
-        )
+        let bounds = playerNode.boundingBox
+        return CGPoint(x: bounds.midX, y: bounds.midY)
     }
     
-    var cameraDistance: CGSize {
-        CGSize(
-            width: 100,
-            height: player.position.distance(to: .zero)
-        )
-    }
+    var cameraScale: CGFloat = 1
     
-    let groundMaterials: [MaterialType] = [
-        .rock,
-        .sand
-    ]
-    
-    override init() {
-        super.init()
+    var targetCameraScale: CGFloat {
+        let bounds = playerNode.boundingBox
+        let xScale = bounds.width / worldSize.width * 2
+        let yScale = bounds.height / worldSize.height * 2
         
+        let scale = max(xScale, yScale)
+        return scale
     }
+    
+    var worldSize: CGSize { UIScreen.main.bounds.size }
+    
+    lazy var playerNode: LiquidNode = {
+        let points = Polygon.make(radius: 50, position: CGPoint(x: 80, y: 10), vertexCount: 8)
+        let node = LiquidNode(world: self, body: points, color: .red, particleRadius: particleRadius)
+        return node
+    }()
+    
+    
+    var viewportBoundsNode: SKShapeNode?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setup() {
-        generate()
+    init(level: Level, camera: SKCameraNode) {
+        self.world = ZPWorld(gravity: CGPoint(x: 0, y: -10), particleRadius: particleRadius)
+        super.init()
         
-        let g = SKFieldNode.radialGravityField()
-        g.position = core.position
+        levelNode = LevelNode(world: self, level: level)
+        addChild(levelNode)
         
-        g.strength = 0.05
-        g.falloff = 0.5
-        g.region = SKRegion(radius: 100)
-    
-        addChild(g)
+        addChild(camera)
         
-        self.player = Player(world: self, position: CGPoint(x: 0, y: -250))
-        addChild(player)
-        player.weapon = Weapon(world: self, type: .gun)
+        camera.addChild(playerNode)
+        
+//        let n = SKShapeNode(rectOf: .zero)
+//        viewportBoundsNode = n
+//        addChild(n)
+        
+        
+        let displayLink = CADisplayLink(target: self, selector: #selector(update(displayLink:)))
+        displayLink.preferredFramesPerSecond = 60
+        displayLink.add(to: .current, forMode: .default)
     }
     
-    func cleanUp() {
-        let eliminated = chunks.filter { $0.physicsBody == nil }
-        removeChunks(eliminated)
+    func updateCamera(camera: SKCameraNode) {
+        camera.position = cameraCenter
         
-        let outOfBounds = chunks.filter { chunk in
-            let a = 1 - (chunk.position.distance(to: .zero) / Const.chunkRemoveRadius)
-            return a <= 0
-        }
-        removeChunks(outOfBounds)
+        let cameraScale = cameraScale
+        camera.xScale = cameraScale
+        camera.yScale = cameraScale
     }
     
-    func replace(chunks: [Chunk], with newChunks: [Chunk]) {
-        removeChunks(chunks)
-        addChunks(newChunks)
-    }
-    
-    func removeChunks(_ oldChunks: [Chunk]) {
-        oldChunks.forEach { chunk in
-            self.removeNode(chunk)
+    @objc
+    private func update(displayLink: CADisplayLink) {
+        autoreleasepool {
+            world.worldStep(displayLink.duration, velocityIterations: 6, positionIterations: 2)
         }
-    }
-    
-    func addChunks(_ newChunks: [Chunk]) {
-        for chunk in newChunks {
-            addChild(chunk)
-            if let world = scene?.physicsWorld {
-                switch chunk.type {
-                case .terrain:
-                    chunk.link(with: core, at: world)
-                case .fragment:
-                    let chunkPos = chunk.position
-                    let corePos = core.position
-                    let d = (chunk.physicsBody?.mass ?? 1)//chunkPos.distance(to: corePos)
-                    print(d)
-                    let n = CGVector(dx: corePos.y - chunkPos.y, dy: chunkPos.x - corePos.x)
-                    let force = CGVector(dx: n.dx * d, dy: n.dy * d)
-                    chunk.physicsBody?.applyForce(force, at: .zero)
-                }
-            }
-            chunks.append(chunk)
-        }
-    }
-}
-
-// MARK: - Chunks
-
-extension World {
-    
-}
-
-// MARK: - Core
-
-extension World {
-    private func setupCoreAnchor(at position: CGPoint) {
-        if let coreAnchor = self.coreAnchor {
-            removeNode(coreAnchor)
-            self.coreAnchor = nil
-        }
+        let viewportSize = CGSize(width: worldSize.width * cameraScale, height: worldSize.height * cameraScale)
         
-        let anchorNode = SKNode()
-        anchorNode.position = position
-        let anchorBody = SKPhysicsBody(circleOfRadius: 1)
-        anchorBody.isDynamic = false
-        anchorNode.physicsBody = anchorBody
-        addChild(anchorNode)
-        self.coreAnchor = anchorNode
-    }
-    
-    private func setupCore() {
-        if let core = self.core {
-            removeNode(core)
-            self.core = nil
-        }
+        levelNode.updateViewport(center: cameraCenter, size: viewportSize)
+//        playerNode.updateViewport(center: cameraCenter, size: viewportSize)
         
-        let corePolygon = Polygon.make(radius: Const.coreRadius, vertexCount: 6)
-        let core = Core(world: self, globalPolygon: corePolygon)
-        addChild(core)
-        self.core = core
+        cameraScale = targetCameraScale//cameraScale + (targetCameraScale - cameraScale) * 0.01
         
-        if let coreAnchor = coreAnchor, let bodyA = coreAnchor.physicsBody, let bodyB = core.physicsBody {
-            let j = SKPhysicsJointPin.joint(withBodyA: bodyA, bodyB: bodyB, anchor: coreAnchor.position)
-            j.shouldEnableLimits = false
-            scene?.physicsWorld.add(j)
-        }
-    }
-}
-
-// MARK: - Node utils
-
-extension World {
-    private func removeNode(_ node: SKNode) {
-        (node as? SKShapeNode)?.fillColor = .red
-        if let p = node.physicsBody, let world = scene?.physicsWorld {
-            p.joints.forEach { j in
-                world.remove(j)
-            }
-        }
-        node.removeFromParent()
-        self.chunks.removeAll(where: { $0 === node })
-    }
-}
-
-// MARK: - Generation
-
-extension World {
-    private func generate() {
-        removeChunks(chunks)
-        
-        setupCoreAnchor(at: .zero)
-        setupCore()
-        
-        
-        let boundsPolygon = Polygon.make(radius: Const.planetRadius, vertexCount: 12)
-        let boundsPolygons = boundsPolygon.split(minDistance: 40)
-        let chunkPolygons = boundsPolygons.getDifference(from: [core.globalPolygon])
-        let groundChunks: [Chunk] = chunkPolygons.map { polygon in
-            let type = groundMaterials.randomElement()!
-            let material = Material(type: type)
-            let chunk = Chunk(world: self, globalPolygon: polygon, material: material, type: .terrain)
-            return chunk
-        }
-        
-        for chunk in groundChunks {
-            addChild(chunk)
-            if chunk.type == .terrain || chunk.type == .fragment, let world = scene?.physicsWorld {
-                chunk.link(with: core, at: world)
-            }
-            chunks.append(chunk)
-        }
-        
-        
-        let rotateAction = SKAction.rotate(byAngle: 2 * .pi, duration: 5)
-        let repeatAction = SKAction.repeatForever(rotateAction)
-        core.run(repeatAction)
+        viewportBoundsNode?.path = CGPath(rect: CGRect(origin: .zero, size: viewportSize), transform: nil)
+        viewportBoundsNode?.position = CGPoint(x: cameraCenter.x - viewportSize.width / 2, y: cameraCenter.y - viewportSize.height / 2)
     }
 }

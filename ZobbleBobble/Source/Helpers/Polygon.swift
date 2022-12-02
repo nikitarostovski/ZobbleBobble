@@ -8,17 +8,17 @@
 import UIKit
 import PoissonDisk
 
-typealias Polygon = [CGPoint]
+public typealias Polygon = [CGPoint]
 
 extension Polygon {
-    var bounds: CGRect {
+    public var bounds: CGRect {
         self.reduce(CGRect.null) { rect, point in
             return rect.union(CGRect(origin: point, size: .zero))
         }
     }
     
-    func destruct(impulse: CGFloat, normal: CGVector, contactPoint: CGPoint) -> [Polygon] {
-        var points = generatePointsPoissonDisk(count: 100, minDistance: Const.chunkSplitMinDistance)
+    public func destruct(impulse: CGFloat, normal: CGVector, contactPoint: CGPoint) -> [Polygon] {
+        var points = generatePointsPoissonDisk(count: 100, minDistance: 16)
         
         let maxDist: CGFloat = 100
         points = points.map { p in
@@ -30,7 +30,7 @@ extension Polygon {
         return result.flatMap { $0.intersection(with: self) }
     }
     
-    func split(minDistance: CGFloat = Const.chunkSplitMinDistance) -> [Polygon] {
+    public func split(minDistance: CGFloat) -> [Polygon] {
         let points = generatePointsPoissonDisk(count: 16, minDistance: minDistance)
         let result = Polygon.make(from: points, bounds: bounds)
         return result.flatMap { $0.intersection(with: self) }

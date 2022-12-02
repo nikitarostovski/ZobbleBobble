@@ -6,13 +6,15 @@
 //
 
 import SpriteKit
+import ZobbleCore
 
 final class GameScene: SKScene {
     private let contactProcessor = ContactProcessor()
     private let sceneCamera = SKCameraNode()
     
     private lazy var world: World = {
-        let world = World()
+        let level = LevelParser.parse(UIImage(named: "Level")!)
+        let world = World(level: level, camera: sceneCamera)
         return world
     }()
     
@@ -20,42 +22,21 @@ final class GameScene: SKScene {
         self.resetScene()
     }
     
-    override func didSimulatePhysics() {
-        super.didSimulatePhysics()
-        sceneCamera.position = world.cameraCenter
-        
-        let sceneWidth = size.width / 1.1
-        let cameraScale = 2 * Const.planetRadius / sceneWidth
-        sceneCamera.xScale = cameraScale
-        sceneCamera.yScale = cameraScale
-        
-        world.cleanUp()
-    }
-    
-    func startFire() {
-        world.player.fire()
-    }
-    
-    func stopFire() {
-//        playerNode?.weaponNode?.stopFire()
-    }
-    
-    func changeWeapon(to weapon: WeaponType) {
-        world.player.weapon = Weapon(world: world, type: weapon)
+    override func update(_ currentTime: TimeInterval) {
+        super.update(currentTime)
+        updateCamera()
     }
     
     private func resetScene() {
-        physicsWorld.removeAllJoints()
-        physicsWorld.gravity = .zero
-        physicsWorld.contactDelegate = contactProcessor
-        
         world.removeFromParent()
         addChild(world)
         
-        sceneCamera.removeFromParent()
-        addChild(sceneCamera)
+//        sceneCamera.removeFromParent()
+//        addChild(sceneCamera)
         camera = sceneCamera
-        
-        world.setup()
+    }
+    
+    private func updateCamera() {
+        world.updateCamera(camera: sceneCamera)
     }
 }

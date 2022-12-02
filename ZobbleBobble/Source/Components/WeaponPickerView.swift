@@ -50,20 +50,20 @@ final class WeaponPickerView: UIView {
     }
     
     private func resetContent() {
-        let buttonSize = scrollView.bounds.height
-        let inset: CGFloat = 12
-        var lastView: UIView?
-        for (i, weapon) in weapons.enumerated() {
-            let x = CGFloat(i) * (buttonSize + inset)
-            let button = WeaponButton(frame: CGRect(x: inset + x, y: 0, width: buttonSize, height: buttonSize))
-            button.addTarget(self, action: #selector(weaponTap(_:)), for: .touchUpInside)
-            button.setTitle(weapon.rawValue, for: .normal)
-            button.weaponIndex = i
-            button.backgroundColor = .red
-            scrollView.addSubview(button)
-            lastView = button
-        }
-        scrollView.contentSize.width = lastView?.frame.maxX ?? 0 + inset
+//        let buttonSize = scrollView.bounds.height
+//        let inset: CGFloat = 12
+//        var lastView: UIView?
+//        for (i, weapon) in weapons.enumerated() {
+//            let x = CGFloat(i) * (buttonSize + inset)
+//            let button = WeaponButton(frame: CGRect(x: inset + x, y: 0, width: buttonSize, height: buttonSize))
+//            button.addTarget(self, action: #selector(weaponTap(_:)), for: .touchUpInside)
+//            button.setTitle(weapon.rawValue, for: .normal)
+//            button.weaponIndex = i
+//            button.backgroundColor = .red
+//            scrollView.addSubview(button)
+//            lastView = button
+//        }
+//        scrollView.contentSize.width = lastView?.frame.maxX ?? 0 + inset
     }
     
     @objc

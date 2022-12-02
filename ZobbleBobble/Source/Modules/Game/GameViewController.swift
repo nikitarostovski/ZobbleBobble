@@ -32,13 +32,13 @@ final class GameViewController: UIViewController {
         return b
     }()
     
-    lazy var weaponPicker: WeaponPickerView = {
-        let picker = WeaponPickerView(frame: CGRect(x: 0, y: 0, width: 0, height: 80))
-        picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.delegate = self
-        picker.weapons = WeaponType.allCases
-        return picker
-    }()
+//    lazy var weaponPicker: WeaponPickerView = {
+//        let picker = WeaponPickerView(frame: CGRect(x: 0, y: 0, width: 0, height: 80))
+//        picker.translatesAutoresizingMaskIntoConstraints = false
+//        picker.delegate = self
+//        picker.weapons = WeaponType.allCases
+//        return picker
+//    }()
     
     lazy var gesture: UIGestureRecognizer = {
         let g = UILongPressGestureRecognizer(target: self, action: #selector(onTap(gr:)))
@@ -55,22 +55,22 @@ final class GameViewController: UIViewController {
         
         view.addSubview(sceneView)
         
-        view.addSubview(weaponPicker)
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: weaponPicker, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 80),
-            NSLayoutConstraint(item: weaponPicker, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: weaponPicker, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: weaponPicker, attribute: .bottom, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0)
-        ])
-        
-        view.addSubview(resetButton)
-        
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 80),
-            NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 50),
-            NSLayoutConstraint(item: resetButton, attribute: .bottom, relatedBy: .equal, toItem: weaponPicker, attribute: .top, multiplier: 1, constant: -12),
-            NSLayoutConstraint(item: resetButton, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
-        ])
+//        view.addSubview(weaponPicker)
+//        NSLayoutConstraint.activate([
+//            NSLayoutConstraint(item: weaponPicker, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 80),
+//            NSLayoutConstraint(item: weaponPicker, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
+//            NSLayoutConstraint(item: weaponPicker, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
+//            NSLayoutConstraint(item: weaponPicker, attribute: .bottom, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0)
+//        ])
+//        
+//        view.addSubview(resetButton)
+//        
+//        NSLayoutConstraint.activate([
+//            NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 80),
+//            NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 50),
+//            NSLayoutConstraint(item: resetButton, attribute: .bottom, relatedBy: .equal, toItem: weaponPicker, attribute: .top, multiplier: 1, constant: -12),
+//            NSLayoutConstraint(item: resetButton, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
+//        ])
         
         setup()
     }
@@ -87,15 +87,15 @@ final class GameViewController: UIViewController {
     
     @objc
     private func onTap(gr: UIGestureRecognizer) {
-        guard let scene = scene else { return }
-        switch gr.state {
-        case .began:
-            scene.startFire()
-        case .cancelled, .ended, .failed:
-            scene.stopFire()
-        default:
-            break
-        }
+//        guard let scene = scene else { return }
+//        switch gr.state {
+//        case .began:
+//            scene.startFire()
+//        case .cancelled, .ended, .failed:
+//            scene.stopFire()
+//        default:
+//            break
+//        }
     }
     
     @objc
@@ -104,11 +104,11 @@ final class GameViewController: UIViewController {
     }
 }
 
-extension GameViewController: WeaponPickerDelegate {
-    func weaponPickerDidChange(weapon: WeaponType) {
-        scene?.changeWeapon(to: weapon)
-    }
-}
+//extension GameViewController: WeaponPickerDelegate {
+//    func weaponPickerDidChange(weapon: WeaponType) {
+//        scene?.changeWeapon(to: weapon)
+//    }
+//}
 
 extension GameViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
