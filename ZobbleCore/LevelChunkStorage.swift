@@ -40,8 +40,9 @@ final class LevelChunkStorage {
         var didUpdateChunks = false
         while visiblePositions.upperBound >= allChunks.count {
             didUpdateChunks = true
-            let chunk = makeChunk(for: allChunks.count)
-            allChunks.append(chunk)
+            if let chunk = makeChunk(for: allChunks.count) {
+                allChunks.append(chunk)
+            }
         }
         
         visibleChunks = Array(allChunks[visiblePositions])
@@ -49,28 +50,20 @@ final class LevelChunkStorage {
         return didUpdateChunks
     }
     
-    private func makeChunk(for i: Int) -> LevelChunk {
+    private func makeChunk(for i: Int) -> LevelChunk? {
         var previousChunk: LevelChunk?
         if i > 0, i <= allChunks.count {
             previousChunk = allChunks[i - 1]
         }
-        let startHeight = previousChunk?.exitHeight ?? 0
+        let startHeight = previousChunk?.exitPoint.y ?? 0
         let exitHeight = startHeight - CGFloat.random(in: chunkSize...2 * chunkSize)
         
         let left = CGFloat(i) * chunkSize
         let topLeft = startHeight
         let topRight = exitHeight
         let right = CGFloat(i + 1) * chunkSize
-        let bottom = min(topLeft, topRight) - chunkSize
         
-        let points: Polygon = [
-            CGPoint(x: left, y: topLeft),
-            CGPoint(x: right, y: topRight),
-            CGPoint(x: right, y: bottom),
-            CGPoint(x: left, y: bottom)
-        ]
-        
-        let chunk = LevelChunk(polygon: points, material: Material(type: .solid), startHeight: startHeight, exitHeight: exitHeight)
+        let chunk = LevelChunk(ground: [.init(left: CGPoint(x: left, y: topLeft), right: CGPoint(x: right, y: topRight))])
         return chunk
     }
 }

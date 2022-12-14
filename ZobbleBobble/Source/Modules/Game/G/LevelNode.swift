@@ -56,7 +56,8 @@ class LevelNode: SKNode {
     }
     
     private func addChunk(levelChunk: LevelChunk) {
-        let t = TerrainNode(chunkUUID: levelChunk.uuid, polygon: levelChunk.polygon, physicsWorld: world.world)
+        let t = TerrainNode(chunkUUID: levelChunk.uuid, leftPoint: levelChunk.ground.first!.left, rightPoint: levelChunk.ground.last!.right, physicsWorld: world.world)
+//        let t = TerrainNode(chunkUUID: levelChunk.uuid, polygon: levelChunk.polygon, physicsWorld: world.world)
         addChild(t)
         terrainNodes.append(t)
     }
@@ -65,25 +66,34 @@ class LevelNode: SKNode {
 class TerrainNode: RigidBodyNode {
     let chunkUUID: UUID
     
-    init(chunkUUID: UUID, polygon: Polygon, physicsWorld: ZPWorld) {
+    init(chunkUUID: UUID, leftPoint: CGPoint, rightPoint: CGPoint, physicsWorld: ZPWorld) {
         self.chunkUUID = chunkUUID
         super.init()
         
         let path = CGMutablePath()
-        path.addLines(between: polygon)
+        path.addLines(between: [leftPoint, rightPoint])
         path.closeSubpath()
         self.path = path
         
         self.strokeColor = UIColor.white
         self.fillColor = UIColor(red: 155/255, green: 139/255, blue: 118/255, alpha: 0.5)
         
-        self.body = ZPRigidBody(polygon: polygon.map { NSValue(cgPoint: $0) },
+        self.body = ZPRigidBody(edge: leftPoint,
+                                to: rightPoint,
                                 isDynamic: false,
                                 position: .zero,
                                 density: 1,
                                 friction: 0,
                                 restitution: 0,
                                 at: physicsWorld)
+        
+//        self.body = ZPRigidBody(polygon: polygon.map { NSValue(cgPoint: $0) },
+//                                isDynamic: false,
+//                                position: .zero,
+//                                density: 1,
+//                                friction: 0,
+//                                restitution: 0,
+//                                at: physicsWorld)
     }
     
     required init?(coder aDecoder: NSCoder) {

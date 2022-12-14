@@ -11,7 +11,6 @@
 		1126C1B22773AFB100C26BEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B12773AFB100C26BEC /* Assets.xcassets */; };
 		1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B32773AFB100C26BEC /* LaunchScreen.storyboard */; };
 		1126C1D22777711B00C26BEC /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C1D12777711B00C26BEC /* Const.swift */; };
-		1126C230277A205600C26BEC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* GameViewController.swift */; };
 		1126C232277A206C00C26BEC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C231277A206C00C26BEC /* GameScene.swift */; };
 		1126C23F277A2CDB00C26BEC /* ContactProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C23E277A2CDA00C26BEC /* ContactProcessor.swift */; };
 		1126C243277A2E0B00C26BEC /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C242277A2E0B00C26BEC /* Category.swift */; };
@@ -58,6 +57,7 @@
 		112EFBC327944D7400494CA0 /* PoissonDiskSampling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBBF27944D7400494CA0 /* PoissonDiskSampling.swift */; };
 		112EFBC427944D7400494CA0 /* GridPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBC027944D7400494CA0 /* GridPoint.swift */; };
 		1130A4A829323939004898D9 /* LiquidShaders.ci.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1130A4A729323939004898D9 /* LiquidShaders.ci.metal */; };
+		1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* GameViewController.swift */; };
 		1160EF552928E14400AFD08C /* ZPWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF68B2927C32B001EA051 /* ZPWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF592928E83900AFD08C /* ZPBody.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1160EF582928E83900AFD08C /* ZPBody.mm */; };
 		1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF5A2928E84100AFD08C /* ZPBody.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -87,6 +87,9 @@
 		11C0A72F292254AC00CA7954 /* Voronoi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB3F2791BDB400494CA0 /* Voronoi.framework */; };
 		11C0A730292254AC00CA7954 /* Voronoi.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB3F2791BDB400494CA0 /* Voronoi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11C0A734292503C800CA7954 /* Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FCBA9B27A5D0AE00A25665 /* Material.swift */; };
+		11C9188D293A07AD0024D181 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C9188C293A07AD0024D181 /* PhysicsWorld.swift */; };
+		11C9188F293A07B80024D181 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C9188E293A07B80024D181 /* Renderer.swift */; };
+		11C91891293A3DAE0024D181 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11C91890293A3DAE0024D181 /* Shaders.metal */; };
 		11DFF3262927717E001EA051 /* ItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF3252927717E001EA051 /* ItemNode.swift */; };
 		11DFF32829278523001EA051 /* PlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF32729278523001EA051 /* PlayerNode.swift */; };
 		11DFF3312927BB3B001EA051 /* ZobblePhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF3302927BB3B001EA051 /* ZobblePhysics.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -386,6 +389,10 @@
 		11C0A70E2922492E00CA7954 /* ZobbleCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobbleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C0A7102922492E00CA7954 /* ZobbleCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobbleCore.h; sourceTree = "<group>"; };
 		11C0A721292250F800CA7954 /* Level.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level.swift; sourceTree = "<group>"; };
+		11C9188A293A073F0024D181 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		11C9188C293A07AD0024D181 /* PhysicsWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsWorld.swift; sourceTree = "<group>"; };
+		11C9188E293A07B80024D181 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		11C91890293A3DAE0024D181 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		11DFF3252927717E001EA051 /* ItemNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemNode.swift; sourceTree = "<group>"; };
 		11DFF32729278523001EA051 /* PlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNode.swift; sourceTree = "<group>"; };
 		11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobblePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -603,6 +610,7 @@
 		1126C1BD2773B17C00C26BEC /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				11C91889293A07270024D181 /* GameScene */,
 				1126C22E277A204900C26BEC /* Game */,
 			);
 			path = Modules;
@@ -763,6 +771,17 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		11C91889293A07270024D181 /* GameScene */ = {
+			isa = PBXGroup;
+			children = (
+				11C9188A293A073F0024D181 /* GameViewController.swift */,
+				11C9188C293A07AD0024D181 /* PhysicsWorld.swift */,
+				11C9188E293A07B80024D181 /* Renderer.swift */,
+				11C91890293A3DAE0024D181 /* Shaders.metal */,
+			);
+			path = GameScene;
 			sourceTree = "<group>";
 		};
 		11D1139825D9A7B50063F332 = {
@@ -1343,15 +1362,18 @@
 				11DFF32829278523001EA051 /* PlayerNode.swift in Sources */,
 				1126C23F277A2CDB00C26BEC /* ContactProcessor.swift in Sources */,
 				11FCBA9827A5D06B00A25665 /* World.swift in Sources */,
-				1126C230277A205600C26BEC /* GameViewController.swift in Sources */,
 				1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */,
 				1126C1D22777711B00C26BEC /* Const.swift in Sources */,
+				1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */,
+				11C9188D293A07AD0024D181 /* PhysicsWorld.swift in Sources */,
 				11DFF3262927717E001EA051 /* ItemNode.swift in Sources */,
+				11C91891293A3DAE0024D181 /* Shaders.metal in Sources */,
 				1126C232277A206C00C26BEC /* GameScene.swift in Sources */,
 				11BAD2EE2936326D001E72BA /* LevelNode.swift in Sources */,
 				1130A4A829323939004898D9 /* LiquidShaders.ci.metal in Sources */,
 				1160EF7C292D1C9200AFD08C /* LiquidNode.swift in Sources */,
 				1126C243277A2E0B00C26BEC /* Category.swift in Sources */,
+				11C9188F293A07B80024D181 /* Renderer.swift in Sources */,
 				1160EF5D2929047A00AFD08C /* RigidBodyNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

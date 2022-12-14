@@ -8,22 +8,21 @@
 import Foundation
 
 public struct LevelChunk {
+    public struct Ground {
+        public let left: CGPoint
+        public let right: CGPoint
+    }
+    
     public let uuid = UUID()
-    public let polygon: Polygon
-    public let bounds: CGRect
-    public let material: Material
+    public let ground: [Ground]
     
-    public let startHeight: CGFloat
-    public let exitHeight: CGFloat
+    public let startPoint: CGPoint
+    public let exitPoint: CGPoint
     
-    public var maxHeight: CGFloat { max(startHeight, exitHeight) }
-    public var minHeight: CGFloat { min(startHeight, exitHeight) }
-    
-    public init(polygon: Polygon, material: Material, startHeight: CGFloat, exitHeight: CGFloat) {
-        self.polygon = polygon
-        self.material = material
-        self.startHeight = startHeight
-        self.exitHeight = exitHeight
-        self.bounds = polygon.bounds
+    public init?(ground: [Ground]) {
+        guard !ground.isEmpty else { return nil }
+        self.ground = ground
+        self.startPoint = ground.first!.left
+        self.exitPoint = ground.last!.right
     }
 }
