@@ -37,6 +37,13 @@ final class GameScene: SKScene {
     }
     
     private func updateCamera() {
-        world.updateCamera(camera: sceneCamera)
+//        world.updateCamera(camera: sceneCamera)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let first = touches.first {
+            let location = first.location(in: first.view)
+            world.onTouch(position: location)
+        }
     }
 }

@@ -11,6 +11,12 @@
 
 @interface ZPBody : NSObject
 
+@property int category;
+@property BOOL isDestroying;
+@property (nonatomic, copy) void (^onContact)(ZPBody * otherBody);
+@property (nonatomic, weak) ZPWorld *world;
+
 - (void)stepAtWorld:(ZPWorld *)world;
+- (void)destroy;
 
 @end

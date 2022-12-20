@@ -82,7 +82,7 @@ extern "C" {
             
             
             
-            if (radius >= minDist)
+            if (minDist <= radius)
             {
                 return float4(1);
             }
