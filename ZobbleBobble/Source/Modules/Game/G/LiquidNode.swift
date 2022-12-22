@@ -57,7 +57,7 @@ class LiquidNode: SKEffectNode {
     
     func addLiquid(polygon: Polygon) {
         let polygon = polygon.map { NSValue(cgPoint: $0) }
-        guard let body = ZPSoftBody(polygon: polygon, position: .zero, color: Self.uiColorToCGRect(.white), category: CAT_COMET, at: world.world) else { return }
+        guard let body = ZPSoftBody(polygon: polygon, position: .zero, category: CAT_COMET, at: world.world) else { return }
         bodies.append(body)
         
         body.onContact = { (_: ZPBody?) -> Void in
@@ -94,15 +94,6 @@ class LiquidNode: SKEffectNode {
         placeholder.path = CGPath(rect: CGRect(origin: CGPoint(x: -worldSize.width / 2, y: -worldSize.height / 2), size: worldSize), transform: nil)
         
         lastSize = worldSize
-    }
-    
-    private static func uiColorToCGRect(_ color: UIColor) -> CGRect {
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        color.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return CGRect(x: r * 255, y: g * 255, width: b * 255, height: 0)
     }
 }
 

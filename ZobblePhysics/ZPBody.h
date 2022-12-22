@@ -11,12 +11,11 @@
 
 @interface ZPBody : NSObject
 
-@property int category;
-@property BOOL isDestroying;
-@property (nonatomic, copy) void (^onContact)(ZPBody * otherBody);
-@property (nonatomic, weak) ZPWorld *world;
+@property NSArray<NSValue *> *polygon;
+@property (nonatomic) void *body;
 
-- (void)stepAtWorld:(ZPWorld *)world;
-- (void)destroy;
+@property BOOL isRemoving;
+
+- (id)initWithPolygon:(NSArray<NSValue *> *)points IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Density:(float)density Friction:(float)friction Restitution:(float)restitution Category:(int)category AtWorld:(ZPWorld *)world;
 
 @end

@@ -17,6 +17,4 @@ FOUNDATION_EXPORT const unsigned char ZobblePhysicsVersionString[];
 
 #import "ZPWorld.h"
 #import "ZPBody.h"
-#import "ZPRigidBody.h"
-#import "ZPSoftBody.h"
 #import "Constants.h"

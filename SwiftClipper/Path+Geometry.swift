@@ -111,7 +111,7 @@ extension Path {
     
     /// Simplify the polygon with Ramer–Douglas–Peucker algorithm.
     /// - Parameter epsilon: Threshold value.
-     func simplify(_ epsilon:CGFloat) -> Path {
+     public func simplify(_ epsilon: CGFloat) -> Path {
          var simplePolygon = Path()
          var maxIndex = 0
          var maxDistance = CGFloat.leastNormalMagnitude

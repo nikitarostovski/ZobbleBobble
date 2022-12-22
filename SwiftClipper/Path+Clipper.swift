@@ -8,7 +8,6 @@
 import CoreGraphics
 
 extension Path {
-    
     public func union(_ path: Path, isClosed: Bool = true) -> Paths {
         var paths = Paths()
         let c = Clipper()
@@ -200,7 +199,6 @@ extension Path {
 
 
 extension Paths {
-    
     public func unions(_ isClosed: Bool = true) -> Paths {
         var paths = Paths()
         let c = Clipper()
