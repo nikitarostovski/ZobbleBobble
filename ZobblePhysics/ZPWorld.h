@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 
 static NSString *kBodyPolygonKey = @"body_polygon";
+static NSString *kBodyRadiusKey = @"body_radius";
 static NSString *kBodyPositionKey = @"body_position";
 static NSString *kBodyIsStaticKey = @"body_static";
 
@@ -22,7 +23,13 @@ typedef void(^OnParticleHarden)(int);
 
 @property (nonatomic) NSMutableArray<ZPBody *> *bodies;
 
+@property (nonatomic) void *circleBodiesPositions;
+@property (nonatomic) void *circleBodiesRadii;
+@property (nonatomic) void *circleBodiesColors;
+@property (nonatomic) int circleBodyCount;
+
 @property (nonatomic) void *liquidPositions;
+@property (nonatomic) void *liquidColors;
 @property (nonatomic) int liquidCount;
 @property (nonatomic, copy) OnParticleHarden onHarden;
 
@@ -30,7 +37,7 @@ typedef void(^OnParticleHarden)(int);
 - (id)initWithGravity:(CGPoint)gravity ParticleRadius:(CGFloat)radius;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
-- (void)addBodyWithPolygon:(NSArray<NSValue *> *)polygon Position:(CGPoint)position;
+- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position;
 - (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Position:(CGPoint)position IsStatic:(BOOL)isStatic;
 
 - (void)removeBodyAt:(int)index;

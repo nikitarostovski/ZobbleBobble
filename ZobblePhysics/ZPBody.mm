@@ -14,21 +14,25 @@
 
 @implementation ZPBody
 
-- (id)initWithPolygon:(NSArray<NSValue *> *)points IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Density:(float)density Friction:(float)friction Restitution:(float)restitution Category:(int)category AtWorld:(ZPWorld *)world {
-    b2Vec2 *pts = new b2Vec2[points.count];
-    for (int i = 0; i < points.count; i++) {
-        NSValue *v = points[i];
-        CGPoint pt = [v CGPointValue];
-        b2Vec2 p = *new b2Vec2(pt.x, pt.y);
-        pts[i] = p;
-    }
-    b2PolygonShape shape;
-    shape.Set(pts, (int32)points.count);
+- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Density:(float)density Friction:(float)friction Restitution:(float)restitution Category:(int)category AtWorld:(ZPWorld *)world {
+//    b2Vec2 *pts = new b2Vec2[points.count];
+//    for (int i = 0; i < points.count; i++) {
+//        NSValue *v = points[i];
+//        CGPoint pt = [v CGPointValue];
+//        b2Vec2 p = *new b2Vec2(pt.x, pt.y);
+//        pts[i] = p;
+//    }
+//    b2PolygonShape shape;
+//    shape.Set(pts, (int32)points.count);
+    b2CircleShape shape;
+    shape.m_radius = radius;
     
     b2BodyType type = isDynamic ? b2_dynamicBody : b2_staticBody;
     
     self.isRemoving = NO;
-    self.polygon = points;
+    self.radius = radius;
+    self.position = position;
+//    self.polygon = points;
     self = [super init];
     
     b2BodyDef bodyDef;

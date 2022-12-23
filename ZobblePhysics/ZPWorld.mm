@@ -12,8 +12,8 @@
 #import "ZPBody.h"
 #import "Constants.h"
 
-static uint32 COMET_MASK = b2_elasticParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle;
-static uint32 LIQUID_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle;
+static uint32 COMET_MASK = b2_elasticParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
+static uint32 LIQUID_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
 static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
 
 @implementation ZPWorld {
@@ -141,7 +141,7 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
         float velocity = velocityBuffer[i].Length();
         uint32 flags = flagsBuffer[i];
 
-        if (flags == LIQUID_MASK && velocity < 2 && contactBuffer[i]) {
+        if (flags == LIQUID_MASK && velocity < 4 && contactBuffer[i]) {
             [self replaceParticleAt:i];
         }
     }
@@ -167,10 +167,10 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     
     // Add Bodies
     for (NSDictionary *dict in _bodiesToAdd) {
-        NSArray<NSValue *> *polygon = dict[kBodyPolygonKey];
+        float radius = [dict[kBodyRadiusKey] floatValue];
         CGPoint position = [dict[kBodyPositionKey] CGPointValue];
         
-        ZPBody *body = [[ZPBody alloc] initWithPolygon:polygon IsDynamic:false Position:position Density:1 Friction:1 Restitution:0 Category:CAT_CORE AtWorld: self];
+        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:false Position:position Density:1 Friction:1 Restitution:0 Category:CAT_CORE AtWorld: self];
         [self.bodies addObject:body];
     }
     [_bodiesToAdd removeAllObjects];
@@ -200,6 +200,10 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
         particleGroupDef.shape = &shape;
         particleGroupDef.strength = 1;
         
+        b2ParticleColor color;
+        color.Set(255, 0, 0, 255);
+        particleGroupDef.color = color;
+        
         b2ParticleSystem *_particleSystem = (b2ParticleSystem *)self.particleSystem;
         _particleSystem->CreateParticleGroup(particleGroupDef);
     }
@@ -208,10 +212,31 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     // Update render data
     self.liquidCount = _system->GetParticleCount();
     self.liquidPositions = _system->GetPositionBuffer();
+    self.liquidColors = _system->GetColorBuffer();
+    
+    int circleBodyCount = (int)self.bodies.count;
+    b2Vec2 *circleBodiesPositions = new b2Vec2[self.circleBodyCount];
+    float *circleBodiesRadii = new float[self.circleBodyCount];
+    b2ParticleColor *circleBodiesColors = new b2ParticleColor[self.circleBodyCount];
+    
+    for (int i = 0; i < self.circleBodyCount; i++) {
+        CGPoint pos = self.bodies[i].position;
+        b2ParticleColor color;
+        color.Set(0, 255, 0, 255);
+        
+        circleBodiesPositions[i] = b2Vec2(pos.x, pos.y);
+        circleBodiesColors[i] = color;
+        circleBodiesRadii[i] = self.bodies[i].radius;
+    }
+    
+    self.circleBodiesPositions = circleBodiesPositions;
+    self.circleBodiesRadii = circleBodiesRadii;
+    self.circleBodiesColors = circleBodiesColors;
+    self.circleBodyCount = circleBodyCount;
 }
 
-- (void)addBodyWithPolygon:(NSArray<NSValue *> *)polygon Position:(CGPoint)position {
-    NSDictionary *dict = @{kBodyPolygonKey: polygon, kBodyPositionKey: @(position)};
+- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position {
+    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position)};
     if (![_bodiesToAdd containsObject:dict]) {
         [_bodiesToAdd addObject:dict];
     }
