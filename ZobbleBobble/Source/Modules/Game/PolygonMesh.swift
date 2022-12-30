@@ -7,7 +7,7 @@
 
 import MetalKit
 
-class PolygonMesh: Mesh {
+class PolygonMesh {
     private static var defaultVertexDescriptor: MTLVertexDescriptor {
         let vertexDescriptor = MTLVertexDescriptor()
         vertexDescriptor.attributes[0].format = .float2
@@ -31,7 +31,8 @@ class PolygonMesh: Mesh {
     
     private var currentPosition: SIMD2<Float>?
     
-    init() {
+    init(_ device: MTLDevice?) {
+        self.device = device
         self.vertexBuffers = []
         self.vertexDescriptor = Self.defaultVertexDescriptor
         self.vertexCount = 0

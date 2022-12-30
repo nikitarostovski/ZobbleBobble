@@ -17,22 +17,26 @@ static uint32 LIQUID_MASK = b2_tensileParticle | b2_viscousParticle | b2_particl
 static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
 
 @implementation ZPWorld {
+    NSMutableArray<ZPBody *> *_bodies;
     NSMutableArray *_bodiesToAdd;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
 }
 
+const float rotation = 1000;
+
 - (id)initWithGravity:(CGPoint)gravity ParticleRadius:(CGFloat)radius {
     self = [super init];
     
+    _bodies = [NSMutableArray new];
     _bodiesToAdd = [NSMutableArray new];
     _particleIndicesToDestroy = [NSMutableArray new];
     _particlesToAdd = [NSMutableArray new];
     
     b2World *_world = new b2World(b2Vec2(gravity.x, gravity.y));
     _world->SetAllowSleeping(true);
+    
     self.world = _world;
-    self.bodies = [NSMutableArray new];
     
     b2ParticleSystemDef particleSystemDef;
     particleSystemDef.radius = radius;
@@ -53,7 +57,7 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
 
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations {
     b2World *_world = (b2World *)self.world;
-    _world->Step(timeStep, velocityIterations, positionIterations, 3);
+    _world->Step(timeStep, velocityIterations, positionIterations, 2);
     
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
@@ -63,6 +67,7 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     
     b2Vec2 *positionBuffer = _system->GetPositionBuffer();
     b2Vec2 *velocityBuffer = _system->GetVelocityBuffer();
+    b2ParticleColor *colorBuffer = _system->GetColorBuffer();
     const b2ParticleContact *particleContactBuffer = _system->GetContacts();
     const b2ParticleBodyContact *bodyContactBuffer = _system->GetBodyContacts();
     const uint32 *flagsBuffer = _system->GetFlagsBuffer();
@@ -70,16 +75,35 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     bool *contactBuffer = new bool[particleCount];
     
     // Apply gravity to bodies
-    for (int i = 0; i < self.bodies.count; i++) {
-        b2Body *body = (b2Body *)(self.bodies[i].body);
-        b2Vec2 pos = body->GetPosition();
-        b2Vec2 d = pos - b2Vec2_zero;
-        d.Normalize();
-
-        float mass = 10;//body->GetMass()
-        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
-        body->ApplyForce(d * -force, pos, true);
-    }
+//    for (int i = 0; i < _bodies.count; i++) {
+//        b2Body *body = (b2Body *)(_bodies[i].body);
+//        b2Vec2 pos = body->GetPosition();
+//        b2Vec2 d = pos - b2Vec2_zero;
+//        d.Normalize();
+//
+//        float mass = 10;//body->GetMass()
+//        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
+//        body->ApplyForce(d * -force, pos, true);
+        
+//        check against core angular velocity
+//        float amount = rotation;
+//        const b2Transform xfm = body->GetTransform();
+//        const b2Vec2 p = body->GetPosition();//xfm.p;// - worldPoint;
+//        const float32 c = cos(amount);
+//        const float32 s = sin(amount);
+//        const float32 x = p.x * c - p.y * s;
+//        const float32 y = p.x * s + p.y * c;
+//        const b2Vec2 pos2 = b2Vec2(x, y);// + worldPoint;
+//        const float32 angle = xfm.q.GetAngle() + amount;
+//        body->SetTransform(pos2, angle);
+        
+        
+        // Calculate Tangent Vector
+//        b2Vec2 radius = body->GetPosition();
+//        b2Vec2 tangent = radius.Skew();
+//        tangent.Normalize();
+//        body->SetLinearVelocity(rotation * timeStep * tangent);
+//    }
     
     // Apply gravity to liquids
     for (int i = 0; i < particleCount; i++) {
@@ -139,23 +163,38 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     // Check for static particles
     for (int i = 0; i < particleCount; i++) {
         float velocity = velocityBuffer[i].Length();
+        b2Vec2 pos = b2Vec2(positionBuffer[i].Length(), 0);//positionBuffer[i];
+        b2Vec2 stepPos = b2Vec2(pos.Length() * cos(rotation), pos.Length() * sin(rotation));
+//        float dist = (pos - stepPos).Length();
+//        float idleVelocity = dist / timeStep;
+//        NSLog(@"%g %g", velocity, idleVelocity);
+//        velocity -= idleVelocity;
+        
+//        b2Vec2 radius = pos;
+//        b2Vec2 tangent = radius.Skew();
+//        tangent.Normalize();
+//        float idleVelocity = (rotation * timeStep * tangent).Length();
+//        NSLog(@"%g %g", velocity, idleVelocity);
+//        velocity -= idleVelocity;
+        
         uint32 flags = flagsBuffer[i];
 
-        if (flags == LIQUID_MASK && velocity < 4 && contactBuffer[i]) {
-            [self replaceParticleAt:i];
+        if (flags == LIQUID_MASK && velocity < 3 && contactBuffer[i]) {
+            CGRect color = CGRectMake(colorBuffer[i].r, colorBuffer[i].g, colorBuffer[i].b, 255);
+            [self replaceParticleAt:i Color: color];
         }
     }
     
     // Remove Bodies
     NSMutableArray *toRemove = [NSMutableArray new];
-    for (ZPBody *body in self.bodies) {
+    for (ZPBody *body in _bodies) {
         if ([body isRemoving]) {
             [toRemove addObject: body];
         }
     }
     for (ZPBody *body in toRemove) {
         _world->DestroyBody((b2Body *)body.body);
-        [self.bodies removeObject:body];
+        [_bodies removeObject:body];
     }
     
     // Remove particles
@@ -169,9 +208,9 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     for (NSDictionary *dict in _bodiesToAdd) {
         float radius = [dict[kBodyRadiusKey] floatValue];
         CGPoint position = [dict[kBodyPositionKey] CGPointValue];
-        
-        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:false Position:position Density:1 Friction:1 Restitution:0 Category:CAT_CORE AtWorld: self];
-        [self.bodies addObject:body];
+        CGRect color = [dict[kBodyColorKey] CGRectValue];
+        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:false Position:position Color:color Density:1 Friction:1 Restitution:0 AtWorld: self];
+        [_bodies addObject:body];
     }
     [_bodiesToAdd removeAllObjects];
     
@@ -180,6 +219,8 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
         NSArray<NSValue *> *polygon = dict[kBodyPolygonKey];
         BOOL isStatic = [dict[kBodyIsStaticKey] boolValue];
         CGPoint position = [dict[kBodyPositionKey] CGPointValue];
+        CGRect col = [dict[kBodyColorKey] CGRectValue];
+        
         b2Vec2 *pts = new b2Vec2[polygon.count];
         for (int i = 0; i < polygon.count; i++) {
             NSValue *v = polygon[i];
@@ -201,7 +242,7 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
         particleGroupDef.strength = 1;
         
         b2ParticleColor color;
-        color.Set(255, 0, 0, 255);
+        color.Set(col.origin.x, col.origin.y, col.size.width, 1);
         particleGroupDef.color = color;
         
         b2ParticleSystem *_particleSystem = (b2ParticleSystem *)self.particleSystem;
@@ -210,23 +251,25 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     [_particlesToAdd removeAllObjects];
     
     // Update render data
-    self.liquidCount = _system->GetParticleCount();
     self.liquidPositions = _system->GetPositionBuffer();
+    self.liquidVelocities = _system->GetVelocityBuffer();
     self.liquidColors = _system->GetColorBuffer();
+    self.liquidCount = _system->GetParticleCount();
     
-    int circleBodyCount = (int)self.bodies.count;
-    b2Vec2 *circleBodiesPositions = new b2Vec2[self.circleBodyCount];
-    float *circleBodiesRadii = new float[self.circleBodyCount];
-    b2ParticleColor *circleBodiesColors = new b2ParticleColor[self.circleBodyCount];
+    int circleBodyCount = (int)_bodies.count;
+    b2Vec2 *circleBodiesPositions = new b2Vec2[circleBodyCount];
+    float32 *circleBodiesRadii = new float32[circleBodyCount];
+    b2ParticleColor *circleBodiesColors = new b2ParticleColor[circleBodyCount];
     
-    for (int i = 0; i < self.circleBodyCount; i++) {
-        CGPoint pos = self.bodies[i].position;
+    for (int i = 0; i < circleBodyCount; i++) {
+        CGPoint pos = _bodies[i].position;
+        CGRect col = _bodies[i].color;
         b2ParticleColor color;
-        color.Set(0, 255, 0, 255);
+        color.Set(col.origin.x, col.origin.y, col.size.width, 1);
         
         circleBodiesPositions[i] = b2Vec2(pos.x, pos.y);
         circleBodiesColors[i] = color;
-        circleBodiesRadii[i] = self.bodies[i].radius;
+        circleBodiesRadii[i] = _bodies[i].radius;
     }
     
     self.circleBodiesPositions = circleBodiesPositions;
@@ -235,23 +278,23 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     self.circleBodyCount = circleBodyCount;
 }
 
-- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position {
-    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position)};
+- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color {
+    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position), kBodyColorKey: [NSValue valueWithCGRect:color]};
     if (![_bodiesToAdd containsObject:dict]) {
         [_bodiesToAdd addObject:dict];
     }
 }
 
-- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Position:(CGPoint)position IsStatic:(BOOL)isStatic {
-    NSDictionary *dict = @{kBodyPolygonKey: polygon, kBodyPositionKey: @(position), kBodyIsStaticKey: @(isStatic)};
+- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic {
+    NSDictionary *dict = @{kBodyPolygonKey: polygon, kBodyPositionKey: @(position), kBodyIsStaticKey: @(isStatic), kBodyColorKey: [NSValue valueWithCGRect:color]};
     [_particlesToAdd addObject:dict];
 }
 
-- (void)replaceParticleAt:(int)index {
+- (void)replaceParticleAt:(int)index Color:(CGRect)color {
     if ([_particleIndicesToDestroy containsObject:@(index)]) {
         return;
     }
-    self.onHarden(index);
+    self.onHarden(index, color);
     
     
 //    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
@@ -283,7 +326,7 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
 }
 
 - (void)removeBodyAt:(int)index {
-    self.bodies[index].isRemoving = YES;
+    _bodies[index].isRemoving = YES;
 }
 
 @end

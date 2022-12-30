@@ -13,8 +13,15 @@
 #import "Box2D.h"
 
 @implementation ZPBody
+@synthesize position;
 
-- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Density:(float)density Friction:(float)friction Restitution:(float)restitution Category:(int)category AtWorld:(ZPWorld *)world {
+- (CGPoint)position {
+    b2Body *body = (b2Body *)self.body;
+    b2Vec2 p = body->GetPosition();
+    return CGPointMake(p.x, p.y);
+}
+
+- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Color:(CGRect)color Density:(float)density Friction:(float)friction Restitution:(float)restitution AtWorld:(ZPWorld *)world {
 //    b2Vec2 *pts = new b2Vec2[points.count];
 //    for (int i = 0; i < points.count; i++) {
 //        NSValue *v = points[i];
@@ -27,11 +34,12 @@
     b2CircleShape shape;
     shape.m_radius = radius;
     
-    b2BodyType type = isDynamic ? b2_dynamicBody : b2_staticBody;
+    b2BodyType type = isDynamic ? b2_dynamicBody : b2_staticBody;//b2_kinematicBody;
     
     self.isRemoving = NO;
     self.radius = radius;
-    self.position = position;
+//    self.position = position;
+    self.color = color;
 //    self.polygon = points;
     self = [super init];
     

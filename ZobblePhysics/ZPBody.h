@@ -12,11 +12,12 @@
 @interface ZPBody : NSObject
 
 @property float radius;
-@property CGPoint position;
+@property (readonly) CGPoint position;
+@property CGRect color;
 @property (nonatomic) void *body;
 
 @property BOOL isRemoving;
 
-- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Density:(float)density Friction:(float)friction Restitution:(float)restitution Category:(int)category AtWorld:(ZPWorld *)world;
+- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Color:(CGRect)color Density:(float)density Friction:(float)friction Restitution:(float)restitution AtWorld:(ZPWorld *)world;
 
 @end

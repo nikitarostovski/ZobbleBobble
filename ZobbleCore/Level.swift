@@ -8,20 +8,34 @@
 import Foundation
 
 public class Level {
-    private let chunkStorage: LevelChunkStorage
+    public struct Shape {
+        public var position: CGPoint
+        public var radius: Float
+        public var color: CGRect
+    }
+    public let number: Int
+    public let initialShapes: [Shape]
+    public var playerShapes: [Shape]
     
-    public var visibleChunks: [LevelChunk] {
-        chunkStorage.visibleChunks
+    init(number: Int) {
+        let shapes = Self.makeShapes(for: number)
+        self.number = number
+        self.initialShapes = shapes
+        self.playerShapes = shapes
     }
     
-    init() {
-        self.chunkStorage = LevelChunkStorage(chunkSize: 10)
-    }
-    
-    public func performUpdateForNewViewport(newCenter: CGPoint, newSize: CGSize) -> Bool {
-        let viewportLeft = newCenter.x - newSize.width / 2
-        let viewportRight = newCenter.x + newSize.width / 2
+    private static func makeShapes(for number: Int) -> [Shape] {
+        let stepX: CGFloat = 400
+        let stepY: CGFloat = 40
         
-        return chunkStorage.performedUpdateForNewViewport(viewportLeft ... viewportRight)
+        return [
+            CGPoint(x: stepX * CGFloat(number), y: stepY * CGFloat(number))
+        ]
+            .map { Shape(position: $0, radius: 20, color: CGRect(x: 255, y: 255, width: 255, height: 255)) }
+    }
+    
+    public func addShape(position: CGPoint, radius: Float, color: CGRect) {
+        playerShapes.append(Shape(position: position, radius: radius, color: color))
+        print("\(number): \(playerShapes.count)")
     }
 }

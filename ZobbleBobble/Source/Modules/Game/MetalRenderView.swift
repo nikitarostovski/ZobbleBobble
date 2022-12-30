@@ -8,37 +8,56 @@
 import UIKit
 import MetalKit
 
-final class MetalRenderView: MTKView, RenderView {
-    lazy var renderer: Renderer = {
-        let device = MTLCreateSystemDefaultDevice()!
-        let renderer = Renderer(device: device, view: self)
-        self.delegate = renderer
-        return renderer
-    }()
+final class MetalRenderView: MTKView {
+    let scale: CGFloat = 1//0.5
+    var renderer: Renderer!
     
-    func setRenderData(polygonMesh: PolygonMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
-        renderer.setRenderData(polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
+    var polygonMesh: PolygonMesh
+    var circleMesh: CircleMesh
+    var liquidMesh: LiquidMesh
+    
+    weak var dataSource: RenderDataSource?
+    
+    init() {
+        let device = MTLCreateSystemDefaultDevice()!
+        
+        let size = CGSize(width: UIScreen.main.bounds.width / scale, height: UIScreen.main.bounds.height / scale)
+//        let size = UIScreen.main.bounds.size
+        
+        self.polygonMesh = PolygonMesh(device)
+        self.circleMesh = CircleMesh(device, size: size)
+        self.liquidMesh = LiquidMesh(device, size: size)
+        super.init(frame: .zero, device: device)
+        self.renderer = Renderer(device: device, view: self)
+        self.delegate = renderer
     }
     
-    func setUniformData(particleRadius: Float) {
-        renderer.setUniformData(particleRadius: particleRadius)
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func update(cameraScale: Float) {
+        guard let dataSource = dataSource else { return }
+        if let liquidCount = dataSource.liquidCount, let liquidPositions = dataSource.liquidPositions, let liquidVelocities = dataSource.liquidVelocities, let liquidColors = dataSource.liquidColors {
+            self.liquidMesh.updateMeshIfNeeded(vertexCount: liquidCount, vertices: liquidPositions, velocities: liquidVelocities, colors: liquidColors, particleRadius: dataSource.particleRadius, cameraScale: cameraScale)
+        }
+        if let circleBodiesPositions = dataSource.circleBodiesPositions, let circleBodiesRadii = dataSource.circleBodiesRadii, let circleBodiesColors = dataSource.circleBodiesColors, let circleBodyCount = dataSource.circleBodyCount {
+            self.circleMesh.updateMeshIfNeeded(positions: circleBodiesPositions, radii: circleBodiesRadii, colors: circleBodiesColors, count: circleBodyCount, cameraScale: cameraScale)
+        }
+        renderer.setRenderData(polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
     }
 }
 
 class Renderer: NSObject, MTKViewDelegate {
-    struct FragmentUniforms {
-        let scaleX: Float
-        let scaleY: Float
-        let particleRadius: Float
-    }
-    
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
-    let view: MTKView
-    private var triangleRenderPipelineState: MTLRenderPipelineState!
-    private var pointRenderPipelineState: MTLRenderPipelineState!
-    private var liquidRenderPipelineState: MTLRenderPipelineState!
-    private var uniformsBuffer: MTLBuffer?
+    var view: MTKView
+    private var drawableRenderPipelineState: MTLRenderPipelineState!
+    
+    private var screenSizeBuffer: MTLBuffer?
+    private var vertexBuffer: MTLBuffer?
+    private var upscaleSamplerState: MTLSamplerState?
+    private var vertexCount: Int = 0
     
     var polygonMesh: PolygonMesh?
     var circleMesh: CircleMesh?
@@ -51,129 +70,90 @@ class Renderer: NSObject, MTKViewDelegate {
         super.init()
         view.device = device
         view.delegate = self
-        view.clearColor = MTLClearColor(red: 0,
-                                        green: 0,
-                                        blue: 0,
-                                        alpha: 1)
         makePipeline()
     }
     
     
-    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        
-    }
-    
-    func setUniformData(particleRadius: Float) {
-        var uniforms = FragmentUniforms(scaleX: 1.0 / Float(UIScreen.main.bounds.width),
-                                        scaleY: 1.0 / Float(UIScreen.main.bounds.height),
-                                        particleRadius: particleRadius)
-        self.uniformsBuffer = device.makeBuffer(
-            bytes: &uniforms,
-            length: MemoryLayout<FragmentUniforms>.stride,
-            options: [])!
-    }
+    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
     
     func setRenderData(polygonMesh: PolygonMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
         self.polygonMesh = polygonMesh
         self.circleMesh = circleMesh
         self.liquidMesh = liquidMesh
-        
-        self.polygonMesh?.device = device
-        self.circleMesh?.device = device
-        self.liquidMesh?.device = device
     }
     
     func makePipeline() {
         guard let library = device.makeDefaultLibrary() else {
-            fatalError("Unable to create default Metal library")
+            return
         }
-        let triangleRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
-        triangleRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_triangle")!
-        triangleRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_triangle")!
-        triangleRenderPipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
+        let drawableRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
+        drawableRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_render")!
+        drawableRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_render")!
+        drawableRenderPipelineDescriptor.colorAttachments[0].pixelFormat = .rgba8Unorm
+        drawableRenderPipelineDescriptor.sampleCount = 1;
         do {
-            triangleRenderPipelineState = try device.makeRenderPipelineState(descriptor: triangleRenderPipelineDescriptor)
+            drawableRenderPipelineState = try device.makeRenderPipelineState(descriptor: drawableRenderPipelineDescriptor)
         } catch {
-            fatalError("Error while creating render pipeline state: \(error)")
+            print(error)
+            return
         }
+        let vertices: [SIMD4<Float>] = [
+            SIMD4<Float>( 1, -1, 1.0, 1.0),
+            SIMD4<Float>(-1, -1, 0.0, 1.0),
+            SIMD4<Float>(-1,  1, 0.0, 0.0),
+            SIMD4<Float>( 1, -1, 1.0, 1.0),
+            SIMD4<Float>(-1,  1, 0.0, 0.0),
+            SIMD4<Float>( 1,  1, 1.0, 0.0)
+        ]
         
-        let liquidRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
-        liquidRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_liquid")!
-        liquidRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_liquid")!
-        liquidRenderPipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
-        do {
-            liquidRenderPipelineState = try device.makeRenderPipelineState(descriptor: liquidRenderPipelineDescriptor)
-        } catch {
-            fatalError("Error while creating render pipeline state: \(error)")
-        }
+        vertexBuffer = device.makeBuffer(
+            bytes: vertices,
+            length: MemoryLayout<SIMD4<Float>>.stride * vertices.count,
+            options: .storageModeShared)!
+        vertexCount = vertices.count
         
-        let pointRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
-        pointRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_point")!
-        pointRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_point")!
-        pointRenderPipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
-        do {
-            pointRenderPipelineState = try device.makeRenderPipelineState(descriptor: pointRenderPipelineDescriptor)
-        } catch {
-            fatalError("Error while creating render pipeline state: \(error)")
-        }
+        var size: SIMD2<Float> = SIMD2<Float>(Float(UIScreen.main.bounds.size.width), Float(UIScreen.main.bounds.size.height))
+        self.screenSizeBuffer = device.makeBuffer(bytes: &size, length: MemoryLayout<SIMD2<Float>>.stride)
+        
+        let s = MTLSamplerDescriptor()
+//        s.magFilter = .nearest
+        self.upscaleSamplerState = device.makeSamplerState(descriptor: s)
     }
     
+//    var angle: Float = 0
+    
     func draw(in view: MTKView) {
-        guard let renderPassDescriptor = view.currentRenderPassDescriptor else { return }
+        self.view = view
+        guard let drawableRenderPassDescriptor = view.currentRenderPassDescriptor else { return }
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
-        guard let uniformsBuffer = uniformsBuffer else { return }
+        guard let vertexBuffer = vertexBuffer, let upscaleSamplerState = upscaleSamplerState else { return }
         
-        let renderCommandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
-        
-        
-        
-        if let liquidMesh = liquidMesh, liquidMesh.vertexCount > 0 {
-            renderCommandEncoder.setRenderPipelineState(liquidRenderPipelineState)
-            renderCommandEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 0)
-            
-            for (i, vertexBuffer) in liquidMesh.vertexBuffers.enumerated() {
-                renderCommandEncoder.setVertexBuffer(vertexBuffer,
-                                                     offset: 0,
-                                                     index: i + 1)
-            }
-            renderCommandEncoder.drawPrimitives(type: liquidMesh.primitiveType,
-                                                vertexStart: 0,
-                                                vertexCount: liquidMesh.vertexCount)
+        var liquidTexture: MTLTexture?
+        if let liquidMesh = liquidMesh {
+            liquidTexture = liquidMesh.render(commandBuffer: commandBuffer)
+        }
+        var circlesTexture: MTLTexture?
+        if let circleMesh = circleMesh {
+            circlesTexture = circleMesh.render(commandBuffer: commandBuffer)
         }
         
-        if let circleMesh = circleMesh, circleMesh.vertexCount > 0 {
-            renderCommandEncoder.setRenderPipelineState(pointRenderPipelineState)
-            renderCommandEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 0)
-            
-            for (i, vertexBuffer) in circleMesh.vertexBuffers.enumerated() {
-                renderCommandEncoder.setVertexBuffer(vertexBuffer,
-                                                     offset: 0,
-                                                     index: i + 1)
-            }
-            renderCommandEncoder.drawPrimitives(type: circleMesh.primitiveType,
-                                                vertexStart: 0,
-                                                vertexCount: circleMesh.vertexCount)
-        }
-//        switch mesh.primitiveType {
-//        case .triangle:
-//            renderCommandEncoder.setRenderPipelineState(triangleRenderPipelineState)
-//        case .point:
-//            renderCommandEncoder.setRenderPipelineState(pointRenderPipelineState)
-//        default:
-//            return
-//        }
-//        renderCommandEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 0)
-//
-//        for (i, vertexBuffer) in mesh.vertexBuffers.enumerated() {
-//            renderCommandEncoder.setVertexBuffer(vertexBuffer,
-//                                                 offset: 0,
-//                                                 index: i + 1)
-//        }
-//        renderCommandEncoder.drawPrimitives(type: mesh.primitiveType,
-//                                            vertexStart: 0,
-//                                            vertexCount: mesh.vertexCount)
         
-        renderCommandEncoder.endEncoding()
+//        var angle = self.angle
+//        let angleBuffer = device.makeBuffer(bytes: &angle, length: MemoryLayout<Float>.stride)!
+//        self.angle += 0.01
+        
+        guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: drawableRenderPassDescriptor) else { return }
+        renderEncoder.setRenderPipelineState(drawableRenderPipelineState)
+        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+//        renderEncoder.setVertexBuffer(angleBuffer, offset: 0, index: 1)
+        renderEncoder.setFragmentTexture(liquidTexture, index: 0)
+        renderEncoder.setFragmentTexture(circlesTexture, index: 1)
+        renderEncoder.setFragmentBuffer(screenSizeBuffer, offset: 0, index: 0)
+        renderEncoder.setFragmentSamplerState(upscaleSamplerState, index: 0)
+        
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount)
+        renderEncoder.endEncoding()
+        
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
     }
