@@ -34,10 +34,10 @@ typedef void(^OnParticleHarden)(int, CGRect);
 @property (nonatomic, copy) OnParticleHarden onHarden;
 
 
-- (id)initWithGravity:(CGPoint)gravity ParticleRadius:(CGFloat)radius;
+- (id)initWithGravityCenter:(CGPoint)center ParticleRadius:(CGFloat)radius;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
-- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color;
+- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic;
 - (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon  Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic;
 
 - (void)removeBodyAt:(int)index;

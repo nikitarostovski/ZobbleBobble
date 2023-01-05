@@ -12,6 +12,7 @@ struct LiquidUniforms {
     float particleRadius;
     float textureDownscale;
     float cameraScale;
+    float2 camera;
 };
 
 #define CLAMP(v, min, max) \
@@ -36,7 +37,6 @@ kernel void metaballs(constant LiquidUniforms &uniforms [[buffer(0)]],
                       constant float2 *velocities [[buffer(2)]],
                       constant uchar4 *color [[buffer(3)]],
                       constant int *pointCount [[buffer(4)]],
-                      constant float *angle [[buffer(5)]],
                       texture2d<float, access::read> input [[texture(0)]],
                       texture2d<float, access::write> output [[texture(1)]],
                       texture2d<float, access::write> colorizedOutput [[texture(2)]],
@@ -53,7 +53,7 @@ kernel void metaballs(constant LiquidUniforms &uniforms [[buffer(0)]],
         float3 col = float4(color[i]).rgb / 255.0;
 //        col = rgb_to_hsv(col.rgb);
         
-        float2 pos = positions[i] * uniforms.textureDownscale * uniforms.cameraScale;
+        float2 pos = (positions[i] - uniforms.camera) * uniforms.textureDownscale * uniforms.cameraScale;
 
 //        float l = length(pos);
 //        float2 norm = normalize(pos);

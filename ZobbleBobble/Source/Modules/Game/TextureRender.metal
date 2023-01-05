@@ -82,19 +82,20 @@ vertex TexturePipelineRasterizerData vertex_render(device float4 const* position
 fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
                                 texture2d<float> texture1 [[texture(0)]],
                                 texture2d<float> texture2 [[texture(1)]],
+                                texture2d<float> texture3 [[texture(2)]],
                                 constant float2 *destSize [[buffer(0)]],
                                 sampler s [[sampler(0)]]) {
     float4 c1 = texture1.sample(s, in.texcoord);
     float4 c2 = texture2.sample(s, in.texcoord);
+    float4 c3 = texture3.sample(s, in.texcoord);
 
-    float4 result;
-    if (c2.a > 0) {
-        result = c2;
+    if (c3.a > 0) {
+        return c3;
+    } else if (c2.a > 0) {
+        return c2;
     } else {
-        result = c1 + c2;
+        return c1;
     }
-    
-    return result;
 //    float2 uv = in.position.xy / *destSize;
 //    float2 crtUV = CRTCurveUV(uv);
 //

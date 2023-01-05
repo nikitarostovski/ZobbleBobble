@@ -12,28 +12,28 @@
 #import "ZPBody.h"
 #import "Constants.h"
 
-static uint32 COMET_MASK = b2_elasticParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
+static uint32 COMET_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
 static uint32 LIQUID_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
 static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
 
 @implementation ZPWorld {
+    CGPoint _gravityCenter;
     NSMutableArray<ZPBody *> *_bodies;
     NSMutableArray *_bodiesToAdd;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
 }
 
-const float rotation = 1000;
-
-- (id)initWithGravity:(CGPoint)gravity ParticleRadius:(CGFloat)radius {
+- (id)initWithGravityCenter:(CGPoint)center ParticleRadius:(CGFloat)radius {
     self = [super init];
     
+    _gravityCenter = center;
     _bodies = [NSMutableArray new];
     _bodiesToAdd = [NSMutableArray new];
     _particleIndicesToDestroy = [NSMutableArray new];
     _particlesToAdd = [NSMutableArray new];
     
-    b2World *_world = new b2World(b2Vec2(gravity.x, gravity.y));
+    b2World *_world = new b2World(b2Vec2(0, 0));
     _world->SetAllowSleeping(true);
     
     self.world = _world;
@@ -75,15 +75,15 @@ const float rotation = 1000;
     bool *contactBuffer = new bool[particleCount];
     
     // Apply gravity to bodies
-//    for (int i = 0; i < _bodies.count; i++) {
-//        b2Body *body = (b2Body *)(_bodies[i].body);
-//        b2Vec2 pos = body->GetPosition();
-//        b2Vec2 d = pos - b2Vec2_zero;
-//        d.Normalize();
-//
-//        float mass = 10;//body->GetMass()
-//        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
-//        body->ApplyForce(d * -force, pos, true);
+    for (int i = 0; i < _bodies.count; i++) {
+        b2Body *body = (b2Body *)(_bodies[i].body);
+        b2Vec2 pos = body->GetPosition();
+        b2Vec2 d = pos - b2Vec2(_gravityCenter.x, _gravityCenter.y);
+        d.Normalize();
+
+        float mass = 10;
+        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
+        body->ApplyForce(d * -force, pos, true);
         
 //        check against core angular velocity
 //        float amount = rotation;
@@ -96,14 +96,14 @@ const float rotation = 1000;
 //        const b2Vec2 pos2 = b2Vec2(x, y);// + worldPoint;
 //        const float32 angle = xfm.q.GetAngle() + amount;
 //        body->SetTransform(pos2, angle);
-        
-        
-        // Calculate Tangent Vector
+//
+//
+//         Calculate Tangent Vector
 //        b2Vec2 radius = body->GetPosition();
 //        b2Vec2 tangent = radius.Skew();
 //        tangent.Normalize();
 //        body->SetLinearVelocity(rotation * timeStep * tangent);
-//    }
+    }
     
     // Apply gravity to liquids
     for (int i = 0; i < particleCount; i++) {
@@ -113,7 +113,7 @@ const float rotation = 1000;
         
         b2Vec2 v = positionBuffer[i];
         
-        b2Vec2 d = b2Vec2_zero - v;
+        b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
         d.Normalize();
         
         float mass = 10;//_system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
@@ -163,19 +163,6 @@ const float rotation = 1000;
     // Check for static particles
     for (int i = 0; i < particleCount; i++) {
         float velocity = velocityBuffer[i].Length();
-        b2Vec2 pos = b2Vec2(positionBuffer[i].Length(), 0);//positionBuffer[i];
-        b2Vec2 stepPos = b2Vec2(pos.Length() * cos(rotation), pos.Length() * sin(rotation));
-//        float dist = (pos - stepPos).Length();
-//        float idleVelocity = dist / timeStep;
-//        NSLog(@"%g %g", velocity, idleVelocity);
-//        velocity -= idleVelocity;
-        
-//        b2Vec2 radius = pos;
-//        b2Vec2 tangent = radius.Skew();
-//        tangent.Normalize();
-//        float idleVelocity = (rotation * timeStep * tangent).Length();
-//        NSLog(@"%g %g", velocity, idleVelocity);
-//        velocity -= idleVelocity;
         
         uint32 flags = flagsBuffer[i];
 
@@ -209,7 +196,8 @@ const float rotation = 1000;
         float radius = [dict[kBodyRadiusKey] floatValue];
         CGPoint position = [dict[kBodyPositionKey] CGPointValue];
         CGRect color = [dict[kBodyColorKey] CGRectValue];
-        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:false Position:position Color:color Density:1 Friction:1 Restitution:0 AtWorld: self];
+        BOOL isStatic = [dict[kBodyIsStaticKey] boolValue];
+        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:!isStatic Position:position Color:color Density:1 Friction:1 Restitution:0 AtWorld: self];
         [_bodies addObject:body];
     }
     [_bodiesToAdd removeAllObjects];
@@ -240,6 +228,7 @@ const float rotation = 1000;
         particleGroupDef.position.Set(position.x, position.y);
         particleGroupDef.shape = &shape;
         particleGroupDef.strength = 1;
+        particleGroupDef.groupFlags = b2_solidParticleGroup;
         
         b2ParticleColor color;
         color.Set(col.origin.x, col.origin.y, col.size.width, 1);
@@ -278,8 +267,8 @@ const float rotation = 1000;
     self.circleBodyCount = circleBodyCount;
 }
 
-- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color {
-    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position), kBodyColorKey: [NSValue valueWithCGRect:color]};
+- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic {
+    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position), kBodyIsStaticKey: @(isStatic), kBodyColorKey: [NSValue valueWithCGRect:color]};
     if (![_bodiesToAdd containsObject:dict]) {
         [_bodiesToAdd addObject:dict];
     }
@@ -295,34 +284,10 @@ const float rotation = 1000;
         return;
     }
     self.onHarden(index, color);
-    
-    
-//    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-//    b2Vec2 *positionBuffer = _system->GetPositionBuffer();
-//
-//    b2Vec2 pos = positionBuffer[index];
-//
-//    int vertexCount = 4;
-//    float radius = _system->GetRadius();
-//
-//    NSMutableArray<NSValue *> *polygon = [NSMutableArray new];
-//    for (int i = 0; i < vertexCount; i++) {
-//        CGFloat a = 2 * M_PI * i / vertexCount;
-//        CGPoint v = CGPointMake(pos.x + radius * cos(a), pos.y + radius * sin(a));
-//        NSValue *val = [NSValue valueWithCGPoint:v];
-//        [polygon addObject: val];
-//    }
-
-    
-//    [_particleIndicesToDestroy addObject:@(index)];
-//    _system->SetParticleFlags(index, CORE_MASK);
 }
 
 - (void)removeParticleAt:(int)index {
     [_particleIndicesToDestroy addObject:@(index)];
-//    [_particleIndicesToDestroy removeObject:@(index)];
-//    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-//    _system->DestroyParticle(index);
 }
 
 - (void)removeBodyAt:(int)index {

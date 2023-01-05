@@ -7,10 +7,11 @@
 
 import MetalKit
 
-class CircleMesh {
+class CircleMesh: BaseMesh {
     struct Uniforms {
         let downScale: Float
         let cameraScale: Float
+        let camera: SIMD2<Float>
     }
     
     private lazy var initPipelineState: MTLComputePipelineState? = {
@@ -48,7 +49,6 @@ class CircleMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "threshold_filter_circle")!)
     }()
     
-    weak var device: MTLDevice?
     var vertexBuffers: [MTLBuffer]
     var angleBuffer: MTLBuffer?
     var thresholdBuffer: MTLBuffer?
@@ -68,9 +68,10 @@ class CircleMesh {
     var finalTexture: MTLTexture?
     
     init(_ device: MTLDevice?, size: CGSize) {
-        self.device = device
         self.vertexBuffers = []
         self.vertexCount = 0
+        super.init()
+        self.device = device
         
         let width = Int(size.width * CGFloat(textureScale))
         let height = Int(size.height * CGFloat(textureScale))
@@ -115,16 +116,20 @@ class CircleMesh {
         self.fadeMultiplierBuffer = device?.makeBuffer(bytes: &fadeMultiplier, length: MemoryLayout<Float>.stride)
     }
     
-    func updateMeshIfNeeded(positions: UnsafeMutableRawPointer,
-                            radii: UnsafeMutableRawPointer,
-                            colors: UnsafeMutableRawPointer,
-                            count: Int,
-                            cameraScale: Float) {
+    func updateMeshIfNeeded(positions: UnsafeMutableRawPointer?,
+                            radii: UnsafeMutableRawPointer?,
+                            colors: UnsafeMutableRawPointer?,
+                            count: Int?,
+                            cameraScale: Float,
+                            camera: SIMD2<Float>) {
         
-        guard let device = device/*, count != vertexCount*/ else { return }
+        guard let device = device, let positions = positions, let radii = radii, let colors = colors, var count = count else {
+            self.vertexBuffers = []
+            self.vertexCount = 0
+            return
+        }
         
-        var count = count
-        var uniforms = Uniforms(downScale: textureScale, cameraScale: cameraScale)
+        var uniforms = Uniforms(downScale: textureScale, cameraScale: cameraScale, camera: camera)
         
         let positionBuffer = device.makeBuffer(
             bytes: positions,
@@ -154,15 +159,15 @@ class CircleMesh {
     }
     
     func render(commandBuffer: MTLCommandBuffer) -> MTLTexture? {
-        guard !vertexBuffers.isEmpty else { return nil }
-        guard let initPipelineState = initPipelineState else { return nil }
-        guard let computeMetaballsPipelineState = computeMetaballsPipelineState else { return nil }
-        guard let computeThresholdPipelineState = computeThresholdPipelineState else { return nil }
-        guard let computeUpscalePipelineState = computeUpscalePipelineState else { return nil }
-        guard let lowResTexture = lowResTexture, let finalTexture = finalTexture, let colorLowResTexture = colorLowResTexture else { return nil }
-        guard let computeBlurPipelineState = computeBlurPipelineState else { return nil }
+        guard !vertexBuffers.isEmpty else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let initPipelineState = initPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let computeMetaballsPipelineState = computeMetaballsPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let computeThresholdPipelineState = computeThresholdPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let computeUpscalePipelineState = computeUpscalePipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let lowResTexture = lowResTexture, let finalTexture = finalTexture, let colorLowResTexture = colorLowResTexture else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let computeBlurPipelineState = computeBlurPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         let computePassDescriptor = MTLComputePassDescriptor()
-        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return nil }
+        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
         
         let lowResThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
         let lowResThreadgroups = MTLSize(width: lowResTexture.width / lowResThreadgroupCount.width + 1, height: lowResTexture.height / lowResThreadgroupCount.height + 1, depth: 1)

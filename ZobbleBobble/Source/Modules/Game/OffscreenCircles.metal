@@ -11,6 +11,7 @@ using namespace metal;
 struct CircleUniforms {
     float textureDownscale;
     float cameraScale;
+    float2 camera;
 };
 
 #define CLAMP(v, min, max) \
@@ -25,7 +26,6 @@ kernel void metaballs_circle(constant CircleUniforms &uniforms [[buffer(0)]],
                              constant float *radii [[buffer(2)]],
                              constant uchar4 *color [[buffer(3)]],
                              constant int *pointCount [[buffer(4)]],
-                             constant float *angle [[buffer(5)]],
                              texture2d<float, access::read> input [[texture(0)]],
                              texture2d<float, access::write> output [[texture(1)]],
                              texture2d<float, access::write> colorizedOutput [[texture(2)]],
@@ -40,7 +40,7 @@ kernel void metaballs_circle(constant CircleUniforms &uniforms [[buffer(0)]],
         float radius = radii[i] * uniforms.textureDownscale * uniforms.cameraScale;
         float3 col = float4(color[i]).rgb / 255.0;
         
-        float2 pos = positions[i] * uniforms.textureDownscale * uniforms.cameraScale;
+        float2 pos = (positions[i] - uniforms.camera) * uniforms.textureDownscale * uniforms.cameraScale;
 //        float l = length(pos);
 //        float2 norm = normalize(pos);
 //

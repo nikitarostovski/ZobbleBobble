@@ -18,4 +18,17 @@ protocol RenderDataSource: AnyObject {
     var circleBodiesPositions: UnsafeMutableRawPointer? { get }
     var circleBodiesColors: UnsafeMutableRawPointer? { get }
     var circleBodiesRadii: UnsafeMutableRawPointer? { get }
+    
+    var cameraX: Float { get }
+    var cameraY: Float { get }
+    
+    var backgroundAnchorPositions: UnsafeMutableRawPointer? { get }
+    var backgroundAnchorRadii: UnsafeMutableRawPointer? { get }
+    var backgroundAnchorColors: UnsafeMutableRawPointer? { get }
+    var backgroundAnchorPointCount: Int? { get }
+}
+
+extension RenderDataSource {
+    var cameraX: Float { 0 }
+    var cameraY: Float { 0 }
 }

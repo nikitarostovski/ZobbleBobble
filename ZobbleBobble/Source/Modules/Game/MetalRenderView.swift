@@ -9,9 +9,10 @@ import UIKit
 import MetalKit
 
 final class MetalRenderView: MTKView {
-    let scale: CGFloat = 1//0.5
+    let scale: CGFloat = 1
     var renderer: Renderer!
     
+    var backgroundMesh: BackgroundMesh
     var polygonMesh: PolygonMesh
     var circleMesh: CircleMesh
     var liquidMesh: LiquidMesh
@@ -24,6 +25,7 @@ final class MetalRenderView: MTKView {
         let size = CGSize(width: UIScreen.main.bounds.width / scale, height: UIScreen.main.bounds.height / scale)
 //        let size = UIScreen.main.bounds.size
         
+        self.backgroundMesh = BackgroundMesh(device, size: size)
         self.polygonMesh = PolygonMesh(device)
         self.circleMesh = CircleMesh(device, size: size)
         self.liquidMesh = LiquidMesh(device, size: size)
@@ -36,15 +38,16 @@ final class MetalRenderView: MTKView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(cameraScale: Float) {
+    func update(cameraScale: Float, camera: SIMD2<Float>) {
         guard let dataSource = dataSource else { return }
-        if let liquidCount = dataSource.liquidCount, let liquidPositions = dataSource.liquidPositions, let liquidVelocities = dataSource.liquidVelocities, let liquidColors = dataSource.liquidColors {
-            self.liquidMesh.updateMeshIfNeeded(vertexCount: liquidCount, vertices: liquidPositions, velocities: liquidVelocities, colors: liquidColors, particleRadius: dataSource.particleRadius, cameraScale: cameraScale)
+        
+        liquidMesh.updateMeshIfNeeded(vertexCount: dataSource.liquidCount, vertices: dataSource.liquidPositions, velocities: dataSource.liquidVelocities, colors: dataSource.liquidColors, particleRadius: dataSource.particleRadius, cameraScale: cameraScale, camera: camera)
+        circleMesh.updateMeshIfNeeded(positions: dataSource.circleBodiesPositions, radii: dataSource.circleBodiesRadii, colors: dataSource.circleBodiesColors, count: dataSource.circleBodyCount, cameraScale: cameraScale, camera: camera)
+        
+        if let backgroundAnchorPointCount = dataSource.backgroundAnchorPointCount, let backgroundAnchorPositions = dataSource.backgroundAnchorPositions, let backgroundAnchorRadii = dataSource.backgroundAnchorRadii, let backgroundAnchorColors = dataSource.backgroundAnchorColors {
+            self.backgroundMesh.updateMeshIfNeeded(positions: backgroundAnchorPositions, radii: backgroundAnchorRadii, colors: backgroundAnchorColors, count: backgroundAnchorPointCount, cameraScale: cameraScale, camera: camera)
         }
-        if let circleBodiesPositions = dataSource.circleBodiesPositions, let circleBodiesRadii = dataSource.circleBodiesRadii, let circleBodiesColors = dataSource.circleBodiesColors, let circleBodyCount = dataSource.circleBodyCount {
-            self.circleMesh.updateMeshIfNeeded(positions: circleBodiesPositions, radii: circleBodiesRadii, colors: circleBodiesColors, count: circleBodyCount, cameraScale: cameraScale)
-        }
-        renderer.setRenderData(polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
+        renderer.setRenderData(backgroundMesh: backgroundMesh, polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
     }
 }
 
@@ -59,6 +62,7 @@ class Renderer: NSObject, MTKViewDelegate {
     private var upscaleSamplerState: MTLSamplerState?
     private var vertexCount: Int = 0
     
+    var backgroundMesh: BackgroundMesh?
     var polygonMesh: PolygonMesh?
     var circleMesh: CircleMesh?
     var liquidMesh: LiquidMesh?
@@ -73,10 +77,10 @@ class Renderer: NSObject, MTKViewDelegate {
         makePipeline()
     }
     
-    
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
     
-    func setRenderData(polygonMesh: PolygonMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
+    func setRenderData(backgroundMesh: BackgroundMesh?, polygonMesh: PolygonMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
+        self.backgroundMesh = backgroundMesh
         self.polygonMesh = polygonMesh
         self.circleMesh = circleMesh
         self.liquidMesh = liquidMesh
@@ -120,34 +124,22 @@ class Renderer: NSObject, MTKViewDelegate {
         self.upscaleSamplerState = device.makeSamplerState(descriptor: s)
     }
     
-//    var angle: Float = 0
-    
     func draw(in view: MTKView) {
         self.view = view
         guard let drawableRenderPassDescriptor = view.currentRenderPassDescriptor else { return }
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
         guard let vertexBuffer = vertexBuffer, let upscaleSamplerState = upscaleSamplerState else { return }
         
-        var liquidTexture: MTLTexture?
-        if let liquidMesh = liquidMesh {
-            liquidTexture = liquidMesh.render(commandBuffer: commandBuffer)
-        }
-        var circlesTexture: MTLTexture?
-        if let circleMesh = circleMesh {
-            circlesTexture = circleMesh.render(commandBuffer: commandBuffer)
-        }
-        
-        
-//        var angle = self.angle
-//        let angleBuffer = device.makeBuffer(bytes: &angle, length: MemoryLayout<Float>.stride)!
-//        self.angle += 0.01
+        let backgroundTexture = backgroundMesh?.render(commandBuffer: commandBuffer)
+        let liquidTexture = liquidMesh?.render(commandBuffer: commandBuffer)
+        let circlesTexture = circleMesh?.render(commandBuffer: commandBuffer)
         
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: drawableRenderPassDescriptor) else { return }
         renderEncoder.setRenderPipelineState(drawableRenderPipelineState)
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-//        renderEncoder.setVertexBuffer(angleBuffer, offset: 0, index: 1)
-        renderEncoder.setFragmentTexture(liquidTexture, index: 0)
-        renderEncoder.setFragmentTexture(circlesTexture, index: 1)
+        renderEncoder.setFragmentTexture(backgroundTexture, index: 0)
+        renderEncoder.setFragmentTexture(liquidTexture, index: 1)
+        renderEncoder.setFragmentTexture(circlesTexture, index: 2)
         renderEncoder.setFragmentBuffer(screenSizeBuffer, offset: 0, index: 0)
         renderEncoder.setFragmentSamplerState(upscaleSamplerState, index: 0)
         

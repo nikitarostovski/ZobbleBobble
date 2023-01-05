@@ -16,6 +16,10 @@ final class Menu {
     var circleBodiesColors: UnsafeMutableRawPointer?
     var circleBodiesRadii: UnsafeMutableRawPointer?
     
+    var backgroundAnchorPointCount: Int? { nil }
+    var backgroundAnchorPoints: UnsafeMutableRawPointer? { nil }
+    var backgroundAnchorRadii: UnsafeMutableRawPointer? { nil }
+    
     init(levels: [Level]) {
         self.levels = levels
         updateData()
@@ -44,6 +48,14 @@ final class Menu {
 }
 
 extension Menu: RenderDataSource {
+    var backgroundAnchorPositions: UnsafeMutableRawPointer? {
+        nil
+    }
+    
+    var backgroundAnchorColors: UnsafeMutableRawPointer? {
+        nil
+    }
+    
     var particleRadius: Float {
         0
     }
