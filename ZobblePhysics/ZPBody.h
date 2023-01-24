@@ -14,10 +14,11 @@
 @property float radius;
 @property (readonly) CGPoint position;
 @property CGRect color;
+@property BOOL isExploding;
 @property (nonatomic) void *body;
 
 @property BOOL isRemoving;
 
-- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Color:(CGRect)color Density:(float)density Friction:(float)friction Restitution:(float)restitution AtWorld:(ZPWorld *)world;
+- (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Color:(CGRect)color Density:(float)density Friction:(float)friction Restitution:(float)restitution AtWorld:(ZPWorld *)world IsExploding:(BOOL)isExploding;
 
 @end

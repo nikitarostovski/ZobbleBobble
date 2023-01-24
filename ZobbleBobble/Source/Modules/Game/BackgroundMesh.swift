@@ -21,7 +21,7 @@ class BackgroundMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "fill_background")!)
     }()
     
-    private var textureScale: Float = 1
+    private var textureScale: Float = 0.4
     weak var device: MTLDevice?
     var vertexBuffers: [MTLBuffer]
     var uniformsBuffer: MTLBuffer?
@@ -33,13 +33,16 @@ class BackgroundMesh {
         self.vertexBuffers = []
         self.vertexCount = 0
         
-        guard size.width > 0, size.height > 0 else { return }
+        let width = Int(size.width * CGFloat(textureScale))
+        let height = Int(size.height * CGFloat(textureScale))
+        
+        guard width > 0, height > 0 else { return }
         self.textureScale /= Float(UIScreen.main.bounds.width / size.width)
         
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .rgba8Unorm,
-            width: Int(size.width),
-            height: Int(size.height),
+            width: width,
+            height: height,
             mipmapped: false)
         finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
         self.finalTexture = device?.makeTexture(descriptor: finalDesc)

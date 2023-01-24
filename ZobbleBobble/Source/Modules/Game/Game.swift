@@ -13,6 +13,10 @@ protocol GameDelegate: AnyObject {
     func gameDidChangeState(_ game: Game)
 }
 
+protocol ScrollHolder: AnyObject {
+    func updateScrollPosition(pageCount: Int, selectedPage: Int)
+}
+
 struct GameState {
     enum State {
         case level
@@ -20,18 +24,23 @@ struct GameState {
     }
     
     var state: State = .menu
-    var level: Int = 0
-    
-    var camera: CGPoint
+    /// index of selected pack for level selection mode
+    var packIndex: Int
+    /// index of level for level mode
+    var levelIndex: Int
 }
 
 final class Game {
-    weak var delegate: GameDelegate?
-    private let animationDuration: TimeInterval = 0.5
-    private(set) var cameraScale: Float = 1
-    private(set) var state: GameState
+    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: 100)
     
+    weak var delegate: GameDelegate?
+    weak var scrollHolder: ScrollHolder?
+    
+    var state: GameState
+    
+    let worldSize: CGSize
     let levelManager: LevelManager
+    
     private var world: World?
     private var menu: Menu?
     
@@ -40,170 +49,215 @@ final class Game {
     var backgroundAnchorColors: UnsafeMutableRawPointer?
     var backgroundAnchorPointCount: Int?
     
-    init(delegate: GameDelegate?) {
+    var nextCometType: CometType? {
+        get { world?.nextCometType }
+        set { world?.nextCometType = newValue! }
+    }
+    
+    init(delegate: GameDelegate?, scrollHolder: ScrollHolder?, worldSize: CGSize) {
         let levelManager = LevelManager()
         self.levelManager = levelManager
-        self.delegate = delegate
-        self.menu = Menu(levels: levelManager.allLevels)
-        self.state = GameState(state: .menu, level: 0, camera: .zero)
+        self.worldSize = worldSize
         
-        changeState(to: self.state.state, animated: false)
+        self.delegate = delegate
+        self.scrollHolder = scrollHolder
+        
+        self.state = GameState(state: .menu, packIndex: 0, levelIndex: 0)
     }
     
     func update(_ time: CFTimeInterval) {
-        world?.update(time)
+        guard let world = world else { return }
+        world.update(time)
     }
     
-    func changeState(to state: GameState.State, animated: Bool = true) {
-        switch state {
-        case .menu:
-            exitToMenu(number: self.state.level, animated: animated)
-        case .level:
-            runGame(number: self.state.level, animated: animated)
-        }
-        self.refreshBackgroundRenderData()
+    func runGame() {
+        let level = levelManager.allLevelPacks[self.state.packIndex].levels[self.state.levelIndex]
+        let world = World(level: level, centerPoint: levelCenterPoint)
+        self.world = world
+        self.state.state = .level
     }
     
-    var isSoldComet = false
-    
-    func gameToScreen(_ point: CGPoint) -> CGPoint {
-        return CGPoint(x: (state.camera.x) + CGFloat(cameraScale) * point.x,
-                       y: (state.camera.y) + CGFloat(cameraScale) * point.y)
-    }
-    
-    func screenToGame(_ point: CGPoint) -> CGPoint {
-        return CGPoint(x: state.camera.x + point.x / CGFloat(cameraScale),
-                       y: state.camera.y + point.y / CGFloat(cameraScale))
+    func runMenu(isFromLevel: Bool = false) {
+        let from = isFromLevel ? Menu.levelCameraScale : Menu.levelsMenuCameraScale
+        let menu = Menu(game: self, from: from)
+        self.menu = menu
+        self.state.state = .menu
     }
     
     func onTap(at pos: CGPoint) {
-        let pos = screenToGame(pos)
-        
         switch state.state {
         case .level:
-            let cometType: CometType = .liquid//isSoldComet ? .solid : .liquid
-            isSoldComet.toggle()
-            let color = Colors.comet(cometType).pickColor()
-            
-            switch state.state {
-            case .level:
-                world?.spawnComet(type: cometType, position: pos, radius: cometType.radius, color: color)
-            case .menu:
-                break
-            }
+            world?.onTap(pos)
         case .menu:
-            self.changeState(to: .level)
+            menu?.onTap(position: pos)
         }
     }
     
     func onSwipe(_ position: CGPoint) {
         switch state.state {
         case .level:
-            break
+            world?.onSwipe(position.x)
         case .menu:
-            self.state.camera.x = position.x / CGFloat(cameraScale)
-            let position = max(0, min((position.x) / CGFloat(cameraScale), levelManager.levelsTotalWidth))
-            if position != 0 {
-                let planetIndex = Int(position / levelManager.levelDistance + 0.5)
-                if self.state.level != planetIndex {
-                    self.state.level = planetIndex
-                }
-            }
+            menu?.onSwipe(position.x)
         }
     }
     
-    private func runGame(number: Int, animated: Bool) {
-        let currentScale: Float = cameraScale
-        let currentCamera = state.camera
-        let targetScale: Float = 1.0
-        let targetCamera = levelManager.allLevels[number].center
-        
-        let completion = { [weak self] in
-            guard let self = self else { return }
-            self.cameraScale = targetScale
-            self.state.camera.x = targetCamera.x
-            self.menu = nil
-            self.world = World(level: self.levelManager.allLevels[number])
-            self.state.state = .level
-            self.delegate?.gameDidChangeState(self)
-        }
-        
-        let animation = { [weak self] (percentage: CGFloat) -> Void in
-            guard let self = self else { return }
-            self.cameraScale = currentScale + (targetScale - currentScale) * Float(percentage)
-            self.state.camera.x = currentCamera.x + (targetCamera.x - currentCamera.x) * percentage
-            self.delegate?.gameDidChangeState(self)
-        }
-        
-        if animated {
-            Animator.animate(duraion: animationDuration, step: animation, completion: completion)
-        } else {
-            completion()
-        }
+    func onExitTap() {
+        guard state.state == .level else { return }
+        runMenu(isFromLevel: true)
     }
     
-    private func exitToMenu(number: Int, animated: Bool) {
-        let currentScale: Float = cameraScale
-        let currentCamera = state.camera
-        let targetScale: Float = 0.4
-        let targetCamera = levelManager.allLevels[number].center
-        
-        self.menu = Menu(levels: levelManager.allLevels)
-        self.state.state = .menu
-        self.world = nil
-        
-        let completion = { [weak self] in
-            guard let self = self else { return }
-            self.cameraScale = targetScale
-            self.state.camera = targetCamera
-            self.delegate?.gameDidChangeState(self)
-        }
-        
-        let animation = { [weak self] (percentage: CGFloat) -> Void in
-            guard let self = self else { return }
-            self.cameraScale = currentScale + (targetScale - currentScale) * Float(percentage)
-            self.state.camera.x = currentCamera.x + (targetCamera.x - currentCamera.x) * percentage
-            self.delegate?.gameDidChangeState(self)
-        }
-        
-        if animated {
-            Animator.animate(duraion: animationDuration, step: animation, completion: completion)
-        } else {
-            completion()
-        }
+//    private func runGame(animated: Bool) {
+//        let currentScale: Float = state.cameraScale
+//        let currentCamera = state.camera
+//        let targetScale = defaultCameraScale
+//        let targetCamera = levelCenterPoint
+//
+//        let animation = { [weak self] (percentage: CGFloat) -> Void in
+//            guard let self = self else { return }
+//            self.state.cameraScale = currentScale + (targetScale - currentScale) * Float(percentage)
+//            self.state.camera.x = currentCamera.x + (targetCamera.x - currentCamera.x) * percentage
+//            self.refreshMenuRenderData()
+////            self.delegate?.gameDidChangeState(self)
+//        }
+//
+//        let completion = { [weak self] in
+//            guard let self = self else { return }
+//            self.state.cameraScale = targetScale
+//            self.state.camera.x = targetCamera.x
+//            self.menu = nil
+//            self.world = World(level: self.levelManager.allLevelPacks[self.state.levelPack].levels[number], centerPoint: self.levelCenterPoint)
+//            self.state.state = .level
+//            self.refreshMenuRenderData()
+//            self.delegate?.gameDidChangeState(self)
+//        }
+//
+//        if animated {
+//            Animator.animate(duraion: animationDuration, step: animation, completion: completion)
+//        } else {
+//            completion()
+//        }
+//    }
+//
+//    private func exitToLevelMenu(number: Int, animated: Bool) {
+//        let currentScale: Float = state.cameraScale
+//        let currentCamera = state.camera
+//        let targetScale = levelsMenuCameraScale
+//        let targetCamera = levelCenterPoint
+//
+//        self.menu = Menu(levelPacks: levelManager.allLevelPacks)
+//        self.state.state = .menuLevels
+//        self.state.camera = .zero
+//        self.world = nil
+//
+//        let animation = { [weak self] (percentage: CGFloat) -> Void in
+//            guard let self = self else { return }
+//            self.state.cameraScale = currentScale + (targetScale - currentScale) * Float(percentage)
+//            self.state.camera.x = currentCamera.x + (targetCamera.x - currentCamera.x) * percentage
+//            self.refreshMenuRenderData()
+////            self.delegate?.gameDidChangeState(self)
+//        }
+//
+//        let completion = { [weak self] in
+//            guard let self = self else { return }
+//            self.state.cameraScale = targetScale
+//            self.state.camera = targetCamera
+//            self.refreshMenuRenderData()
+//            self.delegate?.gameDidChangeState(self)
+//        }
+//
+//        if animated {
+//            Animator.animate(duraion: animationDuration, step: animation, completion: completion)
+//        } else {
+//            completion()
+//        }
+//    }
+//
+//    private func exitToPackMenu(number: Int, animated: Bool) {
+//        let currentScale: Float = state.cameraScale
+//        let currentCamera = state.camera
+//        let targetScale = packsMenuCameraScale
+//        let targetCamera = levelCenterPoint
+//
+////        self.menu = Menu(levels: levelManager.allLevels)
+//        self.state.state = .menuPacks
+//        self.state.camera = .zero
+//        self.world = nil
+//
+//        let animation = { [weak self] (percentage: CGFloat) -> Void in
+//            guard let self = self else { return }
+//            self.state.cameraScale = currentScale + (targetScale - currentScale) * Float(percentage)
+//            self.state.camera.x = currentCamera.x + (targetCamera.x - currentCamera.x) * percentage
+//            self.refreshMenuRenderData()
+////            self.delegate?.gameDidChangeState(self)
+//        }
+//
+//        let completion = { [weak self] in
+//            guard let self = self else { return }
+//            self.state.cameraScale = targetScale
+//            self.state.camera = targetCamera
+//            self.refreshMenuRenderData()
+//            self.delegate?.gameDidChangeState(self)
+//            self.state.camera = .zero
+//        }
+//
+//        if animated {
+//            Animator.animate(duraion: animationDuration, step: animation, completion: completion)
+//        } else {
+//            completion()
+//        }
+//    }
+    
+    private func refreshMenuRenderData() {
+//        let position: CGFloat = state.camera.x / worldSize.width * CGFloat(state.cameraScale) + 0.5
+////        let packIndex = state.state == .menuLevels ? state.levelPack : nil
+////        let levelIndex = state.state == .menuLevels ? state.level : nil
+//
+//        let progress = CGFloat(state.cameraScale)
+//        let visibleIndex = Int(position)
+//
+//        if progress >= 1, progress <= 2, visibleIndex != state.level {
+//            state.level = visibleIndex
+//        } else if visibleIndex != state.levelPack {
+//            state.levelPack = visibleIndex
+//        }
+//
+//        self.menu?.updateCamera(worldSize: worldSize,
+//                                levelToPackProgress: progress,
+//                                currentPagePosition: position,
+//                                packIndex: state.levelPack,
+//                                levelIndex: state.level,
+//                                levelCenterPoint: levelCenterPoint)
     }
     
     private func refreshBackgroundRenderData() {
-        let levels = levelManager.allLevels
-        var outlinePositions: [SIMD2<Float32>] = levels.map { SIMD2<Float32>(Float32($0.center.x), Float32($0.center.y)) }
-        var outlineColors: [SIMD4<UInt8>] = levels.map { $0.targetOutline.color }
-        var outlineRadii: [Float] = levels.map { Float($0.targetOutline.radius) }
-        
-        let outlinePositionsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count, alignment: MemoryLayout<SIMD2<Float32>>.alignment)
-        outlinePositionsPointer.copyMemory(from: &outlinePositions, byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count)
-        
-        let outlineRadiiPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float>.stride * outlineRadii.count, alignment: MemoryLayout<Float>.alignment)
-        outlineRadiiPointer.copyMemory(from: &outlineRadii, byteCount: MemoryLayout<Float>.stride * outlineRadii.count)
-        
-        let outlineColorsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD4<UInt8>>.stride * outlineColors.count, alignment: MemoryLayout<SIMD4<UInt8>>.alignment)
-        outlineColorsPointer.copyMemory(from: &outlineColors, byteCount: MemoryLayout<SIMD4<UInt8>>.stride * outlineColors.count)
-        
-        self.backgroundAnchorPositions = outlinePositionsPointer
-        self.backgroundAnchorRadii = outlineRadiiPointer
-        self.backgroundAnchorColors = outlineColorsPointer
-        self.backgroundAnchorPointCount = levels.count
+//        let packs = levelManager.allLevelPacks
+//        var outlinePositions: [SIMD2<Float32>] = packs.map { SIMD2<Float32>(Float32($0.center.x), Float32($0.center.y)) }
+//        var outlineColors: [SIMD4<UInt8>] = packs.map { $0.targetOutline.color }
+//        var outlineRadii: [Float] = packs.map { Float($0.targetOutline.radius) }
+//
+//        let levels = packs.flatMap { $0.levels }
+//        outlinePositions += levels.map { SIMD2<Float32>(Float32($0.center.x), Float32($0.center.y)) }
+//        outlineColors += levels.map { $0.targetOutline.color }
+//        outlineRadii += levels.map { Float($0.targetOutline.radius) }
+//
+//        let outlinePositionsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count, alignment: MemoryLayout<SIMD2<Float32>>.alignment)
+//        outlinePositionsPointer.copyMemory(from: &outlinePositions, byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count)
+//
+//        let outlineRadiiPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float>.stride * outlineRadii.count, alignment: MemoryLayout<Float>.alignment)
+//        outlineRadiiPointer.copyMemory(from: &outlineRadii, byteCount: MemoryLayout<Float>.stride * outlineRadii.count)
+//
+//        let outlineColorsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD4<UInt8>>.stride * outlineColors.count, alignment: MemoryLayout<SIMD4<UInt8>>.alignment)
+//        outlineColorsPointer.copyMemory(from: &outlineColors, byteCount: MemoryLayout<SIMD4<UInt8>>.stride * outlineColors.count)
+//
+//        self.backgroundAnchorPositions = outlinePositionsPointer
+//        self.backgroundAnchorRadii = outlineRadiiPointer
+//        self.backgroundAnchorColors = outlineColorsPointer
+//        self.backgroundAnchorPointCount = levels.count
     }
 }
 
-extension Game: RenderDataSource {
-    var cameraX: Float {
-        Float(self.state.camera.x)
-    }
-    
-    var cameraY: Float {
-        Float(self.state.camera.y)
-    }
-    
+extension Game {
     var renderDataSource: RenderDataSource? {
         switch state.state {
         case .level:
@@ -212,41 +266,4 @@ extension Game: RenderDataSource {
             return menu
         }
     }
-    var particleRadius: Float {
-        renderDataSource?.particleRadius ?? 0
-    }
-    
-    var liquidCount: Int? {
-        renderDataSource?.liquidCount
-    }
-    
-    var liquidPositions: UnsafeMutableRawPointer? {
-        renderDataSource?.liquidPositions
-    }
-    
-    var liquidVelocities: UnsafeMutableRawPointer? {
-        renderDataSource?.liquidVelocities
-    }
-    
-    var liquidColors: UnsafeMutableRawPointer? {
-        renderDataSource?.liquidColors
-    }
-    
-    var circleBodyCount: Int? {
-        renderDataSource?.circleBodyCount
-    }
-    
-    var circleBodiesPositions: UnsafeMutableRawPointer? {
-        renderDataSource?.circleBodiesPositions
-    }
-    
-    var circleBodiesColors: UnsafeMutableRawPointer? {
-        renderDataSource?.circleBodiesColors
-    }
-    
-    var circleBodiesRadii: UnsafeMutableRawPointer? {
-        renderDataSource?.circleBodiesRadii
-    }
-    
-    
 }

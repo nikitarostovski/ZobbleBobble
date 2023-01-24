@@ -9,11 +9,18 @@ import SpriteKit
 import ZobbleCore
 import ZobblePhysics
 
+struct WorldState {
+    var angle: CGFloat
+    var camera: CGPoint
+    var cameraScale: CGFloat
+}
+
 final class World: RenderDataSource {
     var world: ZPWorld
     let level: Level
     
     var particleRadius: Float = 2.5
+    var liquidFadeModifier: Float = 0.3
     var liquidCount: Int?
     var liquidPositions: UnsafeMutableRawPointer?
     var liquidVelocities: UnsafeMutableRawPointer?
@@ -28,20 +35,29 @@ final class World: RenderDataSource {
     var backgroundAnchorColors: UnsafeMutableRawPointer? { nil }
     var backgroundAnchorPointCount: Int? { nil }
     
+    var cameraX: Float { Float(state.camera.x + levelCenterPoint.x) }
+    var cameraY: Float { Float(state.camera.y + levelCenterPoint.y) }
+    var cameraScale: Float { Float(state.cameraScale) }
+    var cameraAngle: Float { Float(state.angle) }
+    
+    private let levelCenterPoint: CGPoint
+    
+    var nextCometType: CometType = .liquid
+    var state: WorldState
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(level: Level) {
+    init(level: Level, centerPoint: CGPoint) {
         self.level = level
-        self.world = ZPWorld(gravityCenter: level.center, particleRadius: CGFloat(particleRadius))
-        
-        self.world.onHarden = { [weak self] index, color in
-            self?.hardenParticle(at: Int(index), color: color)
-        }
+        self.levelCenterPoint = centerPoint
+        self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.targetOutline.radius, particleRadius: CGFloat(particleRadius))
+        self.state = WorldState(angle: 0, camera: .zero, cameraScale: 1)
         
         level.playerShapes.forEach { shape in
-            self.spawnCore(at: shape.position, radius: CGFloat(shape.radius), color: shape.color, addToLevel: false)
+            let position = shape.position//CGPoint(x: levelCenterPoint.x + shape.position.x, y: levelCenterPoint.y + shape.position.y)
+            self.spawnCore(at: position, radius: CGFloat(shape.radius), color: shape.color, addToLevel: false)
         }
     }
     
@@ -58,18 +74,48 @@ final class World: RenderDataSource {
             self.circleBodiesRadii = world.circleBodiesRadii
             self.circleBodiesColors = world.circleBodiesColors
             self.circleBodyCount = Int(world.circleBodyCount)
+            self.state.angle += CGFloat(time)
         }
     }
     
-    func spawnCore(at position: CGPoint, radius: CGFloat, color: CGRect, addToLevel: Bool = true) {
-        world.addBody(withRadius: Float(radius), position: position, color: color, isStatic: true)
+    func onTap(_ position: CGPoint) {
+        let position = screenToGame(position)
+        let type = nextCometType
+        let color = Colors.comet(type).pickColor()
+        spawnComet(type: type, position: position, radius: type.radius, color: color)
+    }
+    
+    func onSwipe(_ offset: CGFloat) {
+        
+    }
+    
+    func screenToGame(_ point: CGPoint) -> CGPoint {
+        var result = point
+        
+        var center = CGPoint.zero
+        center.x -= state.camera.x + levelCenterPoint.x
+        center.y -= state.camera.y + levelCenterPoint.y
+        
+        let dist = result.distance(to: center)
+        let angle = result.angle(to: center) * .pi / 180 + .pi
+        
+        result.x = cos(angle - state.angle) * dist
+        result.y = sin(angle - state.angle) * dist
+        
+        return CGPoint(x: state.camera.x + result.x / CGFloat(state.cameraScale),
+                       y: state.camera.y + result.y / CGFloat(state.cameraScale))
+    }
+    
+    private func spawnCore(at position: CGPoint, radius: CGFloat, color: CGRect, addToLevel: Bool = true) {
+        let points = Polygon.make(radius: radius, position: position, vertexCount: 8)
+        let polygon = points.map { NSValue(cgPoint: $0) }
+        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: true, isExplodable: false)
         if addToLevel {
-            print("adding core at \(level.number)")
             level.addShape(position: position, radius: Float(radius), color: color)
         }
     }
     
-    func spawnComet(type: CometType, position: CGPoint, radius: CGFloat, color: CGRect) {
+    private func spawnComet(type: CometType, position: CGPoint, radius: CGFloat, color: CGRect) {
         switch type {
         case .liquid:
             spawnLiquidComet(at: position, radius: radius, color: color)
@@ -78,33 +124,15 @@ final class World: RenderDataSource {
         }
     }
     
-    func hardenParticle(at index: Int, color: CGRect) {
-        let count = Int(2 * world.liquidCount)
-        guard (0..<count) ~= index else { return }
-        
-        let pointer = world.liquidPositions.bindMemory(to: Float32.self, capacity: count)
-        let b = UnsafeBufferPointer(start: pointer, count: count)
-        let positions = Array(b)
-        
-        let x = positions[index * 2]
-        let y = positions[index * 2 + 1]
-        let position = CGPoint(x: CGFloat(x), y: CGFloat(y))
-        
-        self.spawnCore(at: position, radius: CGFloat(particleRadius), color: color)
-        self.world.removeParticle(at: Int32(index))
-    }
-    
     private func spawnLiquidComet(at position: CGPoint, radius: CGFloat, color: CGRect) {
-        let points = Polygon.make(radius: radius, position: position, vertexCount: 6)
+        let points = Polygon.make(radius: radius, position: position, vertexCount: 8)
         let polygon = points.map { NSValue(cgPoint: $0) }
-        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false)
+        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false, isExplodable: false)
     }
     
     private func spawnSolidComet(at position: CGPoint, radius: CGFloat, color: CGRect) {
-//        let points = Polygon.make(radius: radius, position: position, vertexCount: 6)
-//        let polygon = points.map { NSValue(cgPoint: $0) }
-//        let color = Colors.comet.pickColor()
-//        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false)
-        world.addBody(withRadius: Float(radius), position: position, color: color, isStatic: false)
+        let points = Polygon.make(radius: radius, position: position, vertexCount: 8)
+        let polygon = points.map { NSValue(cgPoint: $0) }
+        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false, isExplodable: true)
     }
 }

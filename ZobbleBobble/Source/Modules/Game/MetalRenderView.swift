@@ -23,7 +23,6 @@ final class MetalRenderView: MTKView {
         let device = MTLCreateSystemDefaultDevice()!
         
         let size = CGSize(width: UIScreen.main.bounds.width / scale, height: UIScreen.main.bounds.height / scale)
-//        let size = UIScreen.main.bounds.size
         
         self.backgroundMesh = BackgroundMesh(device, size: size)
         self.polygonMesh = PolygonMesh(device)
@@ -38,15 +37,21 @@ final class MetalRenderView: MTKView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(cameraScale: Float, camera: SIMD2<Float>) {
+    func update() {
         guard let dataSource = dataSource else { return }
         
-        liquidMesh.updateMeshIfNeeded(vertexCount: dataSource.liquidCount, vertices: dataSource.liquidPositions, velocities: dataSource.liquidVelocities, colors: dataSource.liquidColors, particleRadius: dataSource.particleRadius, cameraScale: cameraScale, camera: camera)
+        let camera = SIMD2<Float32>(dataSource.cameraX, dataSource.cameraY)
+        let cameraScale = dataSource.cameraScale
+        let coreAngle = dataSource.cameraAngle
+        
+//        print("circles: \(dataSource.circleBodyCount) liquids: \(dataSource.liquidCount)")
+        
+        liquidMesh.updateMeshIfNeeded(vertexCount: dataSource.liquidCount, fadeMultiplier: dataSource.liquidFadeModifier, vertices: dataSource.liquidPositions, velocities: dataSource.liquidVelocities, colors: dataSource.liquidColors, particleRadius: dataSource.particleRadius, cameraAngle: coreAngle, cameraScale: cameraScale, camera: camera)
         circleMesh.updateMeshIfNeeded(positions: dataSource.circleBodiesPositions, radii: dataSource.circleBodiesRadii, colors: dataSource.circleBodiesColors, count: dataSource.circleBodyCount, cameraScale: cameraScale, camera: camera)
         
-        if let backgroundAnchorPointCount = dataSource.backgroundAnchorPointCount, let backgroundAnchorPositions = dataSource.backgroundAnchorPositions, let backgroundAnchorRadii = dataSource.backgroundAnchorRadii, let backgroundAnchorColors = dataSource.backgroundAnchorColors {
-            self.backgroundMesh.updateMeshIfNeeded(positions: backgroundAnchorPositions, radii: backgroundAnchorRadii, colors: backgroundAnchorColors, count: backgroundAnchorPointCount, cameraScale: cameraScale, camera: camera)
-        }
+//        if let backgroundAnchorPointCount = dataSource.backgroundAnchorPointCount, let backgroundAnchorPositions = dataSource.backgroundAnchorPositions, let backgroundAnchorRadii = dataSource.backgroundAnchorRadii, let backgroundAnchorColors = dataSource.backgroundAnchorColors {
+//            self.backgroundMesh.updateMeshIfNeeded(positions: backgroundAnchorPositions, radii: backgroundAnchorRadii, colors: backgroundAnchorColors, count: backgroundAnchorPointCount, cameraScale: cameraScale, camera: camera)
+//        }
         renderer.setRenderData(backgroundMesh: backgroundMesh, polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
     }
 }
@@ -120,7 +125,7 @@ class Renderer: NSObject, MTKViewDelegate {
         self.screenSizeBuffer = device.makeBuffer(bytes: &size, length: MemoryLayout<SIMD2<Float>>.stride)
         
         let s = MTLSamplerDescriptor()
-//        s.magFilter = .nearest
+//        s.magFilter = .linear
         self.upscaleSamplerState = device.makeSamplerState(descriptor: s)
     }
     

@@ -8,32 +8,47 @@
 import UIKit
 
 public final class LevelManager {
-    public var allLevels: [Level]
+    private let packCount = 3
+    private let levelCount = 2
     
-    public let levelDistance: CGFloat
-    public let levelsTotalWidth: CGFloat
+    public lazy var allLevelPacks: [LevelPack] = {
+        return Array(0..<packCount).map { packIndex in
+            let levels = Array(0..<levelCount).map { Level(number: $0) }
+            return LevelPack(number: packIndex, levels: levels)
+        }
+    }()
     
     public init() {
-        let dist: CGFloat = 500
-        let levels = Array(0..<4).map { i in
-            Level(number: i, center: CGPoint(x: dist * CGFloat(i), y: 0))
-        }
-        self.levelDistance = dist
-        self.allLevels = levels
-        self.levelsTotalWidth = (levels.map { $0.center.x }.max() ?? 0) + dist
+
     }
-    
-    public func getClosestLevel(to point: CGPoint) -> (Int, CGFloat) {
-        var closestIndex = 0
-        var closestDist = CGFloat.greatestFiniteMagnitude
-        for level in allLevels {
-            let dist = level.center.distance(to: point)
-            if dist < closestDist {
-                closestDist = dist
-                closestIndex = level.number
-            }
-        }
-//        print("\(point) \(closestIndex) \(closestDist)")
-        return (closestIndex, closestDist)
-    }
+//
+//    public func getWidthOf(pack: Int) -> CGFloat {
+//        (allLevelPacks[pack].levels.map { $0.center.x }.max() ?? 0) + levelDistance
+//    }
+//
+//    public func getClosestLevel(to point: CGPoint, inPack index: Int) -> (Int, CGFloat) {
+//        var closestIndex = 0
+//        var closestDist = CGFloat.greatestFiniteMagnitude
+//        for level in allLevelPacks[index].levels {
+//            let dist = level.center.distance(to: point)
+//            if dist < closestDist {
+//                closestDist = dist
+//                closestIndex = level.number
+//            }
+//        }
+//        return (closestIndex, closestDist)
+//    }
+//
+//    public func getClosestLevelPack(to point: CGPoint) -> (Int, CGFloat) {
+//        var closestIndex = 0
+//        var closestDist = CGFloat.greatestFiniteMagnitude
+//        for pack in allLevelPacks {
+//            let dist = pack.center.distance(to: point)
+//            if dist < closestDist {
+//                closestDist = dist
+//                closestIndex = pack.number
+//            }
+//        }
+//        return (closestIndex, closestDist)
+//    }
 }

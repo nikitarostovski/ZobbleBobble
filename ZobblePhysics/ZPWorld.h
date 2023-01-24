@@ -7,13 +7,14 @@
 
 #import <Foundation/Foundation.h>
 
-static NSString *kBodyPolygonKey = @"body_polygon";
-static NSString *kBodyRadiusKey = @"body_radius";
-static NSString *kBodyColorKey = @"body_color";
-static NSString *kBodyPositionKey = @"body_position";
-static NSString *kBodyIsStaticKey = @"body_static";
+//static NSString *kBodyPolygonKey = @"body_polygon";
+//static NSString *kBodyRadiusKey = @"body_radius";
+//static NSString *kBodyColorKey = @"body_color";
+//static NSString *kBodyPositionKey = @"body_position";
+//static NSString *kBodyIsExplodingKey = @"body_is_exploding";
+//static NSString *kBodyIsStaticKey = @"body_static";
 
-typedef void(^OnParticleHarden)(int, CGRect);
+//typedef void(^OnParticleHarden)(int, CGRect);
 
 @class ZPBody;
 
@@ -27,20 +28,19 @@ typedef void(^OnParticleHarden)(int, CGRect);
 @property (nonatomic) void *circleBodiesColors;
 @property (nonatomic) int circleBodyCount;
 
-@property (nonatomic) void *liquidPositions;
-@property (nonatomic) void *liquidColors;
-@property (nonatomic) void *liquidVelocities;
+@property void *liquidPositions;
+@property void *liquidColors;
+@property void *liquidVelocities;
 @property (nonatomic) int liquidCount;
-@property (nonatomic, copy) OnParticleHarden onHarden;
+//@property (nonatomic, copy) OnParticleHarden onHarden;
 
 
-- (id)initWithGravityCenter:(CGPoint)center ParticleRadius:(CGFloat)radius;
+- (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
-- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic;
-- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon  Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic;
+- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon  Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable;
 
-- (void)removeBodyAt:(int)index;
+//- (void)removeBodyAt:(int)index;
 - (void)removeParticleAt:(int)index;
 
 @end

@@ -1,12 +1,47 @@
 //
-//  Shaders.metal
+//  CommonShaders.metal
 //  ZobbleBobble
 //
 //  Created by Rost on 22.12.2022.
 //
 
 #include <metal_stdlib>
+#include "CommonShaders.h"
 using namespace metal;
+
+void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, float2 center, float radius) {
+    for (int y = floor(center.y - radius); y < ceil(center.y + radius); y++) {
+        for (int x = floor(center.x - radius); x < ceil(center.x + radius); x++) {
+            uint2 coords = uint2(x, y);
+            float dist = distance(float2(x, y), center);
+            
+            float4 color;
+            if (dist == 0) {
+                color = float4(1);
+            } else {
+                float alpha = radius / dist;
+                color = float4(1, 1, 1, alpha);
+            }
+            
+            float4 oldColor = input.read(coords);
+            color += oldColor;
+            output.write(color, coords);
+        }
+    }
+}
+
+void drawCircle(texture2d<float, access::write> output, float2 center, float radius, float4 color) {
+    for (int y = floor(center.y - radius); y < ceil(center.y + radius); y++) {
+        for (int x = floor(center.x - radius); x < ceil(center.x + radius); x++) {
+            uint2 coords = uint2(x, y);
+            float dist = distance(float2(x, y), center);
+            
+            if (dist <= radius) {
+                output.write(color, coords);
+            }
+        }
+    }
+}
 
 kernel void fill_clear(texture2d<float, access::write> output [[texture(0)]],
                        uint2 gid [[thread_position_in_grid]]) {

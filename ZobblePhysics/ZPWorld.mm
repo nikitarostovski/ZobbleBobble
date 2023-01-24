@@ -11,22 +11,34 @@
 #import "ZPWorld.h"
 #import "ZPBody.h"
 #import "Constants.h"
+#import "ZPParticle.h"
+#import "ZPParticleDef.h"
 
-static uint32 COMET_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
-static uint32 LIQUID_MASK = b2_tensileParticle | b2_viscousParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle | b2_staticPressureParticle | b2_colorMixingParticle;
-static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
+static NSString *kParticlePositionKey = @"particle_position";
+static NSString *kParticleColorKey = @"particle_color";
+static NSString *kParticleUserDataKey = @"particle_user_data";
+
+static float kExplosiveDamageRadius = 20.0;
+static float kExplosiveImpulse = 1050000;
+static float kCometShootImpulse = 1650000;
+static float kFreezeVelocityThreshold = 5;
 
 @implementation ZPWorld {
     CGPoint _gravityCenter;
+    CGFloat _gravityRadius;
     NSMutableArray<ZPBody *> *_bodies;
     NSMutableArray *_bodiesToAdd;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
+    
+//    b2ParticleGroup *_coreParticleGroup;
+//    b2ParticleGroup *_cometParticleGroup;
 }
 
-- (id)initWithGravityCenter:(CGPoint)center ParticleRadius:(CGFloat)radius {
+- (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius {
     self = [super init];
     
+    _gravityRadius = gravityRadius;
     _gravityCenter = center;
     _bodies = [NSMutableArray new];
     _bodiesToAdd = [NSMutableArray new];
@@ -44,13 +56,21 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     particleSystemDef.gravityScale = 1;
     particleSystemDef.density = 1;
     particleSystemDef.viscousStrength = 0.9;
-
-//    particleSystemDef.repulsiveStrength = -0.2;
+    particleSystemDef.repulsiveStrength = 1.2;
     particleSystemDef.ejectionStrength = 0;
     particleSystemDef.staticPressureStrength = 0.0f;
     
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
+//    system->GetStuckCandidates()
     self.particleSystem = system;
+    
+//    b2ParticleGroupDef coreGroupDef;
+//    coreGroupDef.groupFlags = b2_rigidParticleGroup | b2_particleGroupCanBeEmpty;
+//    _coreParticleGroup = system->CreateParticleGroup(coreGroupDef);
+//
+//    b2ParticleGroupDef cometGroupDef;
+//    cometGroupDef.groupFlags = b2_solidParticleGroup | b2_particleGroupCanBeEmpty;
+//    _cometParticleGroup = system->CreateParticleGroup(cometGroupDef);
     
     return self;
 }
@@ -59,83 +79,61 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     b2World *_world = (b2World *)self.world;
     _world->Step(timeStep, velocityIterations, positionIterations, 2);
     
+//    int staticCount = 0;
+//    int dynamicCount = 0;
+//    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+//    for (int i = 0; i < _system->GetParticleCount(); i++) {
+//        ZPParticle *ud = (ZPParticle *)_system->GetUserDataBuffer()[i];
+//        if (ud->state == ZPParticleStateStatic) {
+//            staticCount++;
+//        } else if (ud->state == ZPParticleStateDynamic) {
+//            dynamicCount++;
+//        }
+//    }
+//    NSLog(@"Static: %d Dynamic: %d Stuck: %d", staticCount, dynamicCount, _system->GetStuckCandidateCount());
+    
+    [self updateGravity];
+    [self processContacts];
+    [self checkForStaticParticles];
+    [self updateRenderData];
+    
+    [self createAndRemoveBodies];
+}
+
+- (void)updateGravity {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    
+    int particleCount = _system->GetParticleCount();
+    b2Vec2 *positionBuffer = _system->GetPositionBuffer();
+    void **ud = _system->GetUserDataBuffer();
+    
+    // Liquids
+    for (int i = 0; i < particleCount; i++) {
+        ZPParticle *userData = (ZPParticle *)ud[i];
+        if (userData->gravityBehavior == ZPParticleGravityBehaviorNone) { continue; }
+        
+        b2Vec2 v = positionBuffer[i];
+        b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
+        if (d.Length() > _gravityRadius && userData->gravityBehavior == ZPParticleGravityBehaviorLimited) {
+            continue;
+        }
+        
+        d.Normalize();
+        float mass = 10;//_system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
+        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
+        _system->ParticleApplyForce(i, d * force);
+    }
+}
+
+- (void)processContacts {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
     int particleCount = _system->GetParticleCount();
     int particleContactCount = _system->GetContactCount();
-    int bodyContactCount = _system->GetBodyContactCount();
     
     b2Vec2 *positionBuffer = _system->GetPositionBuffer();
-    b2Vec2 *velocityBuffer = _system->GetVelocityBuffer();
-    b2ParticleColor *colorBuffer = _system->GetColorBuffer();
     const b2ParticleContact *particleContactBuffer = _system->GetContacts();
-    const b2ParticleBodyContact *bodyContactBuffer = _system->GetBodyContacts();
-    const uint32 *flagsBuffer = _system->GetFlagsBuffer();
-    
-    bool *contactBuffer = new bool[particleCount];
-    
-    // Apply gravity to bodies
-    for (int i = 0; i < _bodies.count; i++) {
-        b2Body *body = (b2Body *)(_bodies[i].body);
-        b2Vec2 pos = body->GetPosition();
-        b2Vec2 d = pos - b2Vec2(_gravityCenter.x, _gravityCenter.y);
-        d.Normalize();
-
-        float mass = 10;
-        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
-        body->ApplyForce(d * -force, pos, true);
-        
-//        check against core angular velocity
-//        float amount = rotation;
-//        const b2Transform xfm = body->GetTransform();
-//        const b2Vec2 p = body->GetPosition();//xfm.p;// - worldPoint;
-//        const float32 c = cos(amount);
-//        const float32 s = sin(amount);
-//        const float32 x = p.x * c - p.y * s;
-//        const float32 y = p.x * s + p.y * c;
-//        const b2Vec2 pos2 = b2Vec2(x, y);// + worldPoint;
-//        const float32 angle = xfm.q.GetAngle() + amount;
-//        body->SetTransform(pos2, angle);
-//
-//
-//         Calculate Tangent Vector
-//        b2Vec2 radius = body->GetPosition();
-//        b2Vec2 tangent = radius.Skew();
-//        tangent.Normalize();
-//        body->SetLinearVelocity(rotation * timeStep * tangent);
-    }
-    
-    // Apply gravity to liquids
-    for (int i = 0; i < particleCount; i++) {
-        contactBuffer[i] = false;
-        uint32 flags = flagsBuffer[i];
-        if (flags == CORE_MASK) { continue; }
-        
-        b2Vec2 v = positionBuffer[i];
-        
-        b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
-        d.Normalize();
-        
-        float mass = 10;//_system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
-        
-        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
-        _system->ParticleApplyForce(i, d * force);
-    }
-    
-    // Check for particle - body contact
-    for (int i = 0; i < bodyContactCount; i++) {
-        b2ParticleBodyContact contact = bodyContactBuffer[i];
-        int index = contact.index;
-        uint32 flags = flagsBuffer[index];
-        
-        if (flags == COMET_MASK) {
-            _system->SetParticleFlags(index, LIQUID_MASK);
-        }
-        
-        if (flags == LIQUID_MASK) {
-            contactBuffer[index] = true;
-        }
-    }
+    void** ud = _system->GetUserDataBuffer();
     
     // Check for particle - particle contact
     for (int i = 0; i < particleContactCount; i++) {
@@ -144,102 +142,131 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
         int indexA = contact.GetIndexA();
         int indexB = contact.GetIndexB();
         
-        uint32 flagsA = flagsBuffer[indexA];
-        uint32 flagsB = flagsBuffer[indexB];
+        ZPParticle *userDataA = (ZPParticle *)ud[indexA];
+        ZPParticle *userDataB = (ZPParticle *)ud[indexB];
         
-        if (flagsA == LIQUID_MASK && flagsB == COMET_MASK) {
-            _system->SetParticleFlags(indexB, LIQUID_MASK);
-        } else if (flagsA == COMET_MASK && flagsB == LIQUID_MASK) {
-            _system->SetParticleFlags(indexA, LIQUID_MASK);
+        if (userDataA->type == ZPParticleTypeComet && userDataA->contactBehavior == ZPParticleContactBehaviorBecomeLiquid && userDataB->type == ZPParticleTypeCore) {
+            b2Vec2 pos = positionBuffer[indexA];
+            b2ParticleColor col = _system->GetColorBuffer()[indexA];
+            
+            if ([_particleIndicesToDestroy containsObject:@(indexA)]) {
+                break;
+            }
+            [self removeParticleAt:indexA];
+            CGPoint position = CGPointMake(pos.x, pos.y);
+            CGRect color = CGRectMake(col.r, col.g, col.b, col.a);
+            
+            ZPParticleDef *def = [[ZPParticleDef alloc] init];
+            def.type = ZPParticleTypeComet;
+            def.state = ZPParticleStateDynamic;
+            def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
+            def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
+            def.contactBehavior = ZPParticleContactBehaviorNone;
+            [self addParticleAt:position Color:color UserData:def];
+        } else if (userDataB->type == ZPParticleTypeComet && userDataB->contactBehavior == ZPParticleContactBehaviorBecomeLiquid && userDataA->type == ZPParticleTypeCore) {
+            
+            b2Vec2 pos = positionBuffer[indexB];
+            b2ParticleColor col = _system->GetColorBuffer()[indexB];
+            
+            if ([_particleIndicesToDestroy containsObject:@(indexB)]) {
+                break;
+            }
+            [self removeParticleAt:indexB];
+            CGPoint position = CGPointMake(pos.x, pos.y);
+            CGRect color = CGRectMake(col.r, col.g, col.b, col.a);
+            
+            ZPParticleDef *def = [[ZPParticleDef alloc] init];
+            def.type = ZPParticleTypeComet;
+            def.state = ZPParticleStateDynamic;
+            def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
+            def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
+            def.contactBehavior = ZPParticleContactBehaviorNone;
+            [self addParticleAt:position Color:color UserData:def];
         }
         
-        if (flagsA == LIQUID_MASK && flagsB == CORE_MASK) {
-            contactBuffer[indexA] = true;
-        } else if (flagsA == CORE_MASK && flagsB == LIQUID_MASK) {
-            contactBuffer[indexB] = true;
+        b2Vec2 explosionCenter;
+        if (userDataA->type == ZPParticleTypeComet &&
+            userDataA->contactBehavior == ZPParticleContactBehaviorExplosive &&
+            userDataB->contactBehavior != ZPParticleContactBehaviorExplosive) {
+
+            explosionCenter = positionBuffer[indexB];
+            [self removeParticleAt:indexA];
+        } else if (userDataB->type == ZPParticleTypeComet &&
+                   userDataB->contactBehavior == ZPParticleContactBehaviorExplosive &&
+                   userDataA->contactBehavior != ZPParticleContactBehaviorExplosive) {
+
+            explosionCenter = positionBuffer[indexA];
+            [self removeParticleAt:indexB];
+        } else {
+            continue;
+        }
+
+        for (int i = 0; i < particleCount; i++) {
+            b2Vec2 pos = positionBuffer[i];
+            float dist = (pos - explosionCenter).Length();
+            if (dist < kExplosiveDamageRadius) {
+                pos.Normalize();
+                b2Vec2 force = pos * kExplosiveImpulse;
+                
+                [self makeLiquidAt:i Force:CGPointMake(force.x, force.y)];
+                _system->GetColorBuffer()[i] = b2ParticleColor(0, 255, 0, 255);
+            }
         }
     }
+}
+
+- (void)checkForStaticParticles {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    int particleCount = _system->GetParticleCount();
+    b2Vec2 *velocityBuffer = _system->GetVelocityBuffer();
+    void **ud = _system->GetUserDataBuffer();
     
-    // Check for static particles
     for (int i = 0; i < particleCount; i++) {
         float velocity = velocityBuffer[i].Length();
+        ZPParticle *userData = (ZPParticle *)ud[i];
         
-        uint32 flags = flagsBuffer[i];
+        if (userData->staticBehavior == ZPParticleStaticBehaviorBecomeCore && velocity < kFreezeVelocityThreshold) {
+            [self makeCoreAt:i Force:CGPointMake(0, 0)];
+        }
+    }
+}
 
-        if (flags == LIQUID_MASK && velocity < 3 && contactBuffer[i]) {
-            CGRect color = CGRectMake(colorBuffer[i].r, colorBuffer[i].g, colorBuffer[i].b, 255);
-            [self replaceParticleAt:i Color: color];
-        }
-    }
-    
-    // Remove Bodies
-    NSMutableArray *toRemove = [NSMutableArray new];
-    for (ZPBody *body in _bodies) {
-        if ([body isRemoving]) {
-            [toRemove addObject: body];
-        }
-    }
-    for (ZPBody *body in toRemove) {
-        _world->DestroyBody((b2Body *)body.body);
-        [_bodies removeObject:body];
-    }
-    
+- (void)createAndRemoveBodies {
+    b2ParticleSystem *_particleSystem = (b2ParticleSystem *)self.particleSystem;
     // Remove particles
     for (NSNumber *n in _particleIndicesToDestroy) {
-        _system->DestroyParticle([n intValue]);
+        [self destroyParticleAt:[n intValue]];
     }
     [_particleIndicesToDestroy removeAllObjects];
     
-    
-    // Add Bodies
-    for (NSDictionary *dict in _bodiesToAdd) {
-        float radius = [dict[kBodyRadiusKey] floatValue];
-        CGPoint position = [dict[kBodyPositionKey] CGPointValue];
-        CGRect color = [dict[kBodyColorKey] CGRectValue];
-        BOOL isStatic = [dict[kBodyIsStaticKey] boolValue];
-        ZPBody *body = [[ZPBody alloc] initWithRadius:radius IsDynamic:!isStatic Position:position Color:color Density:1 Friction:1 Restitution:0 AtWorld: self];
-        [_bodies addObject:body];
-    }
-    [_bodiesToAdd removeAllObjects];
-    
     // Add particles
     for (NSDictionary *dict in _particlesToAdd) {
-        NSArray<NSValue *> *polygon = dict[kBodyPolygonKey];
-        BOOL isStatic = [dict[kBodyIsStaticKey] boolValue];
-        CGPoint position = [dict[kBodyPositionKey] CGPointValue];
-        CGRect col = [dict[kBodyColorKey] CGRectValue];
-        
-        b2Vec2 *pts = new b2Vec2[polygon.count];
-        for (int i = 0; i < polygon.count; i++) {
-            NSValue *v = polygon[i];
-            CGPoint pt = [v CGPointValue];
-            b2Vec2 p = *new b2Vec2(pt.x, pt.y);
-            pts[i] = p;
-        }
-        b2PolygonShape shape;
-        shape.Set(pts, (int32)polygon.count);
-        
-        b2ParticleGroupDef particleGroupDef;
-        if (isStatic) {
-            particleGroupDef.flags = CORE_MASK;
-        } else {
-            particleGroupDef.flags = COMET_MASK;
-        }
-        particleGroupDef.position.Set(position.x, position.y);
-        particleGroupDef.shape = &shape;
-        particleGroupDef.strength = 1;
-        particleGroupDef.groupFlags = b2_solidParticleGroup;
+        ZPParticleDef *def = dict[kParticleUserDataKey];
+        CGPoint position = [dict[kParticlePositionKey] CGPointValue];
+        CGRect col = [dict[kParticleColorKey] CGRectValue];
         
         b2ParticleColor color;
         color.Set(col.origin.x, col.origin.y, col.size.width, 1);
-        particleGroupDef.color = color;
         
-        b2ParticleSystem *_particleSystem = (b2ParticleSystem *)self.particleSystem;
-        _particleSystem->CreateParticleGroup(particleGroupDef);
+        ZPParticle *userData = new ZPParticle();
+        userData->type = def.type;
+        userData->state = def.state;
+        userData->contactBehavior = def.contactBehavior;
+        userData->staticBehavior = def.staticBehavior;
+        userData->gravityBehavior = def.gravityBehavior;
+        
+        int newIndex = [self createParticleAt:b2Vec2(position.x, position.y) Color:color UserData:userData];
+        
+        if (def.initialForce.x != 0 && def.initialForce.y != 0) {
+            _particleSystem->ParticleApplyForce(newIndex, b2Vec2(def.initialForce.x, def.initialForce.y));
+        }
     }
     [_particlesToAdd removeAllObjects];
+}
+
+- (void)updateRenderData {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
-    // Update render data
     self.liquidPositions = _system->GetPositionBuffer();
     self.liquidVelocities = _system->GetVelocityBuffer();
     self.liquidColors = _system->GetColorBuffer();
@@ -265,33 +292,123 @@ static uint32 CORE_MASK = b2_wallParticle | b2_particleContactListenerParticle |
     self.circleBodiesRadii = circleBodiesRadii;
     self.circleBodiesColors = circleBodiesColors;
     self.circleBodyCount = circleBodyCount;
+    
+    delete[] circleBodiesPositions;
+    delete[] circleBodiesColors;
+    delete[] circleBodiesRadii;
 }
 
-- (void)addBodyWithRadius:(float)radius Position:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic {
-    NSDictionary *dict = @{kBodyRadiusKey: @(radius), kBodyPositionKey: @(position), kBodyIsStaticKey: @(isStatic), kBodyColorKey: [NSValue valueWithCGRect:color]};
-    if (![_bodiesToAdd containsObject:dict]) {
-        [_bodiesToAdd addObject:dict];
+- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    
+    b2Vec2 *pts = new b2Vec2[polygon.count];
+    for (int i = 0; i < polygon.count; i++) {
+        NSValue *v = polygon[i];
+        CGPoint pt = [v CGPointValue];
+        pts[i] = b2Vec2(pt.x, pt.y);
+    }
+    b2PolygonShape shape;
+    shape.Set(pts, (int32)polygon.count);
+    
+    float32 stride = _system->GetRadius() * 2 * b2_particleStride;
+    b2Transform identity;
+    identity.SetIdentity();
+    b2AABB aabb;
+    shape.ComputeAABB(&aabb, identity, 0);
+    
+    delete[] pts;
+    
+    for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride) {
+        for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride) {
+            b2Vec2 p(x, y);
+            if (shape.TestPoint(identity, p)) {
+                
+                b2Vec2 pos = p;
+                pos.x = (pos.x - _gravityCenter.x) * -1;
+                pos.y = (pos.y - _gravityCenter.y) * -1;
+                pos.Normalize();
+                b2Vec2 force = pos * kCometShootImpulse;
+                    
+                ZPParticleDef *def = [[ZPParticleDef alloc] init];
+                def.initialForce = CGPointMake(force.x, force.y);
+                def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
+                def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
+                def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
+                def.staticBehavior = ZPParticleStaticBehaviorNone;
+                def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
+                
+                [self addParticleAt:CGPointMake(x, y) Color:color UserData:def];
+            }
+        }
     }
 }
 
-- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic {
-    NSDictionary *dict = @{kBodyPolygonKey: polygon, kBodyPositionKey: @(position), kBodyIsStaticKey: @(isStatic), kBodyColorKey: [NSValue valueWithCGRect:color]};
+- (void)addParticleAt:(CGPoint)position Color:(CGRect)color UserData:(ZPParticleDef *)userData {
+    NSDictionary *dict = @{kParticlePositionKey: [NSValue valueWithCGPoint:position],
+                           kParticleColorKey: [NSValue valueWithCGRect:color],
+                           kParticleUserDataKey: userData
+    };
     [_particlesToAdd addObject:dict];
 }
 
-- (void)replaceParticleAt:(int)index Color:(CGRect)color {
-    if ([_particleIndicesToDestroy containsObject:@(index)]) {
-        return;
-    }
-    self.onHarden(index, color);
+- (int)createParticleAt:(b2Vec2)position Color:(b2ParticleColor)color UserData:(ZPParticle *)userData {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    
+    b2ParticleDef particleDef;
+    particleDef.flags = userData->getDefaultFlagsForCurrentType();
+    particleDef.position = position;
+    particleDef.color = color;
+//    particleDef.group = userData->state == ZPParticleStateStatic ? _coreParticleGroup : _cometParticleGroup;
+    particleDef.userData = userData;
+    return _system->CreateParticle(particleDef);
 }
 
 - (void)removeParticleAt:(int)index {
     [_particleIndicesToDestroy addObject:@(index)];
 }
 
-- (void)removeBodyAt:(int)index {
-    _bodies[index].isRemoving = YES;
+- (void)destroyParticleAt:(int)index {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    delete (ZPParticle *)_system->GetUserDataBuffer()[index];
+    _system->GetUserDataBuffer()[index] = NULL;
+//    _system->DestroyParticle(index);
+    _system->DestroyParticle(index, YES);
+}
+
+- (void)makeCoreAt:(int)index Force:(CGPoint)force {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    
+    b2Vec2 pos = _system->GetPositionBuffer()[index];
+    b2ParticleColor col = _system->GetColorBuffer()[index];
+    
+    def.initialForce = force;
+    def.state = ZPParticleStateStatic;
+    def.type = ZPParticleTypeCore;
+    def.gravityBehavior = ZPParticleGravityBehaviorNone;
+    def.staticBehavior = ZPParticleStaticBehaviorNone;
+    def.contactBehavior = ZPParticleContactBehaviorNone;
+    
+    [self removeParticleAt:index];
+    [self addParticleAt:CGPointMake(pos.x, pos.y) Color:CGRectMake(col.r, col.g, col.b, col.a) UserData:def];
+}
+
+- (void)makeLiquidAt:(int)index Force:(CGPoint)force {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    
+    b2Vec2 pos = _system->GetPositionBuffer()[index];
+    b2ParticleColor col = _system->GetColorBuffer()[index];
+    
+    def.initialForce = force;
+    def.state = ZPParticleStateDynamic;
+    def.type = ZPParticleTypeCore;
+    def.gravityBehavior = ZPParticleGravityBehaviorLimited;
+    def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
+    def.contactBehavior = ZPParticleContactBehaviorNone;
+    
+    [self removeParticleAt:index];
+    [self addParticleAt:CGPointMake(pos.x, pos.y) Color:CGRectMake(col.r, col.g, col.b, col.a) UserData:def];
 }
 
 @end

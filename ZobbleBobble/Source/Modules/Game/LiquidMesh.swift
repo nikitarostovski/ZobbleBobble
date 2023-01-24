@@ -10,10 +10,11 @@ import MetalPerformanceShaders
 
 class LiquidMesh: BaseMesh {
     struct Uniforms {
-        let particleRadius: Float
-        let downScale: Float
-        let cameraScale: Float
-        let camera: SIMD2<Float>
+        let particleRadius: Float32
+        let downScale: Float32
+        let cameraScale: Float32
+        let cameraAngle: Float32
+        let camera: SIMD2<Float32>
     }
     
     private lazy var initPipelineState: MTLComputePipelineState? = {
@@ -28,6 +29,13 @@ class LiquidMesh: BaseMesh {
             fatalError("Unable to create default Metal library")
         }
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "metaballs")!)
+    }()
+    
+    private lazy var computeParticleColorsPipelineState: MTLComputePipelineState? = {
+        guard let device = device, let library = device.makeDefaultLibrary() else {
+            fatalError("Unable to create default Metal library")
+        }
+        return try? device.makeComputePipelineState(function: library.makeFunction(name: "fill_particle_colors")!)
     }()
     
     private lazy var computeBlurPipelineState: MTLComputePipelineState? = {
@@ -60,10 +68,11 @@ class LiquidMesh: BaseMesh {
     
     var vertexCount: Int
     let primitiveType: MTLPrimitiveType = .point
-    var samplerState: MTLSamplerState?
+    var nearestSamplerState: MTLSamplerState?
+    var linearSamplerState: MTLSamplerState?
     
-    var textureScale: Float = 0.4
-    var fadeMultiplier: Float = 0.3
+    var textureScale: Float = 0.25
+    var fadeMultiplier: Float = 0
     var blurRadius: Int?
     var lowResTexture: MTLTexture?
     var colorLowResTexture: MTLTexture?
@@ -105,34 +114,40 @@ class LiquidMesh: BaseMesh {
         finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
         self.finalTexture = device?.makeTexture(descriptor: finalDesc)
         
-        let s = MTLSamplerDescriptor()
-//        s.magFilter = .linear
-//        s.minFilter = .linear
-        self.samplerState = device?.makeSamplerState(descriptor: s)
+        let nearestSamplerDescriptor = MTLSamplerDescriptor()
+        nearestSamplerDescriptor.magFilter = .nearest
+        nearestSamplerDescriptor.minFilter = .nearest
+        self.nearestSamplerState = device?.makeSamplerState(descriptor: nearestSamplerDescriptor)
         
-        let blurRadius: Int = Int(min(width, height) / 64)
+        let linearSamplerDescriptor = MTLSamplerDescriptor()
+        linearSamplerDescriptor.magFilter = .linear
+        linearSamplerDescriptor.minFilter = .linear
+        self.linearSamplerState = device?.makeSamplerState(descriptor: linearSamplerDescriptor)
+        
+        let blurRadius: Int = 2//Int(min(width, height) / 64)
 //        let blurRadius: Int = Int(1.0 / textureScale)
         self.blurRadius = blurRadius
         self.blurRadiusBuffer = device?.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
         
         self.fadeMultiplierBuffer = device?.makeBuffer(bytes: &fadeMultiplier, length: MemoryLayout<Float>.stride)
     }
-//    var angle: Float = 0
     
     func updateMeshIfNeeded(vertexCount: Int?,
+                            fadeMultiplier: Float,
                             vertices: UnsafeMutableRawPointer?,
                             velocities: UnsafeMutableRawPointer?,
                             colors: UnsafeMutableRawPointer?,
-                            particleRadius: Float,
-                            cameraScale: Float,
-                            camera: SIMD2<Float>) {
+                            particleRadius: Float32,
+                            cameraAngle: Float32,
+                            cameraScale: Float32,
+                            camera: SIMD2<Float32>) {
         
         guard let device = device, var vertexCount = vertexCount, let vertices = vertices, let velocities = velocities, let colors = colors, vertexCount > 0 else {
             self.vertexBuffers = []
             self.vertexCount = 0
             return
         }
-        var uniforms = Uniforms(particleRadius: particleRadius, downScale: textureScale, cameraScale: cameraScale, camera: camera)
+        var uniforms = Uniforms(particleRadius: particleRadius, downScale: textureScale, cameraScale: cameraScale, cameraAngle: cameraAngle, camera: camera)
         
         let positionBuffer = device.makeBuffer(
             bytes: vertices,
@@ -154,10 +169,6 @@ class LiquidMesh: BaseMesh {
             length: MemoryLayout<Int>.stride,
             options: .storageModeShared)!
         
-//        var angle = self.angle
-//        let angleBuffer = device.makeBuffer(bytes: &angle, length: MemoryLayout<Float>.stride)!
-//        self.angle += 0.01
-        
         self.uniformsBuffer = device.makeBuffer(
             bytes: &uniforms,
             length: MemoryLayout<Uniforms>.stride,
@@ -165,6 +176,9 @@ class LiquidMesh: BaseMesh {
         
         self.vertexBuffers = [positionBuffer, velocityBuffer, colorBuffer, countBuffer]
         self.vertexCount = vertexCount
+        
+        self.fadeMultiplier = fadeMultiplier
+        self.fadeMultiplierBuffer = device.makeBuffer(bytes: &self.fadeMultiplier, length: MemoryLayout<Float>.stride)
     }
     
     func render(commandBuffer: MTLCommandBuffer) -> MTLTexture? {
@@ -173,6 +187,7 @@ class LiquidMesh: BaseMesh {
         guard let computeMetaballsPipelineState = computeMetaballsPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeThresholdPipelineState = computeThresholdPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeUpscalePipelineState = computeUpscalePipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let computeParticleColorsPipelineState = computeParticleColorsPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let lowResTexture = lowResTexture, let finalTexture = finalTexture, let colorLowResTexture = colorLowResTexture else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeBlurPipelineState = computeBlurPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         let computePassDescriptor = MTLComputePassDescriptor()
@@ -180,6 +195,10 @@ class LiquidMesh: BaseMesh {
 
         let lowResThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
         let lowResThreadgroups = MTLSize(width: lowResTexture.width / lowResThreadgroupCount.width + 1, height: lowResTexture.height / lowResThreadgroupCount.height + 1, depth: 1)
+        
+        let metaballsThreadgroupCount = MTLSize(width: 8, height: 1, depth: 1)
+        let metaballsThreadgroups = MTLSize(width: self.vertexCount / metaballsThreadgroupCount.width + 1, height: 1, depth: 1)
+        
         let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
         let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)
         
@@ -198,14 +217,23 @@ class LiquidMesh: BaseMesh {
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
+        computeEncoder.dispatchThreadgroups(metaballsThreadgroups, threadsPerThreadgroup: metaballsThreadgroupCount)
+        
+        computeEncoder.setComputePipelineState(computeParticleColorsPipelineState)
+        computeEncoder.setTexture(colorLowResTexture, index: 0)
+        computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
+        vertexBuffers.enumerated().forEach {
+            computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
+        }
         computeEncoder.dispatchThreadgroups(lowResThreadgroups, threadsPerThreadgroup: lowResThreadgroupCount)
+        
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
         computeEncoder.setTexture(lowResTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setSamplerState(samplerState, index: 0)
+        computeEncoder.setSamplerState(linearSamplerState, index: 0)
         computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
-        
+
         computeEncoder.setComputePipelineState(computeBlurPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
@@ -216,7 +244,8 @@ class LiquidMesh: BaseMesh {
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setTexture(colorLowResTexture, index: 1)
         computeEncoder.setTexture(finalTexture, index: 2)
-        computeEncoder.setSamplerState(samplerState, index: 0)
+        computeEncoder.setSamplerState(nearestSamplerState, index: 0)
+        computeEncoder.setSamplerState(linearSamplerState, index: 1)
         computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
         
         computeEncoder.endEncoding()

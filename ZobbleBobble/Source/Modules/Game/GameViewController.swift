@@ -27,8 +27,19 @@ final class GameViewController: UIViewController {
     
     lazy var swipeControl: SwipeView = {
         let view = SwipeView(delegate: self)
+//        view.backgroundColor = .red.withAlphaComponent(0.4)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    lazy var controlsBar: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [exitButton, weapon1Button, weapon2Button])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.spacing = 16
+        stack.alignment = .leading
+        stack.distribution = .equalSpacing
+        return stack
     }()
     
     lazy var exitButton: UIButton = {
@@ -40,9 +51,29 @@ final class GameViewController: UIViewController {
         return b
     }()
     
+    lazy var weapon1Button: UIButton = {
+        let b = UIButton()
+        b.translatesAutoresizingMaskIntoConstraints = false
+        b.backgroundColor = .blue
+        b.setTitle("1", for: .normal)
+        b.addTarget(self, action: #selector(onWeapon1Tap), for: .touchUpInside)
+        return b
+    }()
+    
+    lazy var weapon2Button: UIButton = {
+        let b = UIButton()
+        b.translatesAutoresizingMaskIntoConstraints = false
+        b.backgroundColor = .green
+        b.setTitle("2", for: .normal)
+        b.addTarget(self, action: #selector(onWeapon2Tap), for: .touchUpInside)
+        return b
+    }()
+    
     var renderDataProvider: RenderDataSource? {
-        game
+        game?.renderDataSource
     }
+    
+    private var isConfigured = false
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -55,7 +86,7 @@ final class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self)
+        self.game = Game(delegate: self, scrollHolder: self, worldSize: UIScreen.main.bounds.size)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -74,41 +105,49 @@ final class GameViewController: UIViewController {
         ])
         swipeControl.addGestureRecognizer(tapGesture)
         
-        view.addSubview(exitButton)
+        view.addSubview(controlsBar)
         NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: exitButton, attribute: .leading, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .leading, multiplier: 1, constant: 20),
-            NSLayoutConstraint(item: exitButton, attribute: .top, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .top, multiplier: 1, constant: 20),
-            NSLayoutConstraint(item: exitButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 120),
-            NSLayoutConstraint(item: exitButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 80)
+            NSLayoutConstraint(item: controlsBar, attribute: .leading, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: controlsBar, attribute: .top, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .top, multiplier: 1, constant: 20),
+//            NSLayoutConstraint(item: controlsBar, attribute: .trailing, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .trailing, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: controlsBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 100)
         ])
         
         let displayLink = CADisplayLink(target: self, selector: #selector(update(displayLink:)))
         displayLink.add(to: .main, forMode: .common)
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard !isConfigured else { return }
+        isConfigured = true
+        game?.runMenu()
+    }
+    
     @objc
     private func onExitTap() {
+        game?.onExitTap()
+    }
+    
+    @objc
+    private func onWeapon1Tap() {
         guard let game = game else { return }
-        switch game.state.state {
-        case .level:
-            game.changeState(to: .menu)
-        case .menu:
-            break
-        }
+        game.nextCometType = .liquid
+    }
+    
+    @objc
+    private func onWeapon2Tap() {
+        guard let game = game else { return }
+        game.nextCometType = .solid
     }
     
     @objc
     private func update(displayLink: CADisplayLink) {
         guard let game = game else { return }
-//        DispatchQueue.global().async {
-//            self.lock.lock()
+
         game.update(displayLink.duration)
-//            self.lock.unlock()
-//        }
-        renderView.dataSource = game
-        
-        let camera = SIMD2<Float>(Float(game.state.camera.x), Float(game.state.camera.y))
-        renderView.update(cameraScale: game.cameraScale, camera: camera)
+        renderView.dataSource = game.renderDataSource
+        renderView.update()
     }
     
     @objc
@@ -122,8 +161,15 @@ final class GameViewController: UIViewController {
 
 extension GameViewController: GameDelegate {
     func gameDidChangeState(_ game: Game) {
-        swipeControl.pageSize = game.levelManager.levelDistance * CGFloat(game.cameraScale)
-        swipeControl.maxSize = (game.levelManager.levelsTotalWidth) * CGFloat(game.cameraScale)
+        
+    }
+}
+
+extension GameViewController: ScrollHolder {
+    func updateScrollPosition(pageCount: Int, selectedPage: Int) {
+        swipeControl.pageSize = renderView.bounds.width
+        swipeControl.maxSize = swipeControl.pageSize * CGFloat(pageCount)
+        swipeControl.scrollView.setContentOffset(CGPoint(x: CGFloat(selectedPage) * swipeControl.pageSize, y: 0), animated: false)
     }
 }
 

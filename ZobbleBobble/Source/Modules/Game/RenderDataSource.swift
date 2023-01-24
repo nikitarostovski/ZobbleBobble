@@ -9,6 +9,7 @@ import Foundation
 
 protocol RenderDataSource: AnyObject {
     var particleRadius: Float { get }
+    var liquidFadeModifier: Float { get }
     var liquidCount: Int? { get }
     var liquidPositions: UnsafeMutableRawPointer? { get }
     var liquidVelocities: UnsafeMutableRawPointer? { get }
@@ -21,14 +22,11 @@ protocol RenderDataSource: AnyObject {
     
     var cameraX: Float { get }
     var cameraY: Float { get }
+    var cameraScale: Float { get }
+    var cameraAngle: Float { get }
     
     var backgroundAnchorPositions: UnsafeMutableRawPointer? { get }
     var backgroundAnchorRadii: UnsafeMutableRawPointer? { get }
     var backgroundAnchorColors: UnsafeMutableRawPointer? { get }
     var backgroundAnchorPointCount: Int? { get }
-}
-
-extension RenderDataSource {
-    var cameraX: Float { 0 }
-    var cameraY: Float { 0 }
 }

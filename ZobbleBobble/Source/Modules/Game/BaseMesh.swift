@@ -12,7 +12,7 @@ class BaseMesh {
     weak var device: MTLDevice?
     private var clearTexture: MTLTexture?
     
-    private lazy var clearPipelineState: MTLComputePipelineState? = {
+    lazy var clearPipelineState: MTLComputePipelineState? = {
         guard let device = device, let library = device.makeDefaultLibrary() else {
             fatalError("Unable to create default Metal library")
         }
