@@ -67,31 +67,32 @@ class LiquidMesh: BaseMesh {
     var fadeMultiplierBuffer: MTLBuffer?
     
     var vertexCount: Int
-    let primitiveType: MTLPrimitiveType = .point
     var nearestSamplerState: MTLSamplerState?
     var linearSamplerState: MTLSamplerState?
     
-    var textureScale: Float = 0.25
     var fadeMultiplier: Float = 0
     var blurRadius: Int?
     var lowResTexture: MTLTexture?
-    var colorLowResTexture: MTLTexture?
+    var colorTexture: MTLTexture?
     var finalTexture: MTLTexture?
     
-    init(_ device: MTLDevice?, size: CGSize) {
+    private let screenSize: CGSize
+    private let renderSize: CGSize
+    
+    init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.vertexBuffers = []
         self.vertexCount = 0
+        self.screenSize = screenSize
+        self.renderSize = renderSize
         super.init()
         self.device = device
         
-        let width = Int(size.width * CGFloat(textureScale))
-        let height = Int(size.height * CGFloat(textureScale))
+        let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
+        let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
         guard width > 0, height > 0 else { return }
         
-        self.textureScale /= Float(UIScreen.main.bounds.width / size.width)
-        
         let lowResDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .rgba8Unorm,
+            pixelFormat: .bgra8Unorm,
             width: width,
             height: height,
             mipmapped: false)
@@ -99,17 +100,17 @@ class LiquidMesh: BaseMesh {
         self.lowResTexture = device?.makeTexture(descriptor: lowResDesc)
         
         let colorDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .rgba8Unorm,
-            width: width,
-            height: height,
+            pixelFormat: .bgra8Unorm,
+            width: Int(renderSize.width),
+            height: Int(renderSize.height),
             mipmapped: false)
         colorDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
-        self.colorLowResTexture = device?.makeTexture(descriptor: colorDesc)
+        self.colorTexture = device?.makeTexture(descriptor: colorDesc)
         
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .rgba8Unorm,
-            width: Int(size.width),
-            height: Int(size.height),
+            pixelFormat: .bgra8Unorm,
+            width: Int(renderSize.width),
+            height: Int(renderSize.height),
             mipmapped: false)
         finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
         self.finalTexture = device?.makeTexture(descriptor: finalDesc)
@@ -147,7 +148,19 @@ class LiquidMesh: BaseMesh {
             self.vertexCount = 0
             return
         }
-        var uniforms = Uniforms(particleRadius: particleRadius, downScale: textureScale, cameraScale: cameraScale, cameraAngle: cameraAngle, camera: camera)
+        
+        let defaultScale = Float(renderSize.width / screenSize.width)
+        
+        var uniforms = Uniforms(particleRadius: particleRadius,
+                                downScale: Settings.liquidMetaballsDownscale,
+                                cameraScale: cameraScale * defaultScale,
+                                cameraAngle: cameraAngle,
+                                camera: camera)
+        
+        self.uniformsBuffer = device.makeBuffer(
+            bytes: &uniforms,
+            length: MemoryLayout<Uniforms>.stride,
+            options: [])!
         
         let positionBuffer = device.makeBuffer(
             bytes: vertices,
@@ -158,7 +171,7 @@ class LiquidMesh: BaseMesh {
             bytes: velocities,
             length: MemoryLayout<SIMD2<Float32>>.stride * vertexCount,
             options: .storageModeShared)!
-
+        
         let colorBuffer = device.makeBuffer(
             bytes: colors,
             length: MemoryLayout<SIMD4<UInt8>>.stride * vertexCount,
@@ -169,10 +182,6 @@ class LiquidMesh: BaseMesh {
             length: MemoryLayout<Int>.stride,
             options: .storageModeShared)!
         
-        self.uniformsBuffer = device.makeBuffer(
-            bytes: &uniforms,
-            length: MemoryLayout<Uniforms>.stride,
-            options: [])!
         
         self.vertexBuffers = [positionBuffer, velocityBuffer, colorBuffer, countBuffer]
         self.vertexCount = vertexCount
@@ -188,7 +197,7 @@ class LiquidMesh: BaseMesh {
         guard let computeThresholdPipelineState = computeThresholdPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeUpscalePipelineState = computeUpscalePipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeParticleColorsPipelineState = computeParticleColorsPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
-        guard let lowResTexture = lowResTexture, let finalTexture = finalTexture, let colorLowResTexture = colorLowResTexture else { return getClearTexture(commandBuffer: commandBuffer) }
+        guard let lowResTexture = lowResTexture, let finalTexture = finalTexture, let colorTexture = colorTexture else { return getClearTexture(commandBuffer: commandBuffer) }
         guard let computeBlurPipelineState = computeBlurPipelineState else { return getClearTexture(commandBuffer: commandBuffer) }
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
@@ -212,7 +221,6 @@ class LiquidMesh: BaseMesh {
         computeEncoder.setComputePipelineState(computeMetaballsPipelineState)
         computeEncoder.setTexture(lowResTexture, index: 0)
         computeEncoder.setTexture(lowResTexture, index: 1)
-        computeEncoder.setTexture(colorLowResTexture, index: 2)
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
@@ -220,12 +228,12 @@ class LiquidMesh: BaseMesh {
         computeEncoder.dispatchThreadgroups(metaballsThreadgroups, threadsPerThreadgroup: metaballsThreadgroupCount)
         
         computeEncoder.setComputePipelineState(computeParticleColorsPipelineState)
-        computeEncoder.setTexture(colorLowResTexture, index: 0)
+        computeEncoder.setTexture(colorTexture, index: 0)
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
-        computeEncoder.dispatchThreadgroups(lowResThreadgroups, threadsPerThreadgroup: lowResThreadgroupCount)
+        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
         
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
@@ -242,7 +250,7 @@ class LiquidMesh: BaseMesh {
 
         computeEncoder.setComputePipelineState(computeThresholdPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.setTexture(colorLowResTexture, index: 1)
+        computeEncoder.setTexture(colorTexture, index: 1)
         computeEncoder.setTexture(finalTexture, index: 2)
         computeEncoder.setSamplerState(nearestSamplerState, index: 0)
         computeEncoder.setSamplerState(linearSamplerState, index: 1)

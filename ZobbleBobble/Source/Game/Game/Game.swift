@@ -31,14 +31,16 @@ struct GameState {
 }
 
 final class Game {
-    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: 100)
+    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.levelCenterOffset)
     
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
     
     var state: GameState
     
-    let worldSize: CGSize
+    let screenSize: CGSize
+    let renderSize: CGSize
+    
     let levelManager: LevelManager
     
     private var world: World?
@@ -54,10 +56,11 @@ final class Game {
         set { world?.nextCometType = newValue! }
     }
     
-    init(delegate: GameDelegate?, scrollHolder: ScrollHolder?, worldSize: CGSize) {
-        let levelManager = LevelManager()
+    init(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
+        let levelManager = LevelManager(particleRadius: Settings.particleRadius)
         self.levelManager = levelManager
-        self.worldSize = worldSize
+        self.screenSize = screenSize
+        self.renderSize = renderSize
         
         self.delegate = delegate
         self.scrollHolder = scrollHolder
@@ -72,9 +75,10 @@ final class Game {
     
     func runGame() {
         let level = levelManager.allLevelPacks[self.state.packIndex].levels[self.state.levelIndex]
-        let world = World(level: level, centerPoint: levelCenterPoint)
+        let world = World(level: level, centerPoint: levelCenterPoint, particleRadius: Settings.particleRadius)
         self.world = world
         self.state.state = .level
+        self.menu = nil
     }
     
     func runMenu(isFromLevel: Bool = false) {
@@ -82,6 +86,7 @@ final class Game {
         let menu = Menu(game: self, from: from)
         self.menu = menu
         self.state.state = .menu
+        self.world = nil
     }
     
     func onTap(at pos: CGPoint) {

@@ -40,7 +40,7 @@ class BackgroundMesh {
         self.textureScale /= Float(UIScreen.main.bounds.width / size.width)
         
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .rgba8Unorm,
+            pixelFormat: .bgra8Unorm,
             width: width,
             height: height,
             mipmapped: false)

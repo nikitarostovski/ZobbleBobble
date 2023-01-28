@@ -24,7 +24,7 @@ struct LiquidUniforms {
         v = max; \
     }
 
-float2 convertPosition(float2 pos, LiquidUniforms uniforms) {
+float2 convertPosition(float2 pos, float outWidth, float outHeight, LiquidUniforms uniforms, bool shouldDownscale) {
     float l = length(pos);
     float2 norm = normalize(pos);
     float a = atan2(norm.y, norm.x) + uniforms.cameraAngle;
@@ -36,13 +36,25 @@ float2 convertPosition(float2 pos, LiquidUniforms uniforms) {
     
     pos -= uniforms.camera;
     
-    float2 result = pos * uniforms.textureDownscale * uniforms.cameraScale;
+    float2 result;
+    if (shouldDownscale) {
+        result = pos * uniforms.textureDownscale * uniforms.cameraScale;
+    } else {
+        result = pos * uniforms.cameraScale;
+    }
+    
+    result.x += outWidth / 2;
+    result.y += outHeight / 2;
     
     return result;
 }
 
-float getRadius(LiquidUniforms uniforms) {
-    return uniforms.particleRadius * uniforms.textureDownscale * uniforms.cameraScale;
+float getRadius(LiquidUniforms uniforms, bool shouldDownscale) {
+    if (shouldDownscale) {
+        return uniforms.particleRadius * uniforms.textureDownscale * uniforms.cameraScale;
+    } else {
+        return uniforms.particleRadius * uniforms.cameraScale;
+    }
 }
 
 kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
@@ -62,15 +74,12 @@ kernel void metaballs(constant LiquidUniforms &uniforms [[buffer(0)]],
                       constant int *pointCount [[buffer(4)]],
                       texture2d<float, access::read> input [[texture(0)]],
                       texture2d<float, access::write> output [[texture(1)]],
-                      texture2d<float, access::write> colorizedOutput [[texture(2)]],
                       uint2 gid [[thread_position_in_grid]])
 {
-    float radius = getRadius(uniforms);
+    float radius = getRadius(uniforms, true);
     int i = gid.x;
     
-    float2 pos = convertPosition(positions[i], uniforms);
-    pos.x += output.get_width() / 2;
-    pos.y += output.get_height() / 2;
+    float2 pos = convertPosition(positions[i], output.get_width(), output.get_height(), uniforms, true);
     
     drawMetaball(input, output, pos, radius);
 }
@@ -83,20 +92,18 @@ kernel void fill_particle_colors(constant LiquidUniforms &uniforms [[buffer(0)]]
                                  texture2d<float, access::write> output [[texture(0)]],
                                  uint2 gid [[thread_position_in_grid]])
 {
-    float radius = getRadius(uniforms);
+    float radius = getRadius(uniforms, false);
     float3 resultColor = float3(0);
     float minDist = MAXFLOAT;
-    
+
     for (int i = 0; i < *pointCount; i++) {
         float velocity = length(velocities[i]);
         float3 col = float4(color[i]).rgb / 255.0;
-        float2 pos = convertPosition(positions[i], uniforms);
-        pos.x += output.get_width() / 2;
-        pos.y += output.get_height() / 2;
-        
+        float2 pos = convertPosition(positions[i], output.get_width(), output.get_height(), uniforms, false);
+
         float dist = distance(float2(gid), pos);
         bool isInsideCircle = dist <= radius;
-        
+
         if (dist < minDist || isInsideCircle) {
             minDist = dist;
             resultColor = col + (float3(1) * velocity / 1000);

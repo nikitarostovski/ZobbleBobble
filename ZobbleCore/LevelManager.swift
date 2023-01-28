@@ -9,17 +9,19 @@ import UIKit
 
 public final class LevelManager {
     private let packCount = 3
-    private let levelCount = 2
+    private let levelCount = 10
+    
+    private let particleRadius: CGFloat
     
     public lazy var allLevelPacks: [LevelPack] = {
         return Array(0..<packCount).map { packIndex in
-            let levels = Array(0..<levelCount).map { Level(number: $0) }
+            let levels = Array(0..<levelCount).map { Level(number: $0, particleRadius: particleRadius) }
             return LevelPack(number: packIndex, levels: levels)
         }
     }()
     
-    public init() {
-
+    public init(particleRadius: CGFloat) {
+        self.particleRadius = particleRadius
     }
 //
 //    public func getWidthOf(pack: Int) -> CGFloat {

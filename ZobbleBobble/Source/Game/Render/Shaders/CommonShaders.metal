@@ -15,13 +15,16 @@ void drawMetaball(texture2d<float, access::read> input, texture2d<float, access:
             uint2 coords = uint2(x, y);
             float dist = distance(float2(x, y), center);
             
-            float4 color;
-            if (dist == 0) {
-                color = float4(1);
-            } else {
-                float alpha = radius / dist;
-                color = float4(1, 1, 1, alpha);
-            }
+            
+            float alpha = smoothstep(0, 1, radius / dist);
+            float4 color = float4(1, 1, 1, alpha);
+//            float4 color;
+//            if (dist == 0) {
+//                color = float4(1);
+//            } else {
+//                float alpha = radius / dist;
+//                color = float4(1, 1, 1, alpha);
+//            }
             
             float4 oldColor = input.read(coords);
             color += oldColor;

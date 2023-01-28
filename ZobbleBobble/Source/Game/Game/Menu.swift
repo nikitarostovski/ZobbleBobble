@@ -11,12 +11,13 @@ import ZobbleCore
 struct MenuState {
     /// progress from level state to menuPacks state [1...3] (1 is level state, 2 is level selection, 3 is pack selection)
     var levelToPackProgress: CGFloat
-    /// horizontal scroll position in index values (1.5 equals exact middle between indices 1 and 2)
-    var currentPagePosition: CGFloat
+    /// horizontal scroll position of level in index values (1.5 equals exact middle between indices 1 and 2)
+    var currentLevelPagePosition: CGFloat
+    /// horizontal scroll position of pack in index values (1.5 equals exact middle between indices 1 and 2)
+    var currentPackPagePosition: CGFloat
 }
 
 final class Menu {
-    private static let animationDuration: TimeInterval = 1.5
     static let levelCameraScale: CGFloat = 1
     static let levelsMenuCameraScale: CGFloat = 2
     static let packsMenuCameraScale: CGFloat = 3
@@ -67,7 +68,8 @@ final class Menu {
     
     private var lastUpdateGameSize: CGSize = .zero
     private var lastUpdateLevelToPackProgress: CGFloat = -1
-    private var lastUpdateCurrentPagePosition: CGFloat = -1
+    private var lastUpdateCurrentPackPagePosition: CGFloat = -1
+    private var lastUpdateCurrentLevelPagePosition: CGFloat = -1
     
     
     private var visibleLevelPackIndices: ClosedRange<Int> = 0...0
@@ -81,7 +83,7 @@ final class Menu {
     var circleBodiesColors: UnsafeMutableRawPointer?
     var circleBodiesRadii: UnsafeMutableRawPointer?
     
-    var particleRadius: Float = 2.5
+    var particleRadius: Float = 0
     var liquidFadeModifier: Float = 0
     var liquidCount: Int?
     var liquidPositions: UnsafeMutableRawPointer?
@@ -94,7 +96,7 @@ final class Menu {
     
     init(game: Game?, from: CGFloat = levelsMenuCameraScale, to: CGFloat = levelsMenuCameraScale) {
         self.game = game
-        self.state = MenuState(levelToPackProgress: from, currentPagePosition: 0)
+        self.state = MenuState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
         
         if (to == from) {
             updateScroll()
@@ -116,7 +118,7 @@ final class Menu {
     func onTap(position: CGPoint) {
         // level selection
         if state.levelToPackProgress <= 2 {
-            let level = Int(state.currentPagePosition)
+            let level = Int(state.currentLevelPagePosition)
             game!.state.levelIndex = level
             
             let pack = game!.levelManager.allLevelPacks[game!.state.packIndex]
@@ -140,7 +142,7 @@ final class Menu {
             }
         // pack selection
         } else {
-            let pack = Int(state.currentPagePosition)
+            let pack = Int(state.currentPackPagePosition)
             game!.state.packIndex = pack
             game!.state.levelIndex = 0
             
@@ -158,15 +160,30 @@ final class Menu {
     
     func onSwipe(_ offset: CGFloat) {
         guard let game = game else { return }
-        state.currentPagePosition = offset / game.worldSize.width
+        
+        if state.levelToPackProgress == 2 {
+            // level selection
+            state.currentLevelPagePosition = offset / game.screenSize.width
+        } else if state.levelToPackProgress == 3 {
+            // pack selection
+            state.currentPackPagePosition = offset / game.screenSize.width
+        }
         updateRenderData()
+    }
+    
+    private var visibleLevelPacks: [LevelPack] {
+        Array(game!.levelManager.allLevelPacks[visibleLevelPackIndices])
+    }
+    
+    private var visibleLevels: [Level] {
+        Array(game!.levelManager.allLevelPacks[game!.state.packIndex].levels[visibleLevelIndices])
     }
     
     private func transitionToLevel() {
         let startProgress = state.levelToPackProgress
         let targetProgress = Self.levelCameraScale
         
-        Animator.animate(duraion: Self.animationDuration) { [weak self] percentage in
+        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             self.updateRenderData()
@@ -182,7 +199,9 @@ final class Menu {
         let startProgress = state.levelToPackProgress
         let targetProgress = Self.levelsMenuCameraScale
         
-        Animator.animate(duraion: Self.animationDuration) { [weak self] percentage in
+        state.currentLevelPagePosition = CGFloat(game!.state.levelIndex)
+        
+        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             self.updateRenderData()
@@ -198,9 +217,9 @@ final class Menu {
         let startProgress = state.levelToPackProgress
         let targetProgress = Self.packsMenuCameraScale
         
-        self.state.currentPagePosition = CGFloat(game!.state.packIndex)
+        state.currentPackPagePosition = CGFloat(game!.state.packIndex)
         
-        Animator.animate(duraion: Self.animationDuration) { [weak self] percentage in
+        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             self.updateRenderData()
@@ -235,28 +254,28 @@ final class Menu {
     }
     
     private func isPointVisible(_ point: CGPoint, radius: CGFloat) -> Bool {
-        let left = -game!.worldSize.width / 2 - radius
-        let right = game!.worldSize.width / 2 + radius
-        let top = -game!.worldSize.height / 2 - radius
-        let bottom = game!.worldSize.height / 2 + radius
+        let left = -game!.screenSize.width / 2 - radius
+        let right = game!.screenSize.width / 2 + radius
+        let top = -game!.screenSize.height / 2 - radius
+        let bottom = game!.screenSize.height / 2 + radius
         
         return left...right ~= point.x && top...bottom ~= point.y
     }
     
     private func updatePositionsDataIfNeeded() {
-        if game!.worldSize != lastUpdateGameSize {
-            lastUpdateGameSize = game!.worldSize
+        if game!.screenSize != lastUpdateGameSize {
+            lastUpdateGameSize = game!.screenSize
             
-            starCenterLevelMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y - game!.worldSize.height * 0.6)
-            starCenterMenuLevelMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y - game!.worldSize.height * 0.35)
-            starCenterMenuPackMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y + game!.worldSize.height * 0.1)
+            starCenterLevelMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y - game!.screenSize.height * 0.6)
+            starCenterMenuLevelMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y - game!.screenSize.height * 0.35)
+            starCenterMenuPackMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y + game!.screenSize.height * 0.1)
             
             planetCenterLevelMode = game!.levelCenterPoint
             planetCenterMenuLevelMode = CGPoint(x: game!.levelCenterPoint.x, y: game!.levelCenterPoint.y - 10)
             planetCenterMenuPackMode = starCenterMenuPackMode
             
-            starRadius = game!.worldSize.height
-            planetRadius = game!.worldSize.height / 2
+            starRadius = game!.screenSize.height
+            planetRadius = game!.screenSize.height / 2
         }
         
         if (lastUpdateLevelToPackProgress != state.levelToPackProgress) {
@@ -290,22 +309,33 @@ final class Menu {
             planetAnchor = CGPoint(x: planetCenterPoint.x, y: planetCenterPoint.y - planetRadius)
             starCenterAngle = starCenterPoint.angle(to: starAnchor).radians
             planetCenterAngle = planetCenterPoint.angle(to: planetAnchor).radians
+        }
+        
+        if lastUpdateCurrentPackPagePosition != state.currentPackPagePosition {
+            lastUpdateCurrentPackPagePosition = state.currentPackPagePosition
+            let packCurrent = state.currentPackPagePosition
+            let packCount = game!.levelManager.allLevelPacks.count
             
+            let packVisibilityIndexShift: CGFloat = 1
+            let packStart = max(0, min(packCount - 1, Int(floor(packCurrent - packVisibilityIndexShift))))
+            let packEnd = max(0, min(packCount - 1, Int(ceil(packCurrent + packVisibilityIndexShift))))
+            visibleLevelPackIndices = packStart...packEnd
+        }
+        
+        if lastUpdateCurrentLevelPagePosition != state.currentLevelPagePosition {
+            lastUpdateCurrentLevelPagePosition = state.currentLevelPagePosition
+            let levelCurrent = state.currentLevelPagePosition
+            let levelCount = game!.levelManager.allLevelPacks[game!.state.packIndex].levels.count
             
-//
-//            visibleLevelPackIndices =
+            let levelVisibilityIndexShift: CGFloat = 2
+            let levelStart = max(0, min(levelCount - 1, Int(floor(levelCurrent - levelVisibilityIndexShift))))
+            let levelEnd = max(0, min(levelCount - 1, Int(ceil(levelCurrent + levelVisibilityIndexShift))))
+            visibleLevelIndices = levelStart...levelEnd
         }
     }
     
     private func updateLiquidData() {
-        guard let game = game else { return }
         guard 1...3 ~= state.levelToPackProgress else { return }
-        
-        let visibleLevelPacks = game.levelManager.allLevelPacks
-//        .enumerated().compactMap { i, pack -> LevelPack? in
-//            guard abs(i - visibleIndex) < 2 else { return nil }
-//            return pack
-//        }
         
         var allPositions = [SIMD2<Float32>]()
         var allVelocities = [SIMD2<Float32>]()
@@ -313,26 +343,17 @@ final class Menu {
         var allColors = [SIMD4<UInt8>]()
         
         if (state.levelToPackProgress < 3) {
-            for pack in visibleLevelPacks {
-                for level in pack.levels {
-                    let point = convertPlanetPosition(level.number)
-                    let radius = convertPlanetRadius(50)
+            for level in visibleLevels {
+                for (i, shape) in level.initialShapes.enumerated() {
+                    let point = convertPlanetShapePosition(level.number, shapeIndex: i)
+                    let radius = self.convertPlanetRadius(CGFloat(shape.radius))
                     
-                    
-//                    for (i, shape) in level.initialShapes.enumerated() {
-//                        let point = convertPlanetShapePosition(level.number, shapeIndex: i)
-//                        let radius = self.convertPlanetRadius(CGFloat(shape.radius))
-//
-                        if isPointVisible(point, radius: radius) {
-                            allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
-                            allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
-                            allColors.append(Colors.coreColors.first!.simdColor)//shape.color.simdColor)
-                            allRadii.append(Float(radius))
-                            if level.number == 1 {
-                                print("\(Int(point.x * 100) / 100) \(Int(point.y * 100) / 100)")
-                            }
-                        }
-//                    }
+                    if isPointVisible(point, radius: radius) {
+                        allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
+                        allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
+                        allColors.append(shape.color.simdColor)
+                        allRadii.append(Float(radius))
+                    }
                 }
             }
         }
@@ -362,28 +383,23 @@ final class Menu {
         self.liquidVelocities = velocities
         self.liquidColors = colors
         self.liquidCount = allPositions.count
-        self.particleRadius = Float(self.convertPlanetRadius(2.5))
+        self.particleRadius = Float(self.convertPlanetRadius(Settings.particleRadius))
     }
     
     private func updateCirclesData() {
-        guard let game = game else { return }
         guard 1...3 ~= state.levelToPackProgress else { return }
         
-        let visibleLevelPacks = game.levelManager.allLevelPacks
-//        .enumerated().compactMap { i, pack -> LevelPack? in
-//            guard abs(i - visibleIndex) < 2 else { return nil }
-//            return pack
-//        }
+        let visibleLevelPacks = visibleLevelPacks
         
         var allPositions = [SIMD2<Float32>]()
         var allVelocities = [SIMD2<Float32>]()
         var allRadii = [Float32]()
         var allColors = [SIMD4<UInt8>]()
         
-        for packIndex in visibleLevelPacks.indices {
-            let point = self.convertStarPosition(packIndex)
-            let color = visibleLevelPacks[packIndex].targetOutline.color
-            let radius = self.convertStarRadius(visibleLevelPacks[packIndex].targetOutline.radius)
+        for pack in visibleLevelPacks {
+            let point = self.convertStarPosition(pack.number)
+            let color = pack.targetOutline.color
+            let radius = self.convertStarRadius(pack.targetOutline.radius)
             
             if isPointVisible(point, radius: radius) {
                 allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
@@ -422,7 +438,7 @@ extension Menu {
     private func convertStarPosition(_ index: Int) -> CGPoint {
         var distToCenter: CGFloat = 0
         if state.levelToPackProgress > 2 {
-            distToCenter = CGFloat(index) - state.currentPagePosition
+            distToCenter = CGFloat(index) - state.currentPackPagePosition
         } else {
             distToCenter = CGFloat(index) - CGFloat(game!.state.packIndex)
         }
@@ -438,8 +454,8 @@ extension Menu {
     
     private func convertPlanetPosition(_ index: Int) -> CGPoint {
         var distToCenter: CGFloat = 0
-        if state.levelToPackProgress > 1, state.levelToPackProgress <= 2 {
-            distToCenter = CGFloat(index) - state.currentPagePosition
+        if state.levelToPackProgress > 1, state.levelToPackProgress < 3 {
+            distToCenter = CGFloat(index) - state.currentLevelPagePosition
         }
         let targetAngle = planetCenterAngle + distToCenter * planetAngleBetweenPositions
         let x = planetRadius * cos(targetAngle) - planetAnchor.x

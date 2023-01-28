@@ -26,8 +26,8 @@ public class Level {
     
     public var targetOutline: Outline
     
-    init(number: Int) {
-        let shapes = Self.makeShapes(for: number)
+    init(number: Int, particleRadius: CGFloat) {
+        let shapes = Self.makeShapes(for: number, particleRadius: particleRadius)
         self.number = number
         self.initialShapes = shapes
         self.playerShapes = shapes
@@ -67,8 +67,7 @@ extension Level {
         return Outline(radius: radius, color: resultColor)
     }
     
-    private static func makeShapes(for number: Int) -> [Shape] {
-        let particleRadius: CGFloat = 2.5
+    private static func makeShapes(for number: Int, particleRadius: CGFloat) -> [Shape] {
         let radius: CGFloat = 10
         let particleStride: CGFloat = particleRadius * 2 * 0.75
         

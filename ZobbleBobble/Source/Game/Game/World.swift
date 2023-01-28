@@ -19,7 +19,7 @@ final class World: RenderDataSource {
     var world: ZPWorld
     let level: Level
     
-    var particleRadius: Float = 2.5
+    var particleRadius: Float
     var liquidFadeModifier: Float = 0.3
     var liquidCount: Int?
     var liquidPositions: UnsafeMutableRawPointer?
@@ -49,7 +49,8 @@ final class World: RenderDataSource {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(level: Level, centerPoint: CGPoint) {
+    init(level: Level, centerPoint: CGPoint, particleRadius: CGFloat) {
+        self.particleRadius = Float(particleRadius)
         self.level = level
         self.levelCenterPoint = centerPoint
         self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.targetOutline.radius, particleRadius: CGFloat(particleRadius))

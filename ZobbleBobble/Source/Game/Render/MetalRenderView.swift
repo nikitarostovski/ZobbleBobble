@@ -9,7 +9,6 @@ import UIKit
 import MetalKit
 
 final class MetalRenderView: MTKView {
-    let scale: CGFloat = 1
     var renderer: Renderer!
     
     var backgroundMesh: BackgroundMesh
@@ -19,17 +18,15 @@ final class MetalRenderView: MTKView {
     
     weak var dataSource: RenderDataSource?
     
-    init() {
+    init(screenSize: CGSize, renderSize: CGSize) {
         let device = MTLCreateSystemDefaultDevice()!
         
-        let size = CGSize(width: UIScreen.main.bounds.width / scale, height: UIScreen.main.bounds.height / scale)
-        
-        self.backgroundMesh = BackgroundMesh(device, size: size)
+        self.backgroundMesh = BackgroundMesh(device, size: renderSize)
         self.polygonMesh = PolygonMesh(device)
-        self.circleMesh = CircleMesh(device, size: size)
-        self.liquidMesh = LiquidMesh(device, size: size)
+        self.circleMesh = CircleMesh(device, screenSize: screenSize, renderSize: renderSize)
+        self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
         super.init(frame: .zero, device: device)
-        self.renderer = Renderer(device: device, view: self)
+        self.renderer = Renderer(device: device, view: self, renderSize: renderSize)
         self.delegate = renderer
     }
     
@@ -67,12 +64,15 @@ class Renderer: NSObject, MTKViewDelegate {
     private var upscaleSamplerState: MTLSamplerState?
     private var vertexCount: Int = 0
     
+    private let renderSize: CGSize
+    
     var backgroundMesh: BackgroundMesh?
     var polygonMesh: PolygonMesh?
     var circleMesh: CircleMesh?
     var liquidMesh: LiquidMesh?
     
-    init(device: MTLDevice, view: MTKView) {
+    init(device: MTLDevice, view: MTKView, renderSize: CGSize) {
+        self.renderSize = renderSize
         self.device = device
         self.commandQueue = device.makeCommandQueue()!
         self.view = view
@@ -98,7 +98,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let drawableRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
         drawableRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_render")!
         drawableRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_render")!
-        drawableRenderPipelineDescriptor.colorAttachments[0].pixelFormat = .rgba8Unorm
+        drawableRenderPipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
         drawableRenderPipelineDescriptor.sampleCount = 1;
         do {
             drawableRenderPipelineState = try device.makeRenderPipelineState(descriptor: drawableRenderPipelineDescriptor)
@@ -121,7 +121,7 @@ class Renderer: NSObject, MTKViewDelegate {
             options: .storageModeShared)!
         vertexCount = vertices.count
         
-        var size: SIMD2<Float> = SIMD2<Float>(Float(UIScreen.main.bounds.size.width), Float(UIScreen.main.bounds.size.height))
+        var size: SIMD2<Float> = SIMD2<Float>(Float(renderSize.width), Float(renderSize.height))
         self.screenSizeBuffer = device.makeBuffer(bytes: &size, length: MemoryLayout<SIMD2<Float>>.stride)
         
         let s = MTLSamplerDescriptor()

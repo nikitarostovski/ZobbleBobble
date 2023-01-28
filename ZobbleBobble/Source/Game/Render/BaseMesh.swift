@@ -24,7 +24,7 @@ class BaseMesh {
             return clearTexture
         }
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .rgba8Unorm,
+            pixelFormat: .bgra8Unorm,
             width: 1,
             height: 1,
             mipmapped: false)
