@@ -73,10 +73,6 @@ final class GameViewController: UIViewController {
         return b
     }()
     
-    var renderDataProvider: RenderDataSource? {
-        game?.renderDataSource
-    }
-    
     private var isConfigured = false
     
     init() {
@@ -150,7 +146,9 @@ final class GameViewController: UIViewController {
         guard let game = game else { return }
 
         game.update(displayLink.duration)
-        renderView.dataSource = game.renderDataSource
+        renderView.backgroundDataSource = game.backgroundDataSource
+        renderView.objectsDataSource = game.objectsDataSource
+        renderView.cameraDataSource = game.cameraDataSource
         renderView.update()
     }
     

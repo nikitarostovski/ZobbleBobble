@@ -12,17 +12,17 @@ final class MetalRenderView: MTKView {
     var renderer: Renderer!
     
     var backgroundMesh: BackgroundMesh
-    var polygonMesh: PolygonMesh
     var circleMesh: CircleMesh
     var liquidMesh: LiquidMesh
     
-    weak var dataSource: RenderDataSource?
+    weak var objectsDataSource: ObjectRenderDataSource?
+    weak var cameraDataSource: CameraRenderDataSource?
+    weak var backgroundDataSource: BackgroundRenderDataSource?
     
     init(screenSize: CGSize, renderSize: CGSize) {
         let device = MTLCreateSystemDefaultDevice()!
         
-        self.backgroundMesh = BackgroundMesh(device, size: renderSize)
-        self.polygonMesh = PolygonMesh(device)
+        self.backgroundMesh = BackgroundMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.circleMesh = CircleMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
         super.init(frame: .zero, device: device)
@@ -35,21 +35,44 @@ final class MetalRenderView: MTKView {
     }
     
     func update() {
-        guard let dataSource = dataSource else { return }
+        guard let cameraDataSource = cameraDataSource else { return }
         
-        let camera = SIMD2<Float32>(dataSource.cameraX, dataSource.cameraY)
-        let cameraScale = dataSource.cameraScale
-        let coreAngle = dataSource.cameraAngle
+        let camera = SIMD2<Float32>(cameraDataSource.cameraX, cameraDataSource.cameraY)
+        let cameraScale = cameraDataSource.cameraScale
+        let coreAngle = cameraDataSource.cameraAngle
         
 //        print("circles: \(dataSource.circleBodyCount) liquids: \(dataSource.liquidCount)")
         
-        liquidMesh.updateMeshIfNeeded(vertexCount: dataSource.liquidCount, fadeMultiplier: dataSource.liquidFadeModifier, vertices: dataSource.liquidPositions, velocities: dataSource.liquidVelocities, colors: dataSource.liquidColors, particleRadius: dataSource.particleRadius, cameraAngle: coreAngle, cameraScale: cameraScale, camera: camera)
-        circleMesh.updateMeshIfNeeded(positions: dataSource.circleBodiesPositions, radii: dataSource.circleBodiesRadii, colors: dataSource.circleBodiesColors, count: dataSource.circleBodyCount, cameraScale: cameraScale, camera: camera)
+        print("\(camera) \(cameraScale)")
         
-//        if let backgroundAnchorPointCount = dataSource.backgroundAnchorPointCount, let backgroundAnchorPositions = dataSource.backgroundAnchorPositions, let backgroundAnchorRadii = dataSource.backgroundAnchorRadii, let backgroundAnchorColors = dataSource.backgroundAnchorColors {
-//            self.backgroundMesh.updateMeshIfNeeded(positions: backgroundAnchorPositions, radii: backgroundAnchorRadii, colors: backgroundAnchorColors, count: backgroundAnchorPointCount, cameraScale: cameraScale, camera: camera)
-//        }
-        renderer.setRenderData(backgroundMesh: backgroundMesh, polygonMesh: polygonMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
+        if let objectsDataSource = objectsDataSource {
+            liquidMesh.updateMeshIfNeeded(vertexCount: objectsDataSource.liquidCount,
+                                          fadeMultiplier: objectsDataSource.liquidFadeModifier,
+                                          vertices: objectsDataSource.liquidPositions,
+                                          velocities: objectsDataSource.liquidVelocities,
+                                          colors: objectsDataSource.liquidColors,
+                                          particleRadius: objectsDataSource.particleRadius,
+                                          cameraAngle: coreAngle,
+                                          cameraScale: cameraScale,
+                                          camera: camera)
+            circleMesh.updateMeshIfNeeded(positions: objectsDataSource.circleBodiesPositions,
+                                          radii: objectsDataSource.circleBodiesRadii,
+                                          colors: objectsDataSource.circleBodiesColors,
+                                          count: objectsDataSource.circleBodyCount,
+                                          cameraScale: cameraScale,
+                                          camera: camera)
+        }
+        
+        if let backgroundDataSource = backgroundDataSource {
+            backgroundMesh.updateMeshIfNeeded(positions: backgroundDataSource.backgroundAnchorPositions,
+                                              radii: backgroundDataSource.backgroundAnchorRadii,
+                                              colors: backgroundDataSource.backgroundAnchorColors,
+                                              count: backgroundDataSource.backgroundAnchorPointCount,
+                                              cameraScale: cameraScale,
+                                              camera: camera)
+        }
+        
+        renderer.setRenderData(backgroundMesh: backgroundMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
     }
 }
 
@@ -67,7 +90,6 @@ class Renderer: NSObject, MTKViewDelegate {
     private let renderSize: CGSize
     
     var backgroundMesh: BackgroundMesh?
-    var polygonMesh: PolygonMesh?
     var circleMesh: CircleMesh?
     var liquidMesh: LiquidMesh?
     
@@ -84,9 +106,8 @@ class Renderer: NSObject, MTKViewDelegate {
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
     
-    func setRenderData(backgroundMesh: BackgroundMesh?, polygonMesh: PolygonMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
+    func setRenderData(backgroundMesh: BackgroundMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
         self.backgroundMesh = backgroundMesh
-        self.polygonMesh = polygonMesh
         self.circleMesh = circleMesh
         self.liquidMesh = liquidMesh
     }

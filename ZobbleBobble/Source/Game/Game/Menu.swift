@@ -17,26 +17,10 @@ struct MenuState {
     var currentPackPagePosition: CGFloat
 }
 
-final class Menu {
+final class Menu: ObjectRenderDataSource {
     static let levelCameraScale: CGFloat = 1
     static let levelsMenuCameraScale: CGFloat = 2
     static let packsMenuCameraScale: CGFloat = 3
-    
-    private let starLevelScale: CGFloat = 1
-    private let starLevelMenuScale: CGFloat = 0.25
-    private let starPackMenuScale: CGFloat = 0.5
-    
-    private let planetLevelScale: CGFloat = 1
-    private let planetLevelMenuScale: CGFloat = 0.25
-    private let planetPackMenuScale: CGFloat = 0
-    
-    private let starLevelAngle: CGFloat = CGFloat(90).radians
-    private let starLevelMenuAngle: CGFloat = CGFloat(30).radians
-    private let starPackMenuAngle: CGFloat = CGFloat(20).radians
-    
-    private let planetLevelAngle: CGFloat = CGFloat(90).radians
-    private let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
-    private let planetPackMenuAngle: CGFloat = CGFloat(90).radians
     
     
     private var starCenterLevelMode: CGPoint = .zero
@@ -71,9 +55,8 @@ final class Menu {
     private var lastUpdateCurrentPackPagePosition: CGFloat = -1
     private var lastUpdateCurrentLevelPagePosition: CGFloat = -1
     
-    
-    private var visibleLevelPackIndices: ClosedRange<Int> = 0...0
-    private var visibleLevelIndices: ClosedRange<Int> = 0...0
+    private(set) var visibleLevelPackIndices: ClosedRange<Int> = 0...0
+    private(set) var visibleLevelIndices: ClosedRange<Int> = 0...0
     
     private(set) var state: MenuState
     private weak var game: Game?
@@ -89,10 +72,6 @@ final class Menu {
     var liquidPositions: UnsafeMutableRawPointer?
     var liquidVelocities: UnsafeMutableRawPointer?
     var liquidColors: UnsafeMutableRawPointer?
-    
-//    var backgroundAnchorPointCount: Int? { nil }
-//    var backgroundAnchorPoints: UnsafeMutableRawPointer? { nil }
-//    var backgroundAnchorRadii: UnsafeMutableRawPointer? { nil }
     
     init(game: Game?, from: CGFloat = levelsMenuCameraScale, to: CGFloat = levelsMenuCameraScale) {
         self.game = game
@@ -122,8 +101,8 @@ final class Menu {
             game!.state.levelIndex = level
             
             let pack = game!.levelManager.allLevelPacks[game!.state.packIndex]
-            let packPos = convertStarPosition(game!.state.packIndex)
-            let packRadius = convertStarRadius(pack.targetOutline.radius)
+            let packPos = convertStarPosition(game!.state.packIndex) ?? .zero
+            let packRadius = convertStarRadius(pack.targetOutline.radius) ?? 0
             if packPos.distance(to: position) <= packRadius {
                 // go back to star selection
                 transitionToPackSelection()
@@ -132,8 +111,8 @@ final class Menu {
             
             let packLevels = game!.levelManager.allLevelPacks[game!.state.packIndex].levels
             for i in packLevels.indices {
-                let levelPos = convertPlanetPosition(i)
-                let levelRadius = convertPlanetRadius(packLevels[i].targetOutline.radius)
+                let levelPos = convertPlanetPosition(i) ?? .zero
+                let levelRadius = convertPlanetRadius(packLevels[i].targetOutline.radius) ?? 0
                 if (levelPos.distance(to: position) <= levelRadius) {
                     // run level
                     transitionToLevel()
@@ -147,8 +126,8 @@ final class Menu {
             game!.state.levelIndex = 0
             
             for pack in game!.levelManager.allLevelPacks {
-                let packPos = convertStarPosition(pack.number)
-                let packRadius = convertStarRadius(pack.targetOutline.radius)
+                let packPos = convertStarPosition(pack.number) ?? .zero
+                let packRadius = convertStarRadius(pack.targetOutline.radius) ?? 0
                 if packPos.distance(to: position) <= packRadius {
                     // go inside pack
                     transitionToLevelSelection()
@@ -284,25 +263,25 @@ final class Menu {
             if state.levelToPackProgress <= 2 {
                 // level selection
                 let p = state.levelToPackProgress - 1
-                starRadiusScale = starLevelScale + p * (starLevelMenuScale - starLevelScale)
-                planetRadiusScale = planetLevelScale + p * (planetLevelMenuScale - planetLevelScale)
+                starRadiusScale = Settings.starLevelScale + p * (Settings.starLevelMenuScale - Settings.starLevelScale)
+                planetRadiusScale = Settings.planetLevelScale + p * (Settings.planetLevelMenuScale - Settings.planetLevelScale)
                 starCenterPoint = CGPoint(x: starCenterLevelMode.x + p * (starCenterMenuLevelMode.x - starCenterLevelMode.x),
                                           y: starCenterLevelMode.y + p * (starCenterMenuLevelMode.y - starCenterLevelMode.y))
                 planetCenterPoint = CGPoint(x: planetCenterLevelMode.x + p * (planetCenterMenuLevelMode.x - planetCenterLevelMode.x),
                                             y: planetCenterLevelMode.y + p * (planetCenterMenuLevelMode.y - planetCenterLevelMode.y))
-                starAngleBetweenPositions = starLevelAngle + p * (starLevelMenuAngle - starLevelAngle)
-                planetAngleBetweenPositions = planetLevelAngle + p * (planetLevelMenuAngle - planetLevelAngle)
+                starAngleBetweenPositions = Settings.starLevelAngle + p * (Settings.starLevelMenuAngle - Settings.starLevelAngle)
+                planetAngleBetweenPositions = Settings.planetLevelAngle + p * (Settings.planetLevelMenuAngle - Settings.planetLevelAngle)
             } else {
                 // pack selection
                 let p = state.levelToPackProgress - 2
-                starRadiusScale = starLevelMenuScale + p * (starPackMenuScale - starLevelMenuScale)
-                planetRadiusScale = planetLevelMenuScale + p * (planetPackMenuScale - planetLevelMenuScale)
+                starRadiusScale = Settings.starLevelMenuScale + p * (Settings.starPackMenuScale - Settings.starLevelMenuScale)
+                planetRadiusScale = Settings.planetLevelMenuScale + p * (Settings.planetPackMenuScale - Settings.planetLevelMenuScale)
                 starCenterPoint = CGPoint(x: starCenterMenuLevelMode.x + p * (starCenterMenuPackMode.x - starCenterMenuLevelMode.x),
                                           y: starCenterMenuLevelMode.y + p * (starCenterMenuPackMode.y - starCenterMenuLevelMode.y))
                 planetCenterPoint = CGPoint(x: planetCenterMenuLevelMode.x + p * (planetCenterMenuPackMode.x - planetCenterMenuLevelMode.x),
                                             y: planetCenterMenuLevelMode.y + p * (planetCenterMenuPackMode.y - planetCenterMenuLevelMode.y))
-                starAngleBetweenPositions = starLevelMenuAngle + p * (starPackMenuAngle - starLevelMenuAngle)
-                planetAngleBetweenPositions = planetLevelMenuAngle + p * (planetPackMenuAngle - planetLevelMenuAngle)
+                starAngleBetweenPositions = Settings.starLevelMenuAngle + p * (Settings.starPackMenuAngle - Settings.starLevelMenuAngle)
+                planetAngleBetweenPositions = Settings.planetLevelMenuAngle + p * (Settings.planetPackMenuAngle - Settings.planetLevelMenuAngle)
             }
             
             starAnchor = CGPoint(x: starCenterPoint.x, y: starCenterPoint.y - starRadius)
@@ -346,7 +325,7 @@ final class Menu {
             for level in visibleLevels {
                 for (i, shape) in level.initialShapes.enumerated() {
                     let point = convertPlanetShapePosition(level.number, shapeIndex: i)
-                    let radius = self.convertPlanetRadius(CGFloat(shape.radius))
+                    let radius = self.convertPlanetRadius(CGFloat(shape.radius)) ?? 0
                     
                     if isPointVisible(point, radius: radius) {
                         allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
@@ -383,7 +362,7 @@ final class Menu {
         self.liquidVelocities = velocities
         self.liquidColors = colors
         self.liquidCount = allPositions.count
-        self.particleRadius = Float(self.convertPlanetRadius(Settings.particleRadius))
+        self.particleRadius = Float(self.convertPlanetRadius(Settings.particleRadius) ?? 0)
     }
     
     private func updateCirclesData() {
@@ -397,9 +376,9 @@ final class Menu {
         var allColors = [SIMD4<UInt8>]()
         
         for pack in visibleLevelPacks {
-            let point = self.convertStarPosition(pack.number)
+            let point = self.convertStarPosition(pack.number) ?? .zero
             let color = pack.targetOutline.color
-            let radius = self.convertStarRadius(pack.targetOutline.radius)
+            let radius = self.convertStarRadius(pack.targetOutline.radius) ?? 0
             
             if isPointVisible(point, radius: radius) {
                 allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
@@ -434,8 +413,8 @@ final class Menu {
 
 // Position calculations
 
-extension Menu {
-    private func convertStarPosition(_ index: Int) -> CGPoint {
+extension Menu: ObjectPositionProvider {
+    func convertStarPosition(_ index: Int) -> CGPoint? {
         var distToCenter: CGFloat = 0
         if state.levelToPackProgress > 2 {
             distToCenter = CGFloat(index) - state.currentPackPagePosition
@@ -448,11 +427,11 @@ extension Menu {
         return CGPoint(x: x, y: y)
     }
     
-    private func convertStarRadius(_ radius: CGFloat) -> CGFloat {
+    func convertStarRadius(_ radius: CGFloat) -> CGFloat? {
         radius * starRadiusScale
     }
     
-    private func convertPlanetPosition(_ index: Int) -> CGPoint {
+    func convertPlanetPosition(_ index: Int) -> CGPoint? {
         var distToCenter: CGFloat = 0
         if state.levelToPackProgress > 1, state.levelToPackProgress < 3 {
             distToCenter = CGFloat(index) - state.currentLevelPagePosition
@@ -463,28 +442,20 @@ extension Menu {
         return CGPoint(x: x, y: y)
     }
     
-    private func convertPlanetRadius(_ radius: CGFloat) -> CGFloat {
+    func convertPlanetRadius(_ radius: CGFloat) -> CGFloat? {
         radius * planetRadiusScale
     }
     
     private func convertPlanetShapePosition(_ levelIndex: Int, shapeIndex: Int) -> CGPoint {
         let level = game!.levelManager.allLevelPacks[game!.state.packIndex].levels[levelIndex]
-        let levelPosition = convertPlanetPosition(levelIndex)
+        let levelPosition = convertPlanetPosition(levelIndex) ?? .zero
         
         let shape = level.initialShapes[shapeIndex]
         return CGPoint(x: levelPosition.x + shape.position.x * planetRadiusScale, y: levelPosition.y + shape.position.y * planetRadiusScale)
     }
 }
 
-extension Menu: RenderDataSource {
-    var backgroundAnchorRadii: UnsafeMutableRawPointer? {
-        nil
-    }
-    
-    var backgroundAnchorPointCount: Int? {
-        nil
-    }
-    
+extension Menu: CameraRenderDataSource {
     var cameraX: Float {
         0
     }
@@ -499,13 +470,5 @@ extension Menu: RenderDataSource {
     
     var cameraAngle: Float {
         0
-    }
-    
-    var backgroundAnchorPositions: UnsafeMutableRawPointer? {
-        nil
-    }
-    
-    var backgroundAnchorColors: UnsafeMutableRawPointer? {
-        nil
     }
 }

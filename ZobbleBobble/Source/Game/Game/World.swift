@@ -15,7 +15,8 @@ struct WorldState {
     var cameraScale: CGFloat
 }
 
-final class World: RenderDataSource {
+final class World: ObjectRenderDataSource, CameraRenderDataSource {
+    weak var game: Game?
     var world: ZPWorld
     let level: Level
     
@@ -30,17 +31,12 @@ final class World: RenderDataSource {
     var circleBodiesColors: UnsafeMutableRawPointer?
     var circleBodiesRadii: UnsafeMutableRawPointer?
     
-    var backgroundAnchorPositions: UnsafeMutableRawPointer? { nil }
-    var backgroundAnchorRadii: UnsafeMutableRawPointer? { nil }
-    var backgroundAnchorColors: UnsafeMutableRawPointer? { nil }
-    var backgroundAnchorPointCount: Int? { nil }
-    
     var cameraX: Float { Float(state.camera.x + levelCenterPoint.x) }
     var cameraY: Float { Float(state.camera.y + levelCenterPoint.y) }
     var cameraScale: Float { Float(state.cameraScale) }
     var cameraAngle: Float { Float(state.angle) }
     
-    private let levelCenterPoint: CGPoint
+    private var levelCenterPoint: CGPoint { game?.levelCenterPoint ?? .zero }
     
     var nextCometType: CometType = .liquid
     var state: WorldState
@@ -49,10 +45,10 @@ final class World: RenderDataSource {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(level: Level, centerPoint: CGPoint, particleRadius: CGFloat) {
+    init(game: Game, level: Level, particleRadius: CGFloat) {
+        self.game = game
         self.particleRadius = Float(particleRadius)
         self.level = level
-        self.levelCenterPoint = centerPoint
         self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.targetOutline.radius, particleRadius: CGFloat(particleRadius))
         self.state = WorldState(angle: 0, camera: .zero, cameraScale: 1)
         
@@ -135,5 +131,33 @@ final class World: RenderDataSource {
         let points = Polygon.make(radius: radius, position: position, vertexCount: 8)
         let polygon = points.map { NSValue(cgPoint: $0) }
         world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false, isExplodable: true)
+    }
+}
+
+extension World: ObjectPositionProvider {
+    var visibleLevelIndices: ClosedRange<Int> {
+        game!.state.levelIndex ... game!.state.levelIndex
+    }
+    
+    var visibleLevelPackIndices: ClosedRange<Int> {
+        game!.state.packIndex ... game!.state.packIndex
+    }
+    
+    func convertStarPosition(_ index: Int) -> CGPoint? {
+        guard let game = game else { return nil }
+        let y = game.screenSize.height * 0.6
+        return CGPoint(x: 0, y: y)
+    }
+    
+    func convertStarRadius(_ radius: CGFloat) -> CGFloat? {
+        return radius
+    }
+    
+    func convertPlanetPosition(_ index: Int) -> CGPoint? {
+        return .zero
+    }
+    
+    func convertPlanetRadius(_ radius: CGFloat) -> CGFloat? {
+        radius
     }
 }

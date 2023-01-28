@@ -71,7 +71,6 @@
 		1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF5A2928E84100AFD08C /* ZPBody.h */; };
 		1190952829549010006EE970 /* CommonShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190952729549010006EE970 /* CommonShaders.metal */; };
 		119095292954A22A006EE970 /* MetalRenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952129548AAB006EE970 /* MetalRenderView.swift */; };
-		1190952B2954AE12006EE970 /* PolygonMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952A2954AE12006EE970 /* PolygonMesh.swift */; };
 		1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952E2954AE2C006EE970 /* LiquidMesh.swift */; };
 		11909531295571E0006EE970 /* CircleMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11909530295571E0006EE970 /* CircleMesh.swift */; };
 		1190953429574456006EE970 /* TextureRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190953229573D61006EE970 /* TextureRender.metal */; };
@@ -88,6 +87,8 @@
 		11B321712965CCA3000F4180 /* BaseMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B321702965CCA3000F4180 /* BaseMesh.swift */; };
 		11B3FD0929784E4F0058FFEB /* LevelPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0829784E4F0058FFEB /* LevelPack.swift */; };
 		11B3FD0D298012330058FFEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0C298012330058FFEB /* Settings.swift */; };
+		11B8210629857832005300DC /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B8210529857832005300DC /* Background.swift */; };
+		11B8210829857B9F005300DC /* ObjectPositionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B8210729857B9F005300DC /* ObjectPositionProvider.swift */; };
 		11C0A7112922492E00CA7954 /* ZobbleCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 11C0A7102922492E00CA7954 /* ZobbleCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		11C0A7142922492E00CA7954 /* ZobbleCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11C0A70E2922492E00CA7954 /* ZobbleCore.framework */; };
 		11C0A7152922492E00CA7954 /* ZobbleCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11C0A70E2922492E00CA7954 /* ZobbleCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -414,7 +415,6 @@
 		1160EF77292B8A5600AFD08C /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		1190952129548AAB006EE970 /* MetalRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderView.swift; sourceTree = "<group>"; };
 		1190952729549010006EE970 /* CommonShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CommonShaders.metal; sourceTree = "<group>"; };
-		1190952A2954AE12006EE970 /* PolygonMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolygonMesh.swift; sourceTree = "<group>"; };
 		1190952E2954AE2C006EE970 /* LiquidMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidMesh.swift; sourceTree = "<group>"; };
 		11909530295571E0006EE970 /* CircleMesh.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleMesh.swift; sourceTree = "<group>"; };
 		1190953229573D61006EE970 /* TextureRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureRender.metal; sourceTree = "<group>"; };
@@ -431,6 +431,8 @@
 		11B3FD0A297FBC540058FFEB /* CommonShaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonShaders.h; sourceTree = "<group>"; };
 		11B3FD0C298012330058FFEB /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		11B7D6DE2973E921008C5495 /* ZPParticle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticle.h; sourceTree = "<group>"; };
+		11B8210529857832005300DC /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
+		11B8210729857B9F005300DC /* ObjectPositionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPositionProvider.swift; sourceTree = "<group>"; };
 		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C0A70E2922492E00CA7954 /* ZobbleCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobbleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C0A7102922492E00CA7954 /* ZobbleCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobbleCore.h; sourceTree = "<group>"; };
@@ -835,7 +837,6 @@
 				1190952129548AAB006EE970 /* MetalRenderView.swift */,
 				11B321702965CCA3000F4180 /* BaseMesh.swift */,
 				11B3216E29645CDD000F4180 /* BackgroundMesh.swift */,
-				1190952A2954AE12006EE970 /* PolygonMesh.swift */,
 				11909530295571E0006EE970 /* CircleMesh.swift */,
 				1190952E2954AE2C006EE970 /* LiquidMesh.swift */,
 				11B3FD0B297FBC5A0058FFEB /* Shaders */,
@@ -848,8 +849,10 @@
 			children = (
 				11955287295F51BD000C7A95 /* CometType.swift */,
 				11FEFEFE295DEA7A00528A1C /* Game.swift */,
+				11B8210529857832005300DC /* Background.swift */,
 				11FCBA9727A5D06B00A25665 /* World.swift */,
 				11FEFEFC295DB7D300528A1C /* Menu.swift */,
+				11B8210729857B9F005300DC /* ObjectPositionProvider.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -1487,11 +1490,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1190952B2954AE12006EE970 /* PolygonMesh.swift in Sources */,
 				11FEFF01295DEA8F00528A1C /* Colors.swift in Sources */,
 				11FEFEF829589B1600528A1C /* OffscreenCircles.metal in Sources */,
 				1190952829549010006EE970 /* CommonShaders.metal in Sources */,
 				11B3216F29645CDD000F4180 /* BackgroundMesh.swift in Sources */,
+				11B8210829857B9F005300DC /* ObjectPositionProvider.swift in Sources */,
 				11B321712965CCA3000F4180 /* BaseMesh.swift in Sources */,
 				1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */,
 				11909531295571E0006EE970 /* CircleMesh.swift in Sources */,
@@ -1502,6 +1505,7 @@
 				11FEFEFD295DB7D300528A1C /* Menu.swift in Sources */,
 				1195528A2961CE85000C7A95 /* Animator.swift in Sources */,
 				11955288295F51BD000C7A95 /* CometType.swift in Sources */,
+				11B8210629857832005300DC /* Background.swift in Sources */,
 				1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */,
 				1190953429574456006EE970 /* TextureRender.metal in Sources */,
 				11FEFF03295DEAA700528A1C /* RenderDataSource.swift in Sources */,

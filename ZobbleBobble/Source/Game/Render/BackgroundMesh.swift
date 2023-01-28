@@ -9,7 +9,6 @@ import MetalKit
 
 class BackgroundMesh {
     struct Uniforms {
-        let downScale: Float
         let cameraScale: Float
         let camera: SIMD2<Float>
     }
@@ -21,44 +20,46 @@ class BackgroundMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "fill_background")!)
     }()
     
-    private var textureScale: Float = 0.4
     weak var device: MTLDevice?
     var vertexBuffers: [MTLBuffer]
     var uniformsBuffer: MTLBuffer?
     var vertexCount: Int
     var finalTexture: MTLTexture?
     
-    init(_ device: MTLDevice?, size: CGSize) {
+    private let screenSize: CGSize
+    private let renderSize: CGSize
+    
+    init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
+        self.screenSize = screenSize
+        self.renderSize = renderSize
         self.device = device
         self.vertexBuffers = []
         self.vertexCount = 0
         
-        let width = Int(size.width * CGFloat(textureScale))
-        let height = Int(size.height * CGFloat(textureScale))
-        
-        guard width > 0, height > 0 else { return }
-        self.textureScale /= Float(UIScreen.main.bounds.width / size.width)
-        
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .bgra8Unorm,
-            width: width,
-            height: height,
+            width: Int(renderSize.width),
+            height: Int(renderSize.height),
             mipmapped: false)
         finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
         self.finalTexture = device?.makeTexture(descriptor: finalDesc)
     }
     
-    func updateMeshIfNeeded(positions: UnsafeMutableRawPointer,
-                            radii: UnsafeMutableRawPointer,
-                            colors: UnsafeMutableRawPointer,
-                            count: Int,
+    func updateMeshIfNeeded(positions: UnsafeMutableRawPointer?,
+                            radii: UnsafeMutableRawPointer?,
+                            colors: UnsafeMutableRawPointer?,
+                            count: Int?,
                             cameraScale: Float,
                             camera: SIMD2<Float>) {
         
-        guard let device = device else { return }
+        guard let device = device, let positions = positions, let radii = radii, let colors = colors, var count = count, count > 0 else {
+            self.vertexBuffers = []
+            self.vertexCount = 0
+            return
+        }
         
-        var count = count
-        var uniforms = Uniforms(downScale: textureScale, cameraScale: cameraScale, camera: camera)
+        let defaultScale = Float(renderSize.width / screenSize.width)
+        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, camera: camera)
         
         let positionBuffer = device.makeBuffer(
             bytes: positions,
