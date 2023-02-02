@@ -23,6 +23,7 @@ public class Level {
     public let number: Int
     public let initialShapes: [Shape]
     public var playerShapes: [Shape]
+    public var materials: [Material]
     
     public var targetOutline: Outline
     
@@ -32,6 +33,7 @@ public class Level {
         self.initialShapes = shapes
         self.playerShapes = shapes
         self.targetOutline = Self.makeOutline(for: number)
+        self.materials = Self.makeMaterials(for: number)
     }
     
     public func addShape(position: CGPoint, radius: Float, color: CGRect) {
@@ -40,21 +42,27 @@ public class Level {
 }
 
 extension Level {
+    private static func makeMaterials(for number: Int) -> [Material] {
+        if number == 0 {
+            return [.lavaRed, .lavaYellow, .lavaYellow, .lavaRed, .lavaRed, .lavaYellow, .lavaRed, .lavaYellow]
+        } else {
+            return [.lavaRed, .lavaYellow, .lavaYellow, .lavaRed, .bomb, .lavaYellow]
+        }
+        let materialCount = 2//5 + 2 * number
+        
+        var result = [Material]()
+        for i in 0..<materialCount {
+            if i % 2 == 0 {
+                result.append(.lavaRed)
+            } else {
+                result.append(.lavaYellow)
+            }
+        }
+        return result
+    }
+    
     private static func makeOutline(for number: Int) -> Outline {
         let radius = 10 * CGFloat(number) + 100
-//        let color = UIColor(hue: CGFloat(number) / 10, saturation: 1.0, brightness: 1.0, alpha: 1.0)
-        
-//        var r: CGFloat = 0
-//        var g: CGFloat = 0
-//        var b: CGFloat = 0
-//        var a: CGFloat = 0
-//        color.getRed(&r, green: &g, blue: &b, alpha: &a)
-//        let resultColor = SIMD4<UInt8>(UInt8(r * 255), UInt8(g * 255), UInt8(b * 255), UInt8(a * 255))
-        
-        
-//        float3 darkBlue = float3(12.0/255.0, 22.0/255.0, 79.0/255.0);
-//        float3 pink = float3(186.0/255.0, 30.0/255.0, 104.0/255.0);
-//        float3 lavanda = float3(118.0/255.0, 73.0/255.0, 254.0/255.0);
         
         let resultColor: SIMD4<UInt8>
         switch number % 3 {

@@ -14,13 +14,6 @@ struct CircleUniforms {
     float2 camera;
 };
 
-#define CLAMP(v, min, max) \
-    if (v < min) { \
-        v = min; \
-    } else if (v > max) { \
-        v = max; \
-    }
-
 kernel void draw_circles(constant CircleUniforms &uniforms [[buffer(0)]],
                          constant float2 *positions [[buffer(1)]],
                          constant float *radii [[buffer(2)]],

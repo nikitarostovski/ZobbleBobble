@@ -7,13 +7,14 @@
 
 import Foundation
 
+// TODO: nested structs
 final class Settings {
     static let particleRadius: CGFloat = 2.5
     static let resolutionDownscale: CGFloat = 7
     
     static let liquidMetaballsDownscale: Float = 1
     
-    static let levelCenterOffset: CGFloat = 150
+    static let levelCenterOffset: CGFloat = 50
     
     static let starLevelScale: CGFloat = 1
     static let starLevelMenuScale: CGFloat = 0.25
@@ -31,7 +32,9 @@ final class Settings {
     static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
     static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
     
-    
     static let menuAnimationDuration: Double = 0.3
     static let menuAnimationEasing: Curve = .sine
+    
+    static let shotAnimationDuration: Double = 0.15
+    static let shotAnimationEasing: Curve = .sine
 }

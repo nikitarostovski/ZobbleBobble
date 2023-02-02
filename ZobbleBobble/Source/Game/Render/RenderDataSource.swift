@@ -21,6 +21,15 @@ protocol BackgroundRenderDataSource: AnyObject {
     var backgroundAnchorPointCount: Int? { get }
 }
 
+protocol StarsRenderDataSource: AnyObject {
+    var starPositions: [UnsafeMutableRawPointer] { get }
+    var starRadii: [UnsafeMutableRawPointer] { get }
+    var starMainColors: [UnsafeMutableRawPointer] { get }
+    var starMaterials: [UnsafeMutableRawPointer] { get }
+    var starMaterialCounts: [Int] { get }
+    var starsHasChanges: Bool { get }
+}
+
 protocol ObjectRenderDataSource: AnyObject {
     var particleRadius: Float { get }
     var liquidFadeModifier: Float { get }

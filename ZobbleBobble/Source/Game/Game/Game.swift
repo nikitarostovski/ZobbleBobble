@@ -46,11 +46,7 @@ final class Game {
     private var background: Background?
     private var world: World?
     private var menu: Menu?
-    
-    var nextCometType: CometType? {
-        get { world?.nextCometType }
-        set { world?.nextCometType = newValue! }
-    }
+    var stars = [Star]()
     
     init(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
         let levelManager = LevelManager(particleRadius: Settings.particleRadius)
@@ -63,6 +59,10 @@ final class Game {
         
         self.state = GameState(state: .menu, packIndex: 0, levelIndex: 0)
         
+        self.stars = levelManager.allLevelPacks.map { pack in
+            Star(game: self, number: pack.number)
+        }
+        
         setupBackground()
     }
     
@@ -74,12 +74,13 @@ final class Game {
     }
     
     func runGame() {
-        let level = levelManager.allLevelPacks[self.state.packIndex].levels[self.state.levelIndex]
-        let world = World(game: self, level: level, particleRadius: Settings.particleRadius)
+        let star = stars[state.packIndex]
+        let world = World(game: self, star: star, particleRadius: Settings.particleRadius)
         self.world = world
         self.state.state = .level
         self.menu = nil
         background?.objectPositionProvider = world
+        delegate?.gameDidChangeState(self)
     }
     
     func runMenu(isFromLevel: Bool = false) {
@@ -89,6 +90,7 @@ final class Game {
         self.state.state = .menu
         self.world = nil
         background?.objectPositionProvider = menu
+        delegate?.gameDidChangeState(self)
     }
     
     func onTap(at pos: CGPoint) {
@@ -121,6 +123,15 @@ final class Game {
 }
 
 extension Game {
+    var starsDataSource: StarsRenderDataSource? {
+        switch state.state {
+        case .level:
+            return world
+        case .menu:
+            return menu
+        }
+    }
+    
     var backgroundDataSource: BackgroundRenderDataSource? {
         return background
     }

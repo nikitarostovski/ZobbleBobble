@@ -17,13 +17,6 @@ struct LiquidUniforms {
     float2 camera;
 };
 
-#define CLAMP(v, min, max) \
-    if (v < min) { \
-        v = min; \
-    } else if (v > max) { \
-        v = max; \
-    }
-
 float2 convertPosition(float2 pos, float outWidth, float outHeight, LiquidUniforms uniforms, bool shouldDownscale) {
     float l = length(pos);
     float2 norm = normalize(pos);

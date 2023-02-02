@@ -17,7 +17,7 @@ struct MenuState {
     var currentPackPagePosition: CGFloat
 }
 
-final class Menu: ObjectRenderDataSource {
+final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     static let levelCameraScale: CGFloat = 1
     static let levelsMenuCameraScale: CGFloat = 2
     static let packsMenuCameraScale: CGFloat = 3
@@ -58,6 +58,8 @@ final class Menu: ObjectRenderDataSource {
     private(set) var visibleLevelPackIndices: ClosedRange<Int> = 0...0
     private(set) var visibleLevelIndices: ClosedRange<Int> = 0...0
     
+    private var lastUpdateVisibleLevelPackIndices: ClosedRange<Int> = -1 ... -1
+    
     private(set) var state: MenuState
     private weak var game: Game?
     
@@ -73,6 +75,25 @@ final class Menu: ObjectRenderDataSource {
     var liquidVelocities: UnsafeMutableRawPointer?
     var liquidColors: UnsafeMutableRawPointer?
     
+    
+    var starPositions: [UnsafeMutableRawPointer] = []
+    var starRadii: [UnsafeMutableRawPointer] = []
+    var starMainColors: [UnsafeMutableRawPointer] = []
+    var starMaterials: [UnsafeMutableRawPointer] = []
+    var starMaterialCounts: [Int] = []
+    var starsHasChanges: Bool = true
+    
+    var stars: [Star] {
+        game?.stars ?? []
+    }
+    
+    var visibleStars: [Star] {
+        let visible = visibleLevelPackIndices
+        let allStars = stars
+        guard visible.lowerBound >= 0, visible.upperBound < stars.count else { return [] }
+        return Array(allStars[visibleLevelPackIndices])
+    }
+    
     init(game: Game?, from: CGFloat = levelsMenuCameraScale, to: CGFloat = levelsMenuCameraScale) {
         self.game = game
         self.state = MenuState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
@@ -84,7 +105,7 @@ final class Menu: ObjectRenderDataSource {
         }
         switch to {
         case Self.levelCameraScale:
-                transitionToLevel()
+            transitionToLevel()
         case Self.levelsMenuCameraScale:
             transitionToLevelSelection()
         case Self.packsMenuCameraScale:
@@ -102,7 +123,7 @@ final class Menu: ObjectRenderDataSource {
             
             let pack = game!.levelManager.allLevelPacks[game!.state.packIndex]
             let packPos = convertStarPosition(game!.state.packIndex) ?? .zero
-            let packRadius = convertStarRadius(pack.targetOutline.radius) ?? 0
+            let packRadius = convertStarRadius(pack.radius) ?? 0
             if packPos.distance(to: position) <= packRadius {
                 // go back to star selection
                 transitionToPackSelection()
@@ -127,7 +148,7 @@ final class Menu: ObjectRenderDataSource {
             
             for pack in game!.levelManager.allLevelPacks {
                 let packPos = convertStarPosition(pack.number) ?? .zero
-                let packRadius = convertStarRadius(pack.targetOutline.radius) ?? 0
+                let packRadius = convertStarRadius(pack.radius) ?? 0
                 if packPos.distance(to: position) <= packRadius {
                     // go inside pack
                     transitionToLevelSelection()
@@ -159,34 +180,53 @@ final class Menu: ObjectRenderDataSource {
     }
     
     private func transitionToLevel() {
+        let currentStar = stars[game!.state.packIndex]
+        
         let startProgress = state.levelToPackProgress
         let targetProgress = Self.levelCameraScale
+        
+        let startClipMisslesProgress: CGFloat = currentStar.clipMisslesProgress
+        let targetClipMisslesProgress: CGFloat = 0
         
         Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
+            currentStar.clipMisslesProgress = startClipMisslesProgress + (targetClipMisslesProgress - startClipMisslesProgress) * percentage
             self.updateRenderData()
         } completion: { [weak self] in
             guard let self = self else { return }
             self.state.levelToPackProgress = targetProgress
+            currentStar.clipMisslesProgress = targetClipMisslesProgress
             self.updateRenderData()
             self.game!.runGame()
         }
     }
     
     private func transitionToLevelSelection() {
+        let currentStar = stars[game!.state.packIndex]
+        
         let startProgress = state.levelToPackProgress
         let targetProgress = Self.levelsMenuCameraScale
         
         state.currentLevelPagePosition = CGFloat(game!.state.levelIndex)
         
+        let startMissleCount = currentStar.missleIndicesToSkip
+        let targetMissleCount: CGFloat = 0
+        
+        let startClipMisslesProgress: CGFloat = currentStar.clipMisslesProgress
+        let targetClipMisslesProgress: CGFloat = 1
+        
         Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
+            currentStar.missleIndicesToSkip = startMissleCount + (targetMissleCount - startMissleCount) * percentage
+            currentStar.clipMisslesProgress = startClipMisslesProgress + (targetClipMisslesProgress - startClipMisslesProgress) * percentage
             self.updateRenderData()
         } completion: { [weak self] in
             guard let self = self else { return }
             self.state.levelToPackProgress = targetProgress
+            currentStar.missleIndicesToSkip = targetMissleCount
+            currentStar.clipMisslesProgress = targetClipMisslesProgress
             self.updateScroll()
             self.updateRenderData()
         }
@@ -228,6 +268,7 @@ final class Menu: ObjectRenderDataSource {
     
     private func updateRenderData() {
         updatePositionsDataIfNeeded()
+        updateStarsData()
         updateCirclesData()
         updateLiquidData()
     }
@@ -365,49 +406,42 @@ final class Menu: ObjectRenderDataSource {
         self.particleRadius = Float(self.convertPlanetRadius(Settings.particleRadius) ?? 0)
     }
     
-    private func updateCirclesData() {
-        guard 1...3 ~= state.levelToPackProgress else { return }
-        
-        let visibleLevelPacks = visibleLevelPacks
-        
-        var allPositions = [SIMD2<Float32>]()
-        var allVelocities = [SIMD2<Float32>]()
-        var allRadii = [Float32]()
-        var allColors = [SIMD4<UInt8>]()
-        
-        for pack in visibleLevelPacks {
-            let point = self.convertStarPosition(pack.number) ?? .zero
-            let color = pack.targetOutline.color
-            let radius = self.convertStarRadius(pack.targetOutline.radius) ?? 0
+    private func updateStarsData() {
+        var starPositions: [UnsafeMutableRawPointer] = []
+        var starRadii: [UnsafeMutableRawPointer] = []
+        var starMainColors: [UnsafeMutableRawPointer] = []
+        var starMaterials: [UnsafeMutableRawPointer] = []
+        var starMaterialCounts: [Int] = []
+
+        for i in 0 ..< game!.levelManager.allLevelPacks.count {
+            guard visibleLevelPackIndices ~= i else { continue }
+            let star = stars[i]
+            let pack = game!.levelManager.allLevelPacks[i]
             
-            if isPointVisible(point, radius: radius) {
-                allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
-                allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
-                allRadii.append(Float32(radius))
-                allColors.append(color)
-            }
+            let point = self.convertStarPosition(pack.number) ?? .zero
+            let radius = self.convertStarRadius(pack.radius) ?? 0
+            
+            star.position = SIMD2<Float>(Float(point.x), Float(point.y))
+            star.radius = Float(radius)
+            
+            star.updateVisibleMaterials(levelToPackProgress: state.levelToPackProgress)
+
+            starPositions.append(star.positionPointer)
+            starRadii.append(star.radiusPointer)
+            starMainColors.append(star.mainColorPointer)
+            starMaterials.append(star.materialsPointer)
+            starMaterialCounts.append(star.state.visibleMaterials.count)
         }
         
-        let positions = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride * allPositions.count,
-                                                         alignment: MemoryLayout<SIMD2<Float32>>.alignment)
-        positions.copyMemory(from: &allPositions,
-                             byteCount: MemoryLayout<SIMD2<Float32>>.stride * allPositions.count)
-        
-        let radii = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride * allRadii.count,
-                                                     alignment: MemoryLayout<Float32>.alignment)
-        radii.copyMemory(from: &allRadii,
-                         byteCount: MemoryLayout<Float32>.stride * allRadii.count)
-        
-        let colors = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD4<UInt8>>.stride * allColors.count,
-                                                      alignment: MemoryLayout<SIMD4<UInt8>>.alignment)
-        colors.copyMemory(from: &allColors,
-                          byteCount: MemoryLayout<SIMD4<UInt8>>.stride * allColors.count)
-        
-        
-        self.circleBodiesPositions = positions
-        self.circleBodiesRadii = radii
-        self.circleBodiesColors = colors
-        self.circleBodyCount = allPositions.count
+        self.starPositions = starPositions
+        self.starRadii = starRadii
+        self.starMainColors = starMainColors
+        self.starMaterials = starMaterials
+        self.starMaterialCounts = starMaterialCounts
+    }
+    
+    private func updateCirclesData() {
+
     }
 }
 

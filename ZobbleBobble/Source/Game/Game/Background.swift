@@ -29,15 +29,15 @@ final class Background: BackgroundRenderDataSource {
         var outlineColors = [SIMD4<UInt8>]()
         var outlineRadii = [Float]()
         
-        for pack in packs {
-            guard let pos = objectPositionProvider.convertStarPosition(pack.number),
-                  let r = objectPositionProvider.convertStarRadius(pack.targetOutline.radius)
-            else { return }
-            
-            outlinePositions.append(SIMD2<Float32>(Float32(pos.x), Float32(pos.y)))
-            outlineRadii.append(Float(r * 1.25))
-            outlineColors.append(pack.targetOutline.color)
-        }
+//        for pack in packs {
+//            guard let pos = objectPositionProvider.convertStarPosition(pack.number),
+//                  let r = objectPositionProvider.convertStarRadius(pack.targetOutline.radius)
+//            else { return }
+//            
+//            outlinePositions.append(SIMD2<Float32>(Float32(pos.x), Float32(pos.y)))
+//            outlineRadii.append(Float(r * 1.25))
+//            outlineColors.append(pack.targetOutline.color)
+//        }
         
         let levels = game.levelManager.allLevelPacks[game.state.packIndex].levels[objectPositionProvider.visibleLevelIndices]
         

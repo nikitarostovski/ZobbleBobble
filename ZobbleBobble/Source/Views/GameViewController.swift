@@ -37,7 +37,7 @@ final class GameViewController: UIViewController {
     }()
     
     lazy var controlsBar: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [exitButton, weapon1Button, weapon2Button])
+        let stack = UIStackView(arrangedSubviews: [exitButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.spacing = 16
@@ -52,24 +52,6 @@ final class GameViewController: UIViewController {
         b.backgroundColor = .red
         b.setTitle("EXIT", for: .normal)
         b.addTarget(self, action: #selector(onExitTap), for: .touchUpInside)
-        return b
-    }()
-    
-    lazy var weapon1Button: UIButton = {
-        let b = UIButton()
-        b.translatesAutoresizingMaskIntoConstraints = false
-        b.backgroundColor = .blue
-        b.setTitle("1", for: .normal)
-        b.addTarget(self, action: #selector(onWeapon1Tap), for: .touchUpInside)
-        return b
-    }()
-    
-    lazy var weapon2Button: UIButton = {
-        let b = UIButton()
-        b.translatesAutoresizingMaskIntoConstraints = false
-        b.backgroundColor = .green
-        b.setTitle("2", for: .normal)
-        b.addTarget(self, action: #selector(onWeapon2Tap), for: .touchUpInside)
         return b
     }()
     
@@ -130,24 +112,14 @@ final class GameViewController: UIViewController {
     }
     
     @objc
-    private func onWeapon1Tap() {
-        guard let game = game else { return }
-        game.nextCometType = .liquid
-    }
-    
-    @objc
-    private func onWeapon2Tap() {
-        guard let game = game else { return }
-        game.nextCometType = .solid
-    }
-    
-    @objc
     private func update(displayLink: CADisplayLink) {
         guard let game = game else { return }
 
         game.update(displayLink.duration)
+        
         renderView.backgroundDataSource = game.backgroundDataSource
         renderView.objectsDataSource = game.objectsDataSource
+        renderView.starsDataSource = game.starsDataSource
         renderView.cameraDataSource = game.cameraDataSource
         renderView.update()
     }
@@ -163,7 +135,12 @@ final class GameViewController: UIViewController {
 
 extension GameViewController: GameDelegate {
     func gameDidChangeState(_ game: Game) {
-        
+        switch game.state.state {
+        case .level:
+            controlsBar.isHidden = false
+        default:
+            controlsBar.isHidden = true
+        }
     }
 }
 

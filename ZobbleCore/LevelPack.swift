@@ -7,37 +7,46 @@
 
 import UIKit
 
+public struct LevelPackStyle {
+    public let mainColor: SIMD4<UInt8>
+    public let backgroundColor: SIMD4<UInt8>
+}
+
 public class LevelPack {
-    public struct Outline {
-        public var radius: CGFloat
-        public var color: SIMD4<UInt8>
-    }
-    
     public var levels: [Level]
     
     public let number: Int
+    public let radius: CGFloat
+    public let style: LevelPackStyle
     
-    public var targetOutline: Outline
+    public var allMaterials: [Material] {
+        levels.flatMap { $0.materials }
+    }
     
     init(number: Int, levels: [Level]) {
         self.number = number
         self.levels = levels
-        self.targetOutline = Self.makeOutline(for: number)
+        self.radius = 230
+        self.style = Self.makeStyle(for: number)
     }
 }
 
 extension LevelPack {
-    private static func makeOutline(for number: Int) -> Outline {
-        let radius: CGFloat = 250//10 * CGFloat(number) + 100
-        let color = UIColor(hue: CGFloat(number) / 10, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+    private static func makeStyle(for number: Int) -> LevelPackStyle {
+        let accentHue = CGFloat(number) / 10
+        let accentColor = UIColor(hue: accentHue, saturation: 1.0, brightness: 1.0, alpha: 1.0)
+        let backColor = UIColor(hue: accentHue + 0.5, saturation: 0.8, brightness: 0.5, alpha: 1.0)
         
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
-        color.getRed(&r, green: &g, blue: &b, alpha: &a)
-        let resultColor = SIMD4<UInt8>(UInt8(r * 255), UInt8(g * 255), UInt8(b * 255), UInt8(a * 255))
+        accentColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let mainColor = SIMD4<UInt8>(UInt8(r * 255), UInt8(g * 255), UInt8(b * 255), UInt8(a * 255))
         
-        return Outline(radius: radius, color: resultColor)
+        backColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let backgroundColor = SIMD4<UInt8>(UInt8(r * 255), UInt8(g * 255), UInt8(b * 255), UInt8(a * 255))
+        
+        return LevelPackStyle(mainColor: mainColor, backgroundColor: backgroundColor)
     }
 }

@@ -8,8 +8,8 @@
 import UIKit
 
 public final class LevelManager {
-    private let packCount = 3
-    private let levelCount = 10
+    private let packCount = 12
+    private let levelCount = 2
     
     private let particleRadius: CGFloat
     

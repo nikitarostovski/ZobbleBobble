@@ -12,12 +12,14 @@ final class MetalRenderView: MTKView {
     var renderer: Renderer!
     
     var backgroundMesh: BackgroundMesh
+    var starsMesh: StarsMesh
     var circleMesh: CircleMesh
     var liquidMesh: LiquidMesh
     
     weak var objectsDataSource: ObjectRenderDataSource?
     weak var cameraDataSource: CameraRenderDataSource?
     weak var backgroundDataSource: BackgroundRenderDataSource?
+    weak var starsDataSource: StarsRenderDataSource?
     
     init(screenSize: CGSize, renderSize: CGSize) {
         let device = MTLCreateSystemDefaultDevice()!
@@ -25,6 +27,7 @@ final class MetalRenderView: MTKView {
         self.backgroundMesh = BackgroundMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.circleMesh = CircleMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
+        self.starsMesh = StarsMesh(device, screenSize: screenSize, renderSize: renderSize)
         super.init(frame: .zero, device: device)
         self.renderer = Renderer(device: device, view: self, renderSize: renderSize)
         self.delegate = renderer
@@ -42,8 +45,6 @@ final class MetalRenderView: MTKView {
         let coreAngle = cameraDataSource.cameraAngle
         
 //        print("circles: \(dataSource.circleBodyCount) liquids: \(dataSource.liquidCount)")
-        
-        print("\(camera) \(cameraScale)")
         
         if let objectsDataSource = objectsDataSource {
             liquidMesh.updateMeshIfNeeded(vertexCount: objectsDataSource.liquidCount,
@@ -63,6 +64,17 @@ final class MetalRenderView: MTKView {
                                           camera: camera)
         }
         
+        if let starsDataSource = starsDataSource {
+            starsMesh.updateMeshIfNeeded(positions: starsDataSource.starPositions,
+                                         radii: starsDataSource.starRadii,
+                                         mainColors: starsDataSource.starMainColors,
+                                         materials: starsDataSource.starMaterials,
+                                         materialCounts: starsDataSource.starMaterialCounts,
+                                         hasChanges: starsDataSource.starsHasChanges,
+                                         cameraScale: cameraScale,
+                                         camera: camera)
+        }
+        
         if let backgroundDataSource = backgroundDataSource {
             backgroundMesh.updateMeshIfNeeded(positions: backgroundDataSource.backgroundAnchorPositions,
                                               radii: backgroundDataSource.backgroundAnchorRadii,
@@ -72,7 +84,7 @@ final class MetalRenderView: MTKView {
                                               camera: camera)
         }
         
-        renderer.setRenderData(backgroundMesh: backgroundMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
+        renderer.setRenderData(backgroundMesh: backgroundMesh, starsMesh: starsMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
     }
 }
 
@@ -90,6 +102,7 @@ class Renderer: NSObject, MTKViewDelegate {
     private let renderSize: CGSize
     
     var backgroundMesh: BackgroundMesh?
+    var starsMesh: StarsMesh?
     var circleMesh: CircleMesh?
     var liquidMesh: LiquidMesh?
     
@@ -106,8 +119,9 @@ class Renderer: NSObject, MTKViewDelegate {
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
     
-    func setRenderData(backgroundMesh: BackgroundMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
+    func setRenderData(backgroundMesh: BackgroundMesh?, starsMesh: StarsMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
         self.backgroundMesh = backgroundMesh
+        self.starsMesh = starsMesh
         self.circleMesh = circleMesh
         self.liquidMesh = liquidMesh
     }
@@ -157,15 +171,18 @@ class Renderer: NSObject, MTKViewDelegate {
         guard let vertexBuffer = vertexBuffer, let upscaleSamplerState = upscaleSamplerState else { return }
         
         let backgroundTexture = backgroundMesh?.render(commandBuffer: commandBuffer)
+        let starsTexture = starsMesh?.render(commandBuffer: commandBuffer)
         let liquidTexture = liquidMesh?.render(commandBuffer: commandBuffer)
         let circlesTexture = circleMesh?.render(commandBuffer: commandBuffer)
         
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: drawableRenderPassDescriptor) else { return }
         renderEncoder.setRenderPipelineState(drawableRenderPipelineState)
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+        
         renderEncoder.setFragmentTexture(backgroundTexture, index: 0)
         renderEncoder.setFragmentTexture(liquidTexture, index: 1)
         renderEncoder.setFragmentTexture(circlesTexture, index: 2)
+        renderEncoder.setFragmentTexture(starsTexture, index: 3)
         renderEncoder.setFragmentBuffer(screenSizeBuffer, offset: 0, index: 0)
         renderEncoder.setFragmentSamplerState(upscaleSamplerState, index: 0)
         
