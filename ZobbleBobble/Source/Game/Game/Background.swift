@@ -39,17 +39,17 @@ final class Background: BackgroundRenderDataSource {
 //            outlineColors.append(pack.targetOutline.color)
 //        }
         
-        let levels = game.levelManager.allLevelPacks[game.state.packIndex].levels[objectPositionProvider.visibleLevelIndices]
-        
-        for level in levels {
-            guard let pos = objectPositionProvider.convertPlanetPosition(level.number),
-                    let r = objectPositionProvider.convertPlanetRadius(level.targetOutline.radius)
-            else { return }
-            
-            outlinePositions.append(SIMD2<Float32>(Float32(pos.x), Float32(pos.y)))
-            outlineRadii.append(Float(r))
-            outlineColors.append(level.targetOutline.color)
-        }
+//        let levels = game.levelManager.allLevelPacks[game.state.packIndex].levels[objectPositionProvider.visibleLevelIndices]
+//
+//        for level in levels {
+//            guard let pos = objectPositionProvider.convertPlanetPosition(level.number),
+//                    let r = objectPositionProvider.convertPlanetRadius(level.targetOutline.radius)
+//            else { return }
+//
+//            outlinePositions.append(SIMD2<Float32>(Float32(pos.x), Float32(pos.y)))
+//            outlineRadii.append(Float(r))
+//            outlineColors.append(level.targetOutline.color)
+//        }
 
         let outlinePositionsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count, alignment: MemoryLayout<SIMD2<Float32>>.alignment)
         outlinePositionsPointer.copyMemory(from: &outlinePositions, byteCount: MemoryLayout<SIMD2<Float32>>.stride * outlinePositions.count)

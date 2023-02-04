@@ -1,0 +1,128 @@
+[
+    {
+        "radius": 230,
+        "levels": [
+            {
+                "gravityRadius": 180,
+                "particleRadius": 2.5,
+                "initialChunks": [
+                    {
+                        "material": "coreDark",
+                        "shape": {
+                            "type": "polygon",
+                            "points": [
+                                {
+                                    "x": -30,
+                                    "y": -5
+                                },
+                                {
+                                    "x": -30,
+                                    "y": 5
+                                },
+                                {
+                                    "x": 30,
+                                    "y": 5
+                                },
+                                {
+                                    "x": 30,
+                                    "y": -5
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "missles": [
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 30
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 30
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                ]
+            },
+            {
+                "gravityRadius": 180,
+                "particleRadius": 2.5,
+                "initialChunks": [
+                    {
+                        "material": "coreLight",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 30,
+                            "center": {
+                                "x": 0,
+                                "y": 0
+                            }
+                        }
+                    }
+                ],
+                "missles": [
+                    {
+                        "material": "lavaRed",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "bomb",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 1
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "shape": {
+                            "type": "circle",
+                            "radius": 30
+                        },
+                    },
+                ]
+            }
+        ]
+    }
+]

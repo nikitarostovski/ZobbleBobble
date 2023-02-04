@@ -48,8 +48,18 @@ final class Game {
     private var menu: Menu?
     var stars = [Star]()
     
-    init(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
-        let levelManager = LevelManager(particleRadius: Settings.particleRadius)
+    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
+        let levelManager: LevelManager
+        if let levelDataPath = Bundle.main.path(forResource: "Levels", ofType: "json") {
+            do {
+                let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
+                levelManager = try LevelManager(levelData: data)
+            } catch {
+                return nil
+            }
+        } else {
+            return nil
+        }
         self.levelManager = levelManager
         self.screenSize = screenSize
         self.renderSize = renderSize
@@ -59,8 +69,8 @@ final class Game {
         
         self.state = GameState(state: .menu, packIndex: 0, levelIndex: 0)
         
-        self.stars = levelManager.allLevelPacks.map { pack in
-            Star(game: self, number: pack.number)
+        self.stars = levelManager.allLevelPacks.enumerated().map { i, pack in
+            Star(game: self, number: i)
         }
         
         setupBackground()
@@ -75,7 +85,7 @@ final class Game {
     
     func runGame() {
         let star = stars[state.packIndex]
-        let world = World(game: self, star: star, particleRadius: Settings.particleRadius)
+        let world = World(game: self, star: star)
         self.world = world
         self.state.state = .level
         self.menu = nil

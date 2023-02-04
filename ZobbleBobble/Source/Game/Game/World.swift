@@ -22,10 +22,11 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     var world: ZPWorld
     var star: Star
     
-    let pack: LevelPack
-    let level: Level
+    let pack: PackModel
+    let level: LevelModel
     
-    var particleRadius: Float
+    var particleRadius: Float { Float(level.particleRadius) }
+    
     var liquidFadeModifier: Float = 0.3
     var liquidCount: Int?
     var liquidPositions: UnsafeMutableRawPointer?
@@ -40,6 +41,8 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     var cameraY: Float { Float(state.camera.y + levelCenterPoint.y) }
     var cameraScale: Float { Float(state.cameraScale) }
     var cameraAngle: Float { Float(state.angle) }
+    
+    var userInteractionEnabled = true
     
     private var levelCenterPoint: CGPoint
     private var starCenterPoint: CGPoint
@@ -62,30 +65,32 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(game: Game, star: Star, particleRadius: CGFloat) {
+    init(game: Game, star: Star) {
         let pack = game.levelManager.allLevelPacks[game.state.packIndex]
         let level = pack.levels[game.state.levelIndex]
         
         self.pack = pack
         self.level = level
         self.game = game
-        self.particleRadius = Float(particleRadius)
         self.levelCenterPoint = game.levelCenterPoint
         
         self.starCenterPoint = CGPoint(x: 0, y: game.screenSize.height * 0.6)
-        self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.targetOutline.radius, particleRadius: CGFloat(particleRadius))
+        self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.gravityRadius, particleRadius: level.particleRadius)
         self.state = WorldState(angle: 0, camera: .zero, cameraScale: 1)
         
         self.star = star
         star.radius = Float(pack.radius)
         star.position = SIMD2<Float>(Float(starCenterPoint.x), Float(starCenterPoint.y))
-        star.mainColor = pack.style.mainColor
-        star.updateVisibleMaterials(levelToPackProgress: Menu.levelCameraScale)
+        star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
         
-        level.playerShapes.forEach { shape in
-            let position = shape.position//CGPoint(x: levelCenterPoint.x + shape.position.x, y: levelCenterPoint.y + shape.position.y)
-            self.spawnCore(at: position, radius: CGFloat(shape.radius), color: shape.color, addToLevel: false)
+        level.initialChunks.forEach { [weak self] chunk in
+            self?.spawnChunk(chunk)
         }
+        
+//        level.playerShapes.forEach { shape in
+//            let position = shape.position//CGPoint(x: levelCenterPoint.x + shape.position.x, y: levelCenterPoint.y + shape.position.y)
+//            self.spawnCore(at: position, radius: CGFloat(shape.radius), color: shape.color, addToLevel: false)
+//        }
     }
     
     func update(_ time: CFTimeInterval) {
@@ -107,17 +112,15 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     }
     
     func onTap(_ position: CGPoint) {
-        guard state.currentMissleIndex < level.materials.count else {
+        guard userInteractionEnabled else { return }
+        
+        guard state.currentMissleIndex < level.missles.count else {
             // TODO: level finished
 //            game?.runMenu(isFromLevel: true)
             return
         }
         let position = screenToGame(position)
-        let type = level.materials[state.currentMissleIndex]
-        spawnComet(material: type, position: position)
-        
-//        state.currentMissleIndex += 1
-//        star.updateVisibleMaterials(levelToPackProgress: Menu.levelCameraScale, misslesFired: state.currentMissleIndex)
+        spawnMissle(level.missles[state.currentMissleIndex], at: position)
     }
     
     func onSwipe(_ offset: CGFloat) {
@@ -141,21 +144,28 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
                        y: state.camera.y + result.y / CGFloat(state.cameraScale))
     }
     
-    private func spawnCore(at position: CGPoint, radius: CGFloat, color: CGRect, addToLevel: Bool = true) {
-        let points = Polygon.make(radius: radius, position: position, vertexCount: 8)
-        let polygon = points.map { NSValue(cgPoint: $0) }
-        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: true, isExplodable: false)
-        if addToLevel {
-            level.addShape(position: position, radius: Float(radius), color: color)
+    private func spawnChunk(_ chunk: ChunkModel) {
+        let particleCenters = chunk.shape.particleCenters
+        particleCenters.forEach { [weak self] center in
+            self?.world.addParticle(withPosition: center,
+                                    color: CGRect(chunk.material.color),
+                                    isStatic: true,
+                                    isExplodable: false)
         }
     }
     
-    private func spawnComet(material: Material, position: CGPoint) {
-        switch material {
-        case .lavaRed, .lavaYellow:
-            spawnLiquidComet(at: position, material: material)
-        case .bomb:
-            spawnSolidComet(at: position, material: material)
+    private func spawnMissle(_ missle: MissleModel, at position: CGPoint) {
+        userInteractionEnabled = false
+        
+        let isExplodable = missle.material == .bomb
+        let particleCenters = missle.shape.particleCenters
+        
+        particleCenters.forEach { [weak self] center in
+            let pos = CGPoint(x: position.x + center.x, y: position.y + center.y)
+            self?.world.addParticle(withPosition: pos,
+                                    color: CGRect(missle.material.color),
+                                    isStatic: false,
+                                    isExplodable: isExplodable)
         }
         
         let startMissleCount = CGFloat(state.currentMissleIndex)
@@ -164,28 +174,15 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         Animator.animate(duraion: Settings.shotAnimationDuration, easing: Settings.shotAnimationEasing, step: { percentage in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
             self.star.missleIndicesToSkip = misslesFired
-            self.star.updateVisibleMaterials(levelToPackProgress: Menu.levelCameraScale)
+            self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.lastQueryStarHadChanges = true
         }, completion: {
             self.star.missleIndicesToSkip = endMissleCount
-            self.star.updateVisibleMaterials(levelToPackProgress: Menu.levelCameraScale)
+            self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
+            self.userInteractionEnabled = true
         })
-    }
-    
-    private func spawnLiquidComet(at position: CGPoint, material: Material) {
-        let points = Polygon.make(radius: material.missleRadius, position: position, vertexCount: 8)
-        let polygon = points.map { NSValue(cgPoint: $0) }
-        let color = CGRect(material.color)
-        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false, isExplodable: false)
-    }
-    
-    private func spawnSolidComet(at position: CGPoint, material: Material) {
-        let points = Polygon.make(radius: material.missleRadius, position: position, vertexCount: 8)
-        let polygon = points.map { NSValue(cgPoint: $0) }
-        let color = CGRect(material.color)
-        world.addLiquid(withPolygon: polygon, color: color, position: .zero, isStatic: false, isExplodable: true)
     }
 }
 

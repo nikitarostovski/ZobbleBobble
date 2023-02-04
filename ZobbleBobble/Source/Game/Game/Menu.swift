@@ -133,7 +133,7 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             let packLevels = game!.levelManager.allLevelPacks[game!.state.packIndex].levels
             for i in packLevels.indices {
                 let levelPos = convertPlanetPosition(i) ?? .zero
-                let levelRadius = convertPlanetRadius(packLevels[i].targetOutline.radius) ?? 0
+                let levelRadius = convertPlanetRadius(packLevels[i].gravityRadius) ?? 0
                 if (levelPos.distance(to: position) <= levelRadius) {
                     // run level
                     transitionToLevel()
@@ -142,12 +142,11 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             }
         // pack selection
         } else {
-            let pack = Int(state.currentPackPagePosition)
-            game!.state.packIndex = pack
+            game!.state.packIndex = Int(state.currentPackPagePosition)
             game!.state.levelIndex = 0
             
-            for pack in game!.levelManager.allLevelPacks {
-                let packPos = convertStarPosition(pack.number) ?? .zero
+            for (i, pack) in game!.levelManager.allLevelPacks.enumerated() {
+                let packPos = convertStarPosition(i) ?? .zero
                 let packRadius = convertStarRadius(pack.radius) ?? 0
                 if packPos.distance(to: position) <= packRadius {
                     // go inside pack
@@ -171,11 +170,11 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         updateRenderData()
     }
     
-    private var visibleLevelPacks: [LevelPack] {
+    private var visibleLevelPacks: [PackModel] {
         Array(game!.levelManager.allLevelPacks[visibleLevelPackIndices])
     }
     
-    private var visibleLevels: [Level] {
+    private var visibleLevels: [LevelModel] {
         Array(game!.levelManager.allLevelPacks[game!.state.packIndex].levels[visibleLevelIndices])
     }
     
@@ -362,17 +361,23 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         var allRadii = [Float32]()
         var allColors = [SIMD4<UInt8>]()
         
+        
         if (state.levelToPackProgress < 3) {
-            for level in visibleLevels {
-                for (i, shape) in level.initialShapes.enumerated() {
-                    let point = convertPlanetShapePosition(level.number, shapeIndex: i)
-                    let radius = self.convertPlanetRadius(CGFloat(shape.radius)) ?? 0
-                    
-                    if isPointVisible(point, radius: radius) {
-                        allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
-                        allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
-                        allColors.append(shape.color.simdColor)
-                        allRadii.append(Float(radius))
+            for (levelIndex, level) in visibleLevels.enumerated() {
+                let levelNumber = visibleLevelIndices.lowerBound + levelIndex
+                let particleRadius = level.particleRadius
+                for chunk in level.initialChunks {
+                    let particleCenters = chunk.shape.particleCenters
+                    for center in particleCenters {
+                        let point = convertPlanetChunkPosition(levelNumber, position: center)
+                        let radius = self.convertPlanetRadius(particleRadius) ?? 0
+                        
+                        if isPointVisible(point, radius: radius) {
+                            allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
+                            allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
+                            allColors.append(chunk.material.color)
+                            allRadii.append(Float(radius))
+                        }
                     }
                 }
             }
@@ -403,7 +408,6 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         self.liquidVelocities = velocities
         self.liquidColors = colors
         self.liquidCount = allPositions.count
-        self.particleRadius = Float(self.convertPlanetRadius(Settings.particleRadius) ?? 0)
     }
     
     private func updateStarsData() {
@@ -418,13 +422,13 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             let star = stars[i]
             let pack = game!.levelManager.allLevelPacks[i]
             
-            let point = self.convertStarPosition(pack.number) ?? .zero
+            let point = self.convertStarPosition(i) ?? .zero
             let radius = self.convertStarRadius(pack.radius) ?? 0
             
             star.position = SIMD2<Float>(Float(point.x), Float(point.y))
             star.radius = Float(radius)
             
-            star.updateVisibleMaterials(levelToPackProgress: state.levelToPackProgress)
+            star.updateVisibleMissles(levelToPackProgress: state.levelToPackProgress)
 
             starPositions.append(star.positionPointer)
             starRadii.append(star.radiusPointer)
@@ -480,12 +484,9 @@ extension Menu: ObjectPositionProvider {
         radius * planetRadiusScale
     }
     
-    private func convertPlanetShapePosition(_ levelIndex: Int, shapeIndex: Int) -> CGPoint {
-        let level = game!.levelManager.allLevelPacks[game!.state.packIndex].levels[levelIndex]
+    private func convertPlanetChunkPosition(_ levelIndex: Int, position: CGPoint) -> CGPoint {
         let levelPosition = convertPlanetPosition(levelIndex) ?? .zero
-        
-        let shape = level.initialShapes[shapeIndex]
-        return CGPoint(x: levelPosition.x + shape.position.x * planetRadiusScale, y: levelPosition.y + shape.position.y * planetRadiusScale)
+        return CGPoint(x: levelPosition.x + position.x * planetRadiusScale, y: levelPosition.y + position.y * planetRadiusScale)
     }
 }
 

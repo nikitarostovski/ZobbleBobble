@@ -17,7 +17,6 @@ struct StarUniforms {
 struct Material {
     uchar4 color;
     float2 position;
-    float weight;
 };
 
 kernel void draw_star(constant StarUniforms &uniforms [[buffer(0)]],

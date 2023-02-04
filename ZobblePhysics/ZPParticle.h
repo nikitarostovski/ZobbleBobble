@@ -48,7 +48,7 @@ public:
             case ZPParticleStateStatic:
                 return b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
             case ZPParticleStateDynamic:
-                return b2_viscousParticle | b2_tensileParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
+                return b2_viscousParticle | b2_powderParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
         }
     }
 };

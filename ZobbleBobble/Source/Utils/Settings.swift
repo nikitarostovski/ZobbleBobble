@@ -9,7 +9,6 @@ import Foundation
 
 // TODO: nested structs
 final class Settings {
-    static let particleRadius: CGFloat = 2.5
     static let resolutionDownscale: CGFloat = 7
     
     static let liquidMetaballsDownscale: Float = 1

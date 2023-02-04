@@ -11,6 +11,10 @@ import SwiftClipper
 import Delaunay
 
 extension Polygon {
+    public func contains(point: CGPoint) -> Bool {
+        contains(point: point)
+    }
+    
     public func intersection(with p: Polygon) -> [Polygon] {
         guard p.bounds.intersects(bounds) else { return [] }
         return intersection(p)

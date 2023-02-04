@@ -56,9 +56,11 @@ static float kFreezeVelocityThreshold = 5;
     particleSystemDef.gravityScale = 1;
     particleSystemDef.density = 1;
     particleSystemDef.viscousStrength = 0.9;
-    particleSystemDef.repulsiveStrength = 1.2;
+    particleSystemDef.repulsiveStrength = 0.2;
     particleSystemDef.ejectionStrength = 0;
     particleSystemDef.staticPressureStrength = 0.0f;
+    particleSystemDef.powderStrength = 1.0f;
+    particleSystemDef.staticPressureRelaxation = 0.0f;
     
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
 //    system->GetStuckCandidates()
@@ -298,50 +300,69 @@ static float kFreezeVelocityThreshold = 5;
     delete[] circleBodiesRadii;
 }
 
-- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
-    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+- (void)addParticleWithPosition:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
+    b2Vec2 center = b2Vec2(position.x, position.y);
+    b2Vec2 pos = center;
+    pos.x = (pos.x - _gravityCenter.x) * -1;
+    pos.y = (pos.y - _gravityCenter.y) * -1;
+    pos.Normalize();
+    b2Vec2 force = pos * kCometShootImpulse;
+        
+    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    def.initialForce = CGPointMake(force.x, force.y);
+    def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
+    def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
+    def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
+    def.staticBehavior = ZPParticleStaticBehaviorNone;
+    def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
     
-    b2Vec2 *pts = new b2Vec2[polygon.count];
-    for (int i = 0; i < polygon.count; i++) {
-        NSValue *v = polygon[i];
-        CGPoint pt = [v CGPointValue];
-        pts[i] = b2Vec2(pt.x, pt.y);
-    }
-    b2PolygonShape shape;
-    shape.Set(pts, (int32)polygon.count);
-    
-    float32 stride = _system->GetRadius() * 2 * b2_particleStride;
-    b2Transform identity;
-    identity.SetIdentity();
-    b2AABB aabb;
-    shape.ComputeAABB(&aabb, identity, 0);
-    
-    delete[] pts;
-    
-    for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride) {
-        for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride) {
-            b2Vec2 p(x, y);
-            if (shape.TestPoint(identity, p)) {
-                
-                b2Vec2 pos = p;
-                pos.x = (pos.x - _gravityCenter.x) * -1;
-                pos.y = (pos.y - _gravityCenter.y) * -1;
-                pos.Normalize();
-                b2Vec2 force = pos * kCometShootImpulse;
-                    
-                ZPParticleDef *def = [[ZPParticleDef alloc] init];
-                def.initialForce = CGPointMake(force.x, force.y);
-                def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
-                def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
-                def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
-                def.staticBehavior = ZPParticleStaticBehaviorNone;
-                def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
-                
-                [self addParticleAt:CGPointMake(x, y) Color:color UserData:def];
-            }
-        }
-    }
+    [self addParticleAt:position Color:color UserData:def];
 }
+
+//- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
+//    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+//
+//    b2Vec2 *pts = new b2Vec2[polygon.count];
+//    for (int i = 0; i < polygon.count; i++) {
+//        NSValue *v = polygon[i];
+//        CGPoint pt = [v CGPointValue];
+//        pts[i] = b2Vec2(pt.x, pt.y);
+//    }
+//    b2PolygonShape shape;
+//    shape.Set(pts, (int32)polygon.count);
+//
+//    float32 stride = _system->GetRadius() * 2 * b2_particleStride;
+//    b2Transform identity;
+//    identity.SetIdentity();
+//    b2AABB aabb;
+//    shape.ComputeAABB(&aabb, identity, 0);
+//
+//    delete[] pts;
+//
+//    for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride) {
+//        for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride) {
+//            b2Vec2 p(x, y);
+//            if (shape.TestPoint(identity, p)) {
+//
+//                b2Vec2 pos = p;
+//                pos.x = (pos.x - _gravityCenter.x) * -1;
+//                pos.y = (pos.y - _gravityCenter.y) * -1;
+//                pos.Normalize();
+//                b2Vec2 force = pos * kCometShootImpulse;
+//
+//                ZPParticleDef *def = [[ZPParticleDef alloc] init];
+//                def.initialForce = CGPointMake(force.x, force.y);
+//                def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
+//                def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
+//                def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
+//                def.staticBehavior = ZPParticleStaticBehaviorNone;
+//                def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
+//
+//                [self addParticleAt:CGPointMake(x, y) Color:color UserData:def];
+//            }
+//        }
+//    }
+//}
 
 - (void)addParticleAt:(CGPoint)position Color:(CGRect)color UserData:(ZPParticleDef *)userData {
     NSDictionary *dict = @{kParticlePositionKey: [NSValue valueWithCGPoint:position],

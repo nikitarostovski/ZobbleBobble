@@ -11,7 +11,6 @@ import ZobbleCore
 struct StarMaterialData {
     let color: SIMD4<UInt8>
     let position: SIMD2<Float>
-    let weight: Float
 }
 
 struct StarState {
@@ -45,12 +44,12 @@ final class Star {
         self.state = StarState()
         self.position = SIMD2<Float>(Float(0), Float(0))
         self.radius = Float(pack.radius)
-        self.mainColor = pack.style.mainColor
+        self.mainColor = SIMD4<UInt8>(255, 255, 255, 255)
         
-        updateVisibleMaterials(levelToPackProgress: Menu.levelsMenuCameraScale)
+        updateVisibleMissles(levelToPackProgress: Menu.levelsMenuCameraScale)
     }
     
-    func updateVisibleMaterials(levelToPackProgress: CGFloat) {
+    func updateVisibleMissles(levelToPackProgress: CGFloat) {
         guard let game = game else { return }
         
         let levelIndex = game.state.levelIndex
@@ -72,15 +71,15 @@ final class Star {
         
         var materialOffset = 0
         var previousMaterialPositionEnd: Float = 0
-        for level in pack.levels {
-            let missleIndicesToSkip = level.number == levelIndex ? missleIndicesToSkip : 0
+        for (i, level) in pack.levels.enumerated() {
+            let missleIndicesToSkip = i == levelIndex ? missleIndicesToSkip : 0
             
-            for (j, material) in level.materials.enumerated() {
-                var materialLevelScale = CGFloat(level.number - levelIndex)
-                materialLevelScale += (CGFloat(j + 1) - missleIndicesToSkip) / CGFloat(level.materials.count)
+            for (j, missle) in level.missles.enumerated() {
+                var materialLevelScale = CGFloat(i - levelIndex)
+                materialLevelScale += (CGFloat(j + 1) - missleIndicesToSkip) / CGFloat(level.missles.count)
                 
                 let totalIndex = CGFloat(j + materialOffset)
-                let materialMenuScale = (totalIndex + 1) / CGFloat(pack.allMaterials.count)
+                let materialMenuScale = (totalIndex + 1) / CGFloat(pack.missleCount)
                 
                 let materialScale = materialLevelScale + (materialMenuScale - materialLevelScale) * p
                 
@@ -88,19 +87,18 @@ final class Star {
                 
                 if 0...1 ~= materialScale || 0...1 ~= previousMaterialPositionEnd, materialScale > CGFloat(previousMaterialPositionEnd) {
                     let pos = SIMD2<Float>(Float(1 - materialScale), 1 - previousMaterialPositionEnd)
-                    let materialData = StarMaterialData(color: material.color,
-                                                        position: pos,
-                                                        weight: material.weight)
+                    let materialData = StarMaterialData(color: missle.material.color,
+                                                        position: pos)
                     materialsData.append(materialData)
                 }
                 
-                if j != level.materials.count - 1 {
+                if j != level.missles.count - 1 {
                     previousMaterialPositionEnd = Float(materialScale)
                 } else {
                     previousMaterialPositionEnd = -1
                 }
             }
-            materialOffset += level.materials.count
+            materialOffset += level.missles.count
         }
         
         self.state.visibleMaterials = materialsData

@@ -32,15 +32,13 @@
 @property void *liquidColors;
 @property void *liquidVelocities;
 @property (nonatomic) int liquidCount;
-//@property (nonatomic, copy) OnParticleHarden onHarden;
 
 
 - (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
-- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon  Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable;
+- (void)addParticleWithPosition:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable;
 
-//- (void)removeBodyAt:(int)index;
 - (void)removeParticleAt:(int)index;
 
 @end
