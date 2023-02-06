@@ -16,14 +16,6 @@ public final class LevelManager {
     
     public init(levelData: Data) throws {
         guard let levelPackModels = try? JSONDecoder().decode(Array<PackModel>.self, from: levelData) else { throw LevelManagerError.invaildInput }
-        
         self.allLevelPacks = levelPackModels
-//        self.allLevelPacks = levels.packs.enumerated().map { i, packModel in
-//            let levels = packModel.levels.enumerated().map { j, levelModel in
-//                let materials = levelModel.materials
-//                return Level(number: j, particleRadius: particleRadius)
-//            }
-//            return LevelPack(number: i, radius: packModel.radius, color: packModel.mainColor, levels: levels)
-//        }
     }
 }

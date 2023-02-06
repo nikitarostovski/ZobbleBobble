@@ -146,26 +146,46 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     
     private func spawnChunk(_ chunk: ChunkModel) {
         let particleCenters = chunk.shape.particleCenters
+        
+        let flags = chunk.material.physicsFlags
+        let isStatic = true
+        let gravityScale = chunk.material.gravityScale
+        let freezeVelocityThreshold = chunk.material.freezeVelocityThreshold
+        let staticContactBehavior = chunk.material.staticContactBehavior.rawValue
+        
         particleCenters.forEach { [weak self] center in
             self?.world.addParticle(withPosition: center,
                                     color: CGRect(chunk.material.color),
-                                    isStatic: true,
-                                    isExplodable: false)
+                                    flags: flags,
+                                    isStatic: isStatic,
+                                    gravityScale: gravityScale,
+                                    freezeVelocityThreshold: freezeVelocityThreshold,
+                                    staticContactBehavior: Int32(staticContactBehavior),
+                                    explosionRadius: chunk.material.explosionRadius)
         }
     }
     
     private func spawnMissle(_ missle: MissleModel, at position: CGPoint) {
         userInteractionEnabled = false
         
-        let isExplodable = missle.material == .bomb
         let particleCenters = missle.shape.particleCenters
+        
+        let flags = missle.material.physicsFlags
+        let isStatic = false
+        let gravityScale = missle.material.gravityScale
+        let freezeVelocityThreshold = missle.material.freezeVelocityThreshold
+        let staticContactBehavior = missle.material.staticContactBehavior.rawValue
         
         particleCenters.forEach { [weak self] center in
             let pos = CGPoint(x: position.x + center.x, y: position.y + center.y)
             self?.world.addParticle(withPosition: pos,
                                     color: CGRect(missle.material.color),
-                                    isStatic: false,
-                                    isExplodable: isExplodable)
+                                    flags: flags,
+                                    isStatic: isStatic,
+                                    gravityScale: gravityScale,
+                                    freezeVelocityThreshold: freezeVelocityThreshold,
+                                    staticContactBehavior: Int32(staticContactBehavior),
+                                    explosionRadius: missle.material.explosionRadius)
         }
         
         let startMissleCount = CGFloat(state.currentMissleIndex)

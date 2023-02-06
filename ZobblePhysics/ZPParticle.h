@@ -8,11 +8,6 @@
 #import <Foundation/Foundation.h>
 #import "Box2D.h"
 
-enum ZPParticleType {
-    ZPParticleTypeCore,
-    ZPParticleTypeComet
-};
-
 enum ZPParticleState {
     ZPParticleStateStatic,
     ZPParticleStateDynamic
@@ -24,31 +19,13 @@ enum ZPParticleContactBehavior {
     ZPParticleContactBehaviorExplosive
 };
 
-enum ZPParticleStaticBehavior {
-    ZPParticleStaticBehaviorNone,
-    ZPParticleStaticBehaviorBecomeCore
-};
-
-enum ZPParticleGravityBehavior {
-    ZPParticleGravityBehaviorNone,
-    ZPParticleGravityBehaviorLimited,
-    ZPParticleGravityBehaviorUnlimited
-};
-
 class ZPParticle {
 public:
-    ZPParticleType type;
     ZPParticleState state;
-    ZPParticleContactBehavior contactBehavior;
-    ZPParticleStaticBehavior staticBehavior;
-    ZPParticleGravityBehavior gravityBehavior;
-
-    uint32 getDefaultFlagsForCurrentType() {
-        switch (state) {
-            case ZPParticleStateStatic:
-                return b2_wallParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
-            case ZPParticleStateDynamic:
-                return b2_viscousParticle | b2_powderParticle | b2_particleContactListenerParticle | b2_fixtureContactListenerParticle;
-        }
-    }
+    ZPParticleContactBehavior staticContactBehavior;
+    CGFloat freezeVelocityThreshold;
+    CGFloat gravityScale;
+    uint32 currentFlags;
+    bool isDestroying = false;
+    CGFloat explosionRadius;
 };

@@ -453,7 +453,6 @@
 		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C0A70E2922492E00CA7954 /* ZobbleCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobbleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C0A7102922492E00CA7954 /* ZobbleCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobbleCore.h; sourceTree = "<group>"; };
-		11C0A721292250F800CA7954 /* OLDLEVEL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OLDLEVEL.swift; sourceTree = "<group>"; };
 		11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobblePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11DFF3302927BB3B001EA051 /* ZobblePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobblePhysics.h; sourceTree = "<group>"; };
 		11DFF5552927BEE7001EA051 /* b2Body.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Body.cpp; sourceTree = "<group>"; };
@@ -916,7 +915,6 @@
 				1198BA07298D24F200142DFD /* MissleModel.swift */,
 				1198B9FD298D22B000142DFD /* ShapeModel.swift */,
 				1198B9FF298D22B800142DFD /* MaterialModel.swift */,
-				11C0A721292250F800CA7954 /* OLDLEVEL.swift */,
 				1126C1D627778E1800C26BEC /* Polygon.swift */,
 				1126C1F727787ACC00C26BEC /* Extensions */,
 			);

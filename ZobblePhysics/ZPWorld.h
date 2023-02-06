@@ -7,15 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-//static NSString *kBodyPolygonKey = @"body_polygon";
-//static NSString *kBodyRadiusKey = @"body_radius";
-//static NSString *kBodyColorKey = @"body_color";
-//static NSString *kBodyPositionKey = @"body_position";
-//static NSString *kBodyIsExplodingKey = @"body_is_exploding";
-//static NSString *kBodyIsStaticKey = @"body_static";
-
-//typedef void(^OnParticleHarden)(int, CGRect);
-
 @class ZPBody;
 
 @interface ZPWorld : NSObject
@@ -37,7 +28,24 @@
 - (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
-- (void)addParticleWithPosition:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable;
+
+/// Adds a particle with given parameters
+/// - Parameters:
+///   - position: center point in world space
+///   - color: particle initial color value
+///   - flags: physical flags of particle
+///   - isStatic: if belongs to core
+///   - gravityScale: gravity scale, 0 is zero, 1 is planet gravity radius
+///   - freezeVelocityThreshold: speed threshold for particle to become static
+///   - staticContactBehavior: contact behavior. ZPParticleContactBehavior
+- (void)addParticleWithPosition:(CGPoint)position
+                          Color:(CGRect)color
+                          Flags:(unsigned int)flags
+                       IsStatic:(BOOL)isStatic
+                   GravityScale:(CGFloat)gravityScale
+        FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
+          StaticContactBehavior:(int)staticContactBehavior
+                ExplosionRadius:(CGFloat)explosionRadius;
 
 - (void)removeParticleAt:(int)index;
 

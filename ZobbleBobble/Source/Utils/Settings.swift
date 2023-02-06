@@ -11,7 +11,7 @@ import Foundation
 final class Settings {
     static let resolutionDownscale: CGFloat = 7
     
-    static let liquidMetaballsDownscale: Float = 1
+    static let liquidMetaballsDownscale: Float = 0.75
     
     static let levelCenterOffset: CGFloat = 50
     

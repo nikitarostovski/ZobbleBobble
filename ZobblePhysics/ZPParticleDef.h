@@ -9,14 +9,21 @@
 #import "ZPParticle.h"
 
 @interface ZPParticleDef: NSObject
-@property ZPParticleType type;
+
 @property ZPParticleState state;
-@property ZPParticleContactBehavior contactBehavior;
-@property ZPParticleStaticBehavior staticBehavior;
-@property ZPParticleGravityBehavior gravityBehavior;
+@property ZPParticleContactBehavior staticContactBehavior;
+@property CGFloat freezeVelocityThreshold;
+@property CGFloat gravityScale;
+@property uint32 currentFlags;
+@property CGFloat explosionRadius;
 
 @property CGPoint initialForce;
 
-//- (ZPParticle *)makeUserData;
+- (id)initWithState:(ZPParticleState)state
+    ContactBehavior:(ZPParticleContactBehavior)staticContactBehavior
+FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
+       GravityScale:(CGFloat)gravityScale
+              Flags:(uint32)currentFlags
+    ExplosionRadius:(CGFloat)explosionRadius;
 
 @end

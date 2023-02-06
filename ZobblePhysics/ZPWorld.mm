@@ -18,10 +18,9 @@ static NSString *kParticlePositionKey = @"particle_position";
 static NSString *kParticleColorKey = @"particle_color";
 static NSString *kParticleUserDataKey = @"particle_user_data";
 
-static float kExplosiveDamageRadius = 20.0;
+//static float kExplosiveDamageRadius = 20.0;
 static float kExplosiveImpulse = 1050000;
 static float kCometShootImpulse = 1650000;
-static float kFreezeVelocityThreshold = 5;
 
 @implementation ZPWorld {
     CGPoint _gravityCenter;
@@ -30,9 +29,6 @@ static float kFreezeVelocityThreshold = 5;
     NSMutableArray *_bodiesToAdd;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
-    
-//    b2ParticleGroup *_coreParticleGroup;
-//    b2ParticleGroup *_cometParticleGroup;
 }
 
 - (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius {
@@ -65,15 +61,6 @@ static float kFreezeVelocityThreshold = 5;
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
 //    system->GetStuckCandidates()
     self.particleSystem = system;
-    
-//    b2ParticleGroupDef coreGroupDef;
-//    coreGroupDef.groupFlags = b2_rigidParticleGroup | b2_particleGroupCanBeEmpty;
-//    _coreParticleGroup = system->CreateParticleGroup(coreGroupDef);
-//
-//    b2ParticleGroupDef cometGroupDef;
-//    cometGroupDef.groupFlags = b2_solidParticleGroup | b2_particleGroupCanBeEmpty;
-//    _cometParticleGroup = system->CreateParticleGroup(cometGroupDef);
-    
     return self;
 }
 
@@ -112,17 +99,14 @@ static float kFreezeVelocityThreshold = 5;
     // Liquids
     for (int i = 0; i < particleCount; i++) {
         ZPParticle *userData = (ZPParticle *)ud[i];
-        if (userData->gravityBehavior == ZPParticleGravityBehaviorNone) { continue; }
+        if (userData->gravityScale <= 0) { continue; }
         
         b2Vec2 v = positionBuffer[i];
         b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
-        if (d.Length() > _gravityRadius && userData->gravityBehavior == ZPParticleGravityBehaviorLimited) {
-            continue;
-        }
         
         d.Normalize();
         float mass = 10;//_system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
-        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared();
+        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared() * userData->gravityScale;
         _system->ParticleApplyForce(i, d * force);
     }
 }
@@ -147,71 +131,52 @@ static float kFreezeVelocityThreshold = 5;
         ZPParticle *userDataA = (ZPParticle *)ud[indexA];
         ZPParticle *userDataB = (ZPParticle *)ud[indexB];
         
-        if (userDataA->type == ZPParticleTypeComet && userDataA->contactBehavior == ZPParticleContactBehaviorBecomeLiquid && userDataB->type == ZPParticleTypeCore) {
-            b2Vec2 pos = positionBuffer[indexA];
-            b2ParticleColor col = _system->GetColorBuffer()[indexA];
+        if (userDataA->isDestroying || userDataB->isDestroying) {
+            continue;
+        }
+        
+        if (userDataA->state == ZPParticleStateDynamic &&
+            userDataA->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+            userDataB->state == ZPParticleStateStatic) {
             
-            if ([_particleIndicesToDestroy containsObject:@(indexA)]) {
-                break;
-            }
-            [self removeParticleAt:indexA];
-            CGPoint position = CGPointMake(pos.x, pos.y);
-            CGRect color = CGRectMake(col.r, col.g, col.b, col.a);
+            [self makeLiquidAt:indexA Force:CGPointMake(0, 0)];
+        } else if (userDataB->state == ZPParticleStateDynamic &&
+                   userDataB->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+                   userDataA->state == ZPParticleStateStatic) {
             
-            ZPParticleDef *def = [[ZPParticleDef alloc] init];
-            def.type = ZPParticleTypeComet;
-            def.state = ZPParticleStateDynamic;
-            def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
-            def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
-            def.contactBehavior = ZPParticleContactBehaviorNone;
-            [self addParticleAt:position Color:color UserData:def];
-        } else if (userDataB->type == ZPParticleTypeComet && userDataB->contactBehavior == ZPParticleContactBehaviorBecomeLiquid && userDataA->type == ZPParticleTypeCore) {
-            
-            b2Vec2 pos = positionBuffer[indexB];
-            b2ParticleColor col = _system->GetColorBuffer()[indexB];
-            
-            if ([_particleIndicesToDestroy containsObject:@(indexB)]) {
-                break;
-            }
-            [self removeParticleAt:indexB];
-            CGPoint position = CGPointMake(pos.x, pos.y);
-            CGRect color = CGRectMake(col.r, col.g, col.b, col.a);
-            
-            ZPParticleDef *def = [[ZPParticleDef alloc] init];
-            def.type = ZPParticleTypeComet;
-            def.state = ZPParticleStateDynamic;
-            def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
-            def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
-            def.contactBehavior = ZPParticleContactBehaviorNone;
-            [self addParticleAt:position Color:color UserData:def];
+            [self makeLiquidAt:indexB Force:CGPointMake(0, 0)];
         }
         
         b2Vec2 explosionCenter;
-        if (userDataA->type == ZPParticleTypeComet &&
-            userDataA->contactBehavior == ZPParticleContactBehaviorExplosive &&
-            userDataB->contactBehavior != ZPParticleContactBehaviorExplosive) {
+        CGFloat explosionRadius;
+        if (userDataA->state == ZPParticleStateDynamic &&
+            userDataA->staticContactBehavior == ZPParticleContactBehaviorExplosive &&
+            userDataB->staticContactBehavior != ZPParticleContactBehaviorExplosive) {
 
             explosionCenter = positionBuffer[indexB];
+            explosionRadius = userDataA->explosionRadius;
             [self removeParticleAt:indexA];
-        } else if (userDataB->type == ZPParticleTypeComet &&
-                   userDataB->contactBehavior == ZPParticleContactBehaviorExplosive &&
-                   userDataA->contactBehavior != ZPParticleContactBehaviorExplosive) {
+        } else if (userDataB->state == ZPParticleStateDynamic &&
+                   userDataB->staticContactBehavior == ZPParticleContactBehaviorExplosive &&
+                   userDataA->staticContactBehavior != ZPParticleContactBehaviorExplosive) {
 
             explosionCenter = positionBuffer[indexA];
+            explosionRadius = userDataB->explosionRadius;
             [self removeParticleAt:indexB];
         } else {
             continue;
         }
 
         for (int i = 0; i < particleCount; i++) {
+            ZPParticle *userData = (ZPParticle *)ud[i];
             b2Vec2 pos = positionBuffer[i];
             float dist = (pos - explosionCenter).Length();
-            if (dist < kExplosiveDamageRadius) {
+            if (dist < explosionRadius) {
                 pos.Normalize();
                 b2Vec2 force = pos * kExplosiveImpulse;
                 
                 [self makeLiquidAt:i Force:CGPointMake(force.x, force.y)];
-                _system->GetColorBuffer()[i] = b2ParticleColor(0, 255, 0, 255);
+//                _system->GetColorBuffer()[i] = b2ParticleColor(0, 255, 0, 255);
             }
         }
     }
@@ -224,10 +189,16 @@ static float kFreezeVelocityThreshold = 5;
     void **ud = _system->GetUserDataBuffer();
     
     for (int i = 0; i < particleCount; i++) {
-        float velocity = velocityBuffer[i].Length();
         ZPParticle *userData = (ZPParticle *)ud[i];
+        if (userData->isDestroying) {
+            continue;
+        }
+        float velocity = velocityBuffer[i].Length();
         
-        if (userData->staticBehavior == ZPParticleStaticBehaviorBecomeCore && velocity < kFreezeVelocityThreshold) {
+        if (userData->state == ZPParticleStateDynamic &&
+            userData->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+            velocity < userData->freezeVelocityThreshold) {
+            
             [self makeCoreAt:i Force:CGPointMake(0, 0)];
         }
     }
@@ -251,11 +222,12 @@ static float kFreezeVelocityThreshold = 5;
         color.Set(col.origin.x, col.origin.y, col.size.width, 1);
         
         ZPParticle *userData = new ZPParticle();
-        userData->type = def.type;
         userData->state = def.state;
-        userData->contactBehavior = def.contactBehavior;
-        userData->staticBehavior = def.staticBehavior;
-        userData->gravityBehavior = def.gravityBehavior;
+        userData->staticContactBehavior = def.staticContactBehavior;
+        userData->freezeVelocityThreshold = def.freezeVelocityThreshold;
+        userData->gravityScale = def.gravityScale;
+        userData->currentFlags = def.currentFlags;
+        userData->explosionRadius = def.explosionRadius;
         
         int newIndex = [self createParticleAt:b2Vec2(position.x, position.y) Color:color UserData:userData];
         
@@ -300,69 +272,40 @@ static float kFreezeVelocityThreshold = 5;
     delete[] circleBodiesRadii;
 }
 
-- (void)addParticleWithPosition:(CGPoint)position Color:(CGRect)color IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
+- (void)addParticleWithPosition:(CGPoint)position
+                          Color:(CGRect)color
+                          Flags:(unsigned int)flags
+                       IsStatic:(BOOL)isStatic
+                   GravityScale:(CGFloat)gravityScale
+        FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
+          StaticContactBehavior:(int)staticContactBehavior
+                ExplosionRadius:(CGFloat)explosionRadius {
+    
     b2Vec2 center = b2Vec2(position.x, position.y);
     b2Vec2 pos = center;
     pos.x = (pos.x - _gravityCenter.x) * -1;
     pos.y = (pos.y - _gravityCenter.y) * -1;
     pos.Normalize();
     b2Vec2 force = pos * kCometShootImpulse;
-        
-    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    
+    ZPParticleContactBehavior onContact = ZPParticleContactBehaviorNone;
+    if (staticContactBehavior == 1) {
+        onContact = ZPParticleContactBehaviorBecomeLiquid;
+    } else if (staticContactBehavior == 2) {
+        onContact = ZPParticleContactBehaviorExplosive;
+    }
+    
+    ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic
+                                              ContactBehavior:onContact
+                                      FreezeVelocityThreshold:freezeVelocityThreshold
+                                                 GravityScale:gravityScale
+                                                        Flags:flags
+                                              ExplosionRadius:explosionRadius];
+    
     def.initialForce = CGPointMake(force.x, force.y);
-    def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
-    def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
-    def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
-    def.staticBehavior = ZPParticleStaticBehaviorNone;
-    def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
     
     [self addParticleAt:position Color:color UserData:def];
 }
-
-//- (void)addLiquidWithPolygon:(NSArray<NSValue *> *)polygon Color:(CGRect)color Position:(CGPoint)position IsStatic:(BOOL)isStatic IsExplodable:(BOOL) isExplodable {
-//    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-//
-//    b2Vec2 *pts = new b2Vec2[polygon.count];
-//    for (int i = 0; i < polygon.count; i++) {
-//        NSValue *v = polygon[i];
-//        CGPoint pt = [v CGPointValue];
-//        pts[i] = b2Vec2(pt.x, pt.y);
-//    }
-//    b2PolygonShape shape;
-//    shape.Set(pts, (int32)polygon.count);
-//
-//    float32 stride = _system->GetRadius() * 2 * b2_particleStride;
-//    b2Transform identity;
-//    identity.SetIdentity();
-//    b2AABB aabb;
-//    shape.ComputeAABB(&aabb, identity, 0);
-//
-//    delete[] pts;
-//
-//    for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride) {
-//        for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride) {
-//            b2Vec2 p(x, y);
-//            if (shape.TestPoint(identity, p)) {
-//
-//                b2Vec2 pos = p;
-//                pos.x = (pos.x - _gravityCenter.x) * -1;
-//                pos.y = (pos.y - _gravityCenter.y) * -1;
-//                pos.Normalize();
-//                b2Vec2 force = pos * kCometShootImpulse;
-//
-//                ZPParticleDef *def = [[ZPParticleDef alloc] init];
-//                def.initialForce = CGPointMake(force.x, force.y);
-//                def.type = isStatic ? ZPParticleTypeCore : ZPParticleTypeComet;
-//                def.state = isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic;
-//                def.contactBehavior = isExplodable ? ZPParticleContactBehaviorExplosive : ZPParticleContactBehaviorBecomeLiquid;
-//                def.staticBehavior = ZPParticleStaticBehaviorNone;
-//                def.gravityBehavior = ZPParticleGravityBehaviorUnlimited;
-//
-//                [self addParticleAt:CGPointMake(x, y) Color:color UserData:def];
-//            }
-//        }
-//    }
-//}
 
 - (void)addParticleAt:(CGPoint)position Color:(CGRect)color UserData:(ZPParticleDef *)userData {
     NSDictionary *dict = @{kParticlePositionKey: [NSValue valueWithCGPoint:position],
@@ -375,16 +318,26 @@ static float kFreezeVelocityThreshold = 5;
 - (int)createParticleAt:(b2Vec2)position Color:(b2ParticleColor)color UserData:(ZPParticle *)userData {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
+    uint32 resultFlags = userData->currentFlags;
+    switch (userData->state) {
+        case ZPParticleStateStatic:
+            resultFlags |= b2_wallParticle | b2_barrierParticle;
+        default:
+            break;
+    }
+    
     b2ParticleDef particleDef;
-    particleDef.flags = userData->getDefaultFlagsForCurrentType();
+    particleDef.flags = resultFlags;
     particleDef.position = position;
     particleDef.color = color;
-//    particleDef.group = userData->state == ZPParticleStateStatic ? _coreParticleGroup : _cometParticleGroup;
     particleDef.userData = userData;
     return _system->CreateParticle(particleDef);
 }
 
 - (void)removeParticleAt:(int)index {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
+    userData->isDestroying = YES;
     [_particleIndicesToDestroy addObject:@(index)];
 }
 
@@ -392,23 +345,24 @@ static float kFreezeVelocityThreshold = 5;
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     delete (ZPParticle *)_system->GetUserDataBuffer()[index];
     _system->GetUserDataBuffer()[index] = NULL;
-//    _system->DestroyParticle(index);
     _system->DestroyParticle(index, YES);
 }
 
+// TODO: try to avoid deleting and adding particles. try to change their params
 - (void)makeCoreAt:(int)index Force:(CGPoint)force {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
+    
+    ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:ZPParticleStateStatic
+                                              ContactBehavior:userData->staticContactBehavior
+                                      FreezeVelocityThreshold:userData->freezeVelocityThreshold
+                                                 GravityScale:userData->gravityScale
+                                                        Flags:userData->currentFlags
+                                              ExplosionRadius:userData->explosionRadius];
+    def.initialForce = force;
     
     b2Vec2 pos = _system->GetPositionBuffer()[index];
     b2ParticleColor col = _system->GetColorBuffer()[index];
-    
-    def.initialForce = force;
-    def.state = ZPParticleStateStatic;
-    def.type = ZPParticleTypeCore;
-    def.gravityBehavior = ZPParticleGravityBehaviorNone;
-    def.staticBehavior = ZPParticleStaticBehaviorNone;
-    def.contactBehavior = ZPParticleContactBehaviorNone;
     
     [self removeParticleAt:index];
     [self addParticleAt:CGPointMake(pos.x, pos.y) Color:CGRectMake(col.r, col.g, col.b, col.a) UserData:def];
@@ -416,17 +370,19 @@ static float kFreezeVelocityThreshold = 5;
 
 - (void)makeLiquidAt:(int)index Force:(CGPoint)force {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    ZPParticleDef *def = [[ZPParticleDef alloc] init];
+    ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
+    
+    ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:ZPParticleStateDynamic
+                                              ContactBehavior:userData->staticContactBehavior
+                                      FreezeVelocityThreshold:userData->freezeVelocityThreshold
+                                                 GravityScale:userData->gravityScale
+                                                        Flags:userData->currentFlags
+                                              ExplosionRadius:userData->explosionRadius];
+    
+    def.initialForce = force;
     
     b2Vec2 pos = _system->GetPositionBuffer()[index];
     b2ParticleColor col = _system->GetColorBuffer()[index];
-    
-    def.initialForce = force;
-    def.state = ZPParticleStateDynamic;
-    def.type = ZPParticleTypeCore;
-    def.gravityBehavior = ZPParticleGravityBehaviorLimited;
-    def.staticBehavior = ZPParticleStaticBehaviorBecomeCore;
-    def.contactBehavior = ZPParticleContactBehaviorNone;
     
     [self removeParticleAt:index];
     [self addParticleAt:CGPointMake(pos.x, pos.y) Color:CGRectMake(col.r, col.g, col.b, col.a) UserData:def];
