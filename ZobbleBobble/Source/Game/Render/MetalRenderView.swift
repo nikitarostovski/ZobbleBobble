@@ -15,6 +15,7 @@ final class MetalRenderView: MTKView {
     var starsMesh: StarsMesh
     var circleMesh: CircleMesh
     var liquidMesh: LiquidMesh
+    var missleMesh: LiquidMesh
     
     weak var objectsDataSource: ObjectRenderDataSource?
     weak var cameraDataSource: CameraRenderDataSource?
@@ -27,6 +28,7 @@ final class MetalRenderView: MTKView {
         self.backgroundMesh = BackgroundMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.circleMesh = CircleMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
+        self.missleMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
         self.starsMesh = StarsMesh(device, screenSize: screenSize, renderSize: renderSize)
         super.init(frame: .zero, device: device)
         self.renderer = Renderer(device: device, view: self, renderSize: renderSize)
@@ -62,6 +64,16 @@ final class MetalRenderView: MTKView {
                                           count: objectsDataSource.circleBodyCount,
                                           cameraScale: cameraScale,
                                           camera: camera)
+            missleMesh.updateMeshIfNeeded(vertexCount: objectsDataSource.staticLiquidCount,
+                                          fadeMultiplier: 0,
+                                          vertices: objectsDataSource.staticLiquidPositions,
+                                          velocities: objectsDataSource.staticLiquidVelocities,
+                                          colors: objectsDataSource.staticLiquidColors,
+                                          particleRadius: objectsDataSource.particleRadius,
+                                          cameraAngle: 0,
+                                          cameraScale: cameraScale,
+                                          camera: camera)
+            
         }
         
         if let starsDataSource = starsDataSource {
@@ -84,7 +96,7 @@ final class MetalRenderView: MTKView {
                                               camera: camera)
         }
         
-        renderer.setRenderData(backgroundMesh: backgroundMesh, starsMesh: starsMesh, circleMesh: circleMesh, liquidMesh: liquidMesh)
+        renderer.setRenderData(backgroundMesh: backgroundMesh, starsMesh: starsMesh, circleMesh: circleMesh, liquidMesh: liquidMesh, missleMesh: missleMesh)
     }
 }
 
@@ -105,6 +117,7 @@ class Renderer: NSObject, MTKViewDelegate {
     var starsMesh: StarsMesh?
     var circleMesh: CircleMesh?
     var liquidMesh: LiquidMesh?
+    var missleMesh: LiquidMesh?
     
     init(device: MTLDevice, view: MTKView, renderSize: CGSize) {
         self.renderSize = renderSize
@@ -119,11 +132,12 @@ class Renderer: NSObject, MTKViewDelegate {
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
     
-    func setRenderData(backgroundMesh: BackgroundMesh?, starsMesh: StarsMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?) {
+    func setRenderData(backgroundMesh: BackgroundMesh?, starsMesh: StarsMesh?, circleMesh: CircleMesh?, liquidMesh: LiquidMesh?, missleMesh: LiquidMesh?) {
         self.backgroundMesh = backgroundMesh
         self.starsMesh = starsMesh
         self.circleMesh = circleMesh
         self.liquidMesh = liquidMesh
+        self.missleMesh = missleMesh
     }
     
     func makePipeline() {
@@ -173,6 +187,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let backgroundTexture = backgroundMesh?.render(commandBuffer: commandBuffer)
         let starsTexture = starsMesh?.render(commandBuffer: commandBuffer)
         let liquidTexture = liquidMesh?.render(commandBuffer: commandBuffer)
+        let missleTexture = missleMesh?.render(commandBuffer: commandBuffer)
         let circlesTexture = circleMesh?.render(commandBuffer: commandBuffer)
         
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: drawableRenderPassDescriptor) else { return }
@@ -181,8 +196,9 @@ class Renderer: NSObject, MTKViewDelegate {
         
         renderEncoder.setFragmentTexture(backgroundTexture, index: 0)
         renderEncoder.setFragmentTexture(liquidTexture, index: 1)
-        renderEncoder.setFragmentTexture(circlesTexture, index: 2)
-        renderEncoder.setFragmentTexture(starsTexture, index: 3)
+        renderEncoder.setFragmentTexture(missleTexture, index: 2)
+        renderEncoder.setFragmentTexture(circlesTexture, index: 3)
+        renderEncoder.setFragmentTexture(starsTexture, index: 4)
         renderEncoder.setFragmentBuffer(screenSizeBuffer, offset: 0, index: 0)
         renderEncoder.setFragmentSamplerState(upscaleSamplerState, index: 0)
         

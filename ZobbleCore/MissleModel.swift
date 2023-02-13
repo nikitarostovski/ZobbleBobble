@@ -10,4 +10,5 @@ import Foundation
 public struct MissleModel: Codable {
     public let material: MaterialType
     public internal(set) var shape: ShapeModel
+    public let startImpulse: CGFloat
 }

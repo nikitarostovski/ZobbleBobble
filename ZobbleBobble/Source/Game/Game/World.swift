@@ -21,6 +21,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     weak var game: Game?
     var world: ZPWorld
     var star: Star
+    var missle: Missle?
     
     let pack: PackModel
     let level: LevelModel
@@ -36,6 +37,11 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     var circleBodiesPositions: UnsafeMutableRawPointer?
     var circleBodiesColors: UnsafeMutableRawPointer?
     var circleBodiesRadii: UnsafeMutableRawPointer?
+    
+    var staticLiquidCount: Int?
+    var staticLiquidPositions: UnsafeMutableRawPointer?
+    var staticLiquidVelocities: UnsafeMutableRawPointer?
+    var staticLiquidColors: UnsafeMutableRawPointer?
     
     var cameraX: Float { Float(state.camera.x + levelCenterPoint.x) }
     var cameraY: Float { Float(state.camera.y + levelCenterPoint.y) }
@@ -75,7 +81,28 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         self.levelCenterPoint = game.levelCenterPoint
         
         self.starCenterPoint = CGPoint(x: 0, y: game.screenSize.height * 0.6)
-        self.world = ZPWorld(gravityCenter: .zero, gravityRadius: level.gravityRadius, particleRadius: level.particleRadius)
+        
+        let def = ZPWorldDef()
+        def.center = .zero
+        def.gravityRadius = level.gravityRadius
+        def.radius = Float(level.particleRadius)
+        
+//        def.dampingStrength = 0
+//        def.gravityScale = 1
+//        def.density = 1
+        def.viscousStrength = 0.9
+        def.repulsiveStrength = 0.2
+        def.ejectionStrength = 0
+        def.powderStrength = 1.0
+        
+//        def.staticPressureStrength = 0.2
+//        def.staticPressureRelaxation = 0.2
+//        def.staticPressureIterations = 1//8
+
+        
+        
+        
+        self.world = ZPWorld(worldDef: def)
         self.state = WorldState(angle: 0, camera: .zero, cameraScale: 1)
         
         self.star = star
@@ -87,10 +114,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             self?.spawnChunk(chunk)
         }
         
-//        level.playerShapes.forEach { shape in
-//            let position = shape.position//CGPoint(x: levelCenterPoint.x + shape.position.x, y: levelCenterPoint.y + shape.position.y)
-//            self.spawnCore(at: position, radius: CGFloat(shape.radius), color: shape.color, addToLevel: false)
-//        }
+        spawnNextMissle(animated: false)
     }
     
     func update(_ time: CFTimeInterval) {
@@ -107,24 +131,48 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             self.circleBodiesColors = world.circleBodiesColors
             self.circleBodyCount = Int(world.circleBodyCount)
             
-            self.state.angle += CGFloat(time)
+            self.staticLiquidPositions = missle?.staticLiquidPositions
+            self.staticLiquidColors = missle?.staticLiquidColors
+            self.staticLiquidVelocities = missle?.staticLiquidVelocities
+            self.staticLiquidCount = missle?.staticLiquidCount
+            
+            self.state.angle += CGFloat(time) * level.rotationPerSecond / 60.0
         }
     }
     
     func onTap(_ position: CGPoint) {
         guard userInteractionEnabled else { return }
         
-        guard state.currentMissleIndex < level.missles.count else {
+        guard state.currentMissleIndex <= level.missles.count else {
             // TODO: level finished
 //            game?.runMenu(isFromLevel: true)
             return
         }
-        let position = screenToGame(position)
-        spawnMissle(level.missles[state.currentMissleIndex], at: position)
+        
+        
+        launchCurrentMissle(to: position)
+        spawnNextMissle()
     }
     
     func onSwipe(_ offset: CGFloat) {
         
+    }
+    
+    func gameToScreen(_ point: CGPoint) -> CGPoint {
+        var result = point
+        result.x *= state.cameraScale
+        result.x -= state.camera.x
+        result.y *= state.cameraScale
+        result.y -= state.camera.y
+
+        let dist = result.distance(to: .zero)
+        let angle = result.angle(to: .zero) * .pi / 180 + .pi
+
+        result.x = cos(angle - state.angle) * dist * state.cameraScale
+        result.y = sin(angle - state.angle) * dist * state.cameraScale
+
+        return CGPoint(x: result.x - state.camera.x,
+                       y: result.y - state.camera.y)
     }
     
     func screenToGame(_ point: CGPoint) -> CGPoint {
@@ -151,7 +199,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         let isStatic = true
         let gravityScale = chunk.material.gravityScale
         let freezeVelocityThreshold = chunk.material.freezeVelocityThreshold
-        let staticContactBehavior = chunk.material.staticContactBehavior.rawValue
+        let staticContactBehavior = chunk.material.becomesLiquidOnContact
         
         particleCenters.forEach { [weak self] center in
             self?.world.addParticle(withPosition: center,
@@ -160,49 +208,79 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
                                     isStatic: isStatic,
                                     gravityScale: gravityScale,
                                     freezeVelocityThreshold: freezeVelocityThreshold,
-                                    staticContactBehavior: Int32(staticContactBehavior),
-                                    explosionRadius: chunk.material.explosionRadius)
+                                    becomesLiquidOnContact: staticContactBehavior,
+                                    explosionRadius: chunk.material.explosionRadius,
+                                    shootImpulse: 0)
         }
     }
     
-    private func spawnMissle(_ missle: MissleModel, at position: CGPoint) {
-        userInteractionEnabled = false
-        
-        let particleCenters = missle.shape.particleCenters
-        
-        let flags = missle.material.physicsFlags
-        let isStatic = false
-        let gravityScale = missle.material.gravityScale
-        let freezeVelocityThreshold = missle.material.freezeVelocityThreshold
-        let staticContactBehavior = missle.material.staticContactBehavior.rawValue
-        
-        particleCenters.forEach { [weak self] center in
-            let pos = CGPoint(x: position.x + center.x, y: position.y + center.y)
-            self?.world.addParticle(withPosition: pos,
-                                    color: CGRect(missle.material.color),
-                                    flags: flags,
-                                    isStatic: isStatic,
-                                    gravityScale: gravityScale,
-                                    freezeVelocityThreshold: freezeVelocityThreshold,
-                                    staticContactBehavior: Int32(staticContactBehavior),
-                                    explosionRadius: missle.material.explosionRadius)
+    private func spawnNextMissle(animated: Bool = true) {
+        guard state.currentMissleIndex < level.missles.count else {
+            self.missle = nil
+            return
         }
+        
+        let missleModel = level.missles[state.currentMissleIndex]
+        self.missle = Missle(missleModel: missleModel, star: star, game: game)
         
         let startMissleCount = CGFloat(state.currentMissleIndex)
         let endMissleCount = CGFloat(state.currentMissleIndex + 1)
         
-        Animator.animate(duraion: Settings.shotAnimationDuration, easing: Settings.shotAnimationEasing, step: { percentage in
+        let animation = { (percentage: CGFloat) in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
             self.star.missleIndicesToSkip = misslesFired
             self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.lastQueryStarHadChanges = true
-        }, completion: {
+            
+            self.missle?.updateMisslePosition(percentage)
+        }
+        
+        let completion = {
             self.star.missleIndicesToSkip = endMissleCount
             self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
             self.userInteractionEnabled = true
-        })
+            
+            self.missle?.updateMisslePosition(1)
+        }
+        
+        if animated {
+            Animator.animate(duraion: Settings.shotAnimationDuration, easing: Settings.shotAnimationEasing, step: animation, completion: completion)
+        } else {
+            completion()
+        }
+    }
+    
+    private func launchCurrentMissle(to position: CGPoint) {
+        guard let missle = missle else { return }
+        
+        userInteractionEnabled = false
+        
+        let flags = missle.missleModel.material.physicsFlags
+        let isStatic = false
+        let gravityScale = missle.missleModel.material.gravityScale
+        let freezeVelocityThreshold = missle.missleModel.material.freezeVelocityThreshold
+        let staticContactBehavior = missle.missleModel.material.becomesLiquidOnContact
+        
+        missle.positions.forEach { [weak self] center in
+            var pos = CGPoint(x: CGFloat(center.x), y: CGFloat(center.y))
+            let dist = pos.distance(to: .zero)
+            let angle = pos.angle(to: .zero) * .pi / 180 + .pi
+            
+            pos.x = dist * cos(angle - state.angle)
+            pos.y = dist * sin(angle - state.angle)
+            
+            self?.world.addParticle(withPosition: pos,
+                                    color: CGRect(missle.missleModel.material.color),
+                                    flags: flags,
+                                    isStatic: isStatic,
+                                    gravityScale: gravityScale,
+                                    freezeVelocityThreshold: freezeVelocityThreshold,
+                                    becomesLiquidOnContact: staticContactBehavior,
+                                    explosionRadius: missle.missleModel.material.explosionRadius,
+                                    shootImpulse: missle.missleModel.startImpulse)
+        }
     }
 }
 

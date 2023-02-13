@@ -8,6 +8,8 @@
 import Foundation
 
 public struct LevelModel: Codable {
+    /// In degrees
+    public let rotationPerSecond: CGFloat
     public let gravityRadius: CGFloat
     public let particleRadius: CGFloat
     public let initialChunks: [ChunkModel]
@@ -16,8 +18,9 @@ public struct LevelModel: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.gravityRadius = try container.decode(CGFloat.self, forKey: .gravityRadius)
-        let particleRadius = try container.decode(CGFloat.self, forKey: .particleRadius)
+        self.rotationPerSecond = try container.decode(CGFloat.self, forKey: .rotationPerSecond)
         
+        let particleRadius = try container.decode(CGFloat.self, forKey: .particleRadius)
         let initialChunks = try container.decode([ChunkModel].self, forKey: .initialChunks)
         let missles = try container.decode([MissleModel].self, forKey: .missles)
         

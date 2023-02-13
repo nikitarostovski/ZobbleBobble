@@ -9,11 +9,15 @@ import Foundation
 
 // TODO: nested structs
 final class Settings {
-    static let resolutionDownscale: CGFloat = 7
+//    static let physicsScale: CGFloat = 0.1
+    static let worldWidth: CGFloat = 100
+    
+    static let resolutionDownscale: CGFloat = 5
     
     static let liquidMetaballsDownscale: Float = 0.75
     
     static let levelCenterOffset: CGFloat = 50
+    static let levelMissleCenterOffset: CGFloat = 20
     
     static let starLevelScale: CGFloat = 1
     static let starLevelMenuScale: CGFloat = 0.25

@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZPWorldDef.h"
 
 @class ZPBody;
 
@@ -25,7 +26,7 @@
 @property (nonatomic) int liquidCount;
 
 
-- (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius;
+- (id)initWithWorldDef:(ZPWorldDef *)def;
 - (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
 
 
@@ -37,15 +38,18 @@
 ///   - isStatic: if belongs to core
 ///   - gravityScale: gravity scale, 0 is zero, 1 is planet gravity radius
 ///   - freezeVelocityThreshold: speed threshold for particle to become static
-///   - staticContactBehavior: contact behavior. ZPParticleContactBehavior
+///   - becomesLiquidOnContact: shold become liquid after contact with static
+///   - explosionRadius: radius of explosion if explosive
+///   - shootImpulse: power of missle shot
 - (void)addParticleWithPosition:(CGPoint)position
                           Color:(CGRect)color
                           Flags:(unsigned int)flags
                        IsStatic:(BOOL)isStatic
                    GravityScale:(CGFloat)gravityScale
         FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
-          StaticContactBehavior:(int)staticContactBehavior
-                ExplosionRadius:(CGFloat)explosionRadius;
+         BecomesLiquidOnContact:(BOOL)becomesLiquidOnContact
+                ExplosionRadius:(CGFloat)explosionRadius
+                   ShootImpulse:(CGFloat)shootImpulse;
 
 - (void)removeParticleAt:(int)index;
 

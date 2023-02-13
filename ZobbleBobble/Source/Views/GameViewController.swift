@@ -13,6 +13,8 @@ final class GameViewController: UIViewController {
     var screenSize: CGSize { UIScreen.main.bounds.size }
     var renderSize: CGSize { CGSize(width: UIScreen.main.nativeBounds.size.width / Settings.resolutionDownscale,
                                     height: UIScreen.main.nativeBounds.size.height / Settings.resolutionDownscale) }
+    var physicsSize: CGSize { CGSize(width: Settings.worldWidth,
+                                     height: Settings.worldWidth / UIScreen.main.bounds.width * UIScreen.main.bounds.height) }
     
     private var game: Game?
     
@@ -127,6 +129,7 @@ final class GameViewController: UIViewController {
     @objc
     private func onTap(gr: UIGestureRecognizer) {
         var position = gr.location(in: renderView)
+        
         position.x = position.x - renderView.frame.width / 2
         position.y = position.y - renderView.frame.height / 2
         game?.onTap(at: position)

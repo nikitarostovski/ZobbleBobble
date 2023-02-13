@@ -13,6 +13,7 @@
 #import "Constants.h"
 #import "ZPParticle.h"
 #import "ZPParticleDef.h"
+//#import "ZPWorldDef.h"
 
 static NSString *kParticlePositionKey = @"particle_position";
 static NSString *kParticleColorKey = @"particle_color";
@@ -20,7 +21,7 @@ static NSString *kParticleUserDataKey = @"particle_user_data";
 
 //static float kExplosiveDamageRadius = 20.0;
 static float kExplosiveImpulse = 1050000;
-static float kCometShootImpulse = 1650000;
+//static float kCometShootImpulse = 1650000;
 
 @implementation ZPWorld {
     CGPoint _gravityCenter;
@@ -31,11 +32,11 @@ static float kCometShootImpulse = 1650000;
     NSMutableArray *_particleIndicesToDestroy;
 }
 
-- (id)initWithGravityCenter:(CGPoint)center GravityRadius:(CGFloat)gravityRadius ParticleRadius:(CGFloat)radius {
+- (id)initWithWorldDef:(ZPWorldDef *)def {
     self = [super init];
     
-    _gravityRadius = gravityRadius;
-    _gravityCenter = center;
+    _gravityRadius = def.gravityRadius;
+    _gravityCenter = def.center;
     _bodies = [NSMutableArray new];
     _bodiesToAdd = [NSMutableArray new];
     _particleIndicesToDestroy = [NSMutableArray new];
@@ -47,16 +48,28 @@ static float kCometShootImpulse = 1650000;
     self.world = _world;
     
     b2ParticleSystemDef particleSystemDef;
-    particleSystemDef.radius = radius;
-    particleSystemDef.dampingStrength = 0;
-    particleSystemDef.gravityScale = 1;
-    particleSystemDef.density = 1;
-    particleSystemDef.viscousStrength = 0.9;
-    particleSystemDef.repulsiveStrength = 0.2;
-    particleSystemDef.ejectionStrength = 0;
-    particleSystemDef.staticPressureStrength = 0.0f;
-    particleSystemDef.powderStrength = 1.0f;
-    particleSystemDef.staticPressureRelaxation = 0.0f;
+    
+    particleSystemDef.strictContactCheck = def.strictContactCheck;
+    particleSystemDef.density = def.density;
+    particleSystemDef.gravityScale = def.gravityScale;
+    particleSystemDef.radius = def.radius;
+    particleSystemDef.maxCount = def.maxCount;
+    particleSystemDef.pressureStrength = def.pressureStrength;
+    particleSystemDef.dampingStrength = def.dampingStrength;
+    particleSystemDef.elasticStrength = def.elasticStrength;
+    particleSystemDef.springStrength = def.springStrength;
+    particleSystemDef.viscousStrength = def.viscousStrength;
+    particleSystemDef.surfaceTensionPressureStrength = def.surfaceTensionPressureStrength;
+    particleSystemDef.surfaceTensionNormalStrength = def.surfaceTensionNormalStrength;
+    particleSystemDef.repulsiveStrength = def.repulsiveStrength;
+    particleSystemDef.powderStrength = def.powderStrength;
+    particleSystemDef.ejectionStrength = def.ejectionStrength;
+    particleSystemDef.staticPressureStrength = def.staticPressureStrength;
+    particleSystemDef.staticPressureRelaxation = def.staticPressureRelaxation;
+    particleSystemDef.staticPressureIterations = def.staticPressureIterations;
+    particleSystemDef.colorMixingStrength = def.colorMixingStrength;
+    particleSystemDef.destroyByAge = def.destroyByAge;
+    particleSystemDef.lifetimeGranularity = def.lifetimeGranularity;
     
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
 //    system->GetStuckCandidates()
@@ -136,12 +149,12 @@ static float kCometShootImpulse = 1650000;
         }
         
         if (userDataA->state == ZPParticleStateDynamic &&
-            userDataA->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+            userDataA->becomesLiquidOnContact &&
             userDataB->state == ZPParticleStateStatic) {
             
             [self makeLiquidAt:indexA Force:CGPointMake(0, 0)];
         } else if (userDataB->state == ZPParticleStateDynamic &&
-                   userDataB->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+                   userDataB->becomesLiquidOnContact &&
                    userDataA->state == ZPParticleStateStatic) {
             
             [self makeLiquidAt:indexB Force:CGPointMake(0, 0)];
@@ -150,15 +163,15 @@ static float kCometShootImpulse = 1650000;
         b2Vec2 explosionCenter;
         CGFloat explosionRadius;
         if (userDataA->state == ZPParticleStateDynamic &&
-            userDataA->staticContactBehavior == ZPParticleContactBehaviorExplosive &&
-            userDataB->staticContactBehavior != ZPParticleContactBehaviorExplosive) {
+            userDataA->explosionRadius > 0 &&
+            userDataB->explosionRadius <= 0) {
 
             explosionCenter = positionBuffer[indexB];
             explosionRadius = userDataA->explosionRadius;
             [self removeParticleAt:indexA];
         } else if (userDataB->state == ZPParticleStateDynamic &&
-                   userDataB->staticContactBehavior == ZPParticleContactBehaviorExplosive &&
-                   userDataA->staticContactBehavior != ZPParticleContactBehaviorExplosive) {
+                   userDataB->explosionRadius > 0 &&
+                   userDataA->explosionRadius <= 0) {
 
             explosionCenter = positionBuffer[indexA];
             explosionRadius = userDataB->explosionRadius;
@@ -168,7 +181,6 @@ static float kCometShootImpulse = 1650000;
         }
 
         for (int i = 0; i < particleCount; i++) {
-            ZPParticle *userData = (ZPParticle *)ud[i];
             b2Vec2 pos = positionBuffer[i];
             float dist = (pos - explosionCenter).Length();
             if (dist < explosionRadius) {
@@ -196,7 +208,7 @@ static float kCometShootImpulse = 1650000;
         float velocity = velocityBuffer[i].Length();
         
         if (userData->state == ZPParticleStateDynamic &&
-            userData->staticContactBehavior == ZPParticleContactBehaviorBecomeLiquid &&
+            userData->becomesLiquidOnContact &&
             velocity < userData->freezeVelocityThreshold) {
             
             [self makeCoreAt:i Force:CGPointMake(0, 0)];
@@ -223,11 +235,12 @@ static float kCometShootImpulse = 1650000;
         
         ZPParticle *userData = new ZPParticle();
         userData->state = def.state;
-        userData->staticContactBehavior = def.staticContactBehavior;
+        userData->becomesLiquidOnContact = def.becomesLiquidOnContact;
         userData->freezeVelocityThreshold = def.freezeVelocityThreshold;
         userData->gravityScale = def.gravityScale;
         userData->currentFlags = def.currentFlags;
         userData->explosionRadius = def.explosionRadius;
+        userData->shootImpulse = def.shootImpulse;
         
         int newIndex = [self createParticleAt:b2Vec2(position.x, position.y) Color:color UserData:userData];
         
@@ -278,29 +291,24 @@ static float kCometShootImpulse = 1650000;
                        IsStatic:(BOOL)isStatic
                    GravityScale:(CGFloat)gravityScale
         FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
-          StaticContactBehavior:(int)staticContactBehavior
-                ExplosionRadius:(CGFloat)explosionRadius {
+         BecomesLiquidOnContact:(BOOL)becomesLiquidOnContact
+                ExplosionRadius:(CGFloat)explosionRadius
+                   ShootImpulse:(CGFloat)shootImpulse {
     
     b2Vec2 center = b2Vec2(position.x, position.y);
     b2Vec2 pos = center;
     pos.x = (pos.x - _gravityCenter.x) * -1;
     pos.y = (pos.y - _gravityCenter.y) * -1;
     pos.Normalize();
-    b2Vec2 force = pos * kCometShootImpulse;
-    
-    ZPParticleContactBehavior onContact = ZPParticleContactBehaviorNone;
-    if (staticContactBehavior == 1) {
-        onContact = ZPParticleContactBehaviorBecomeLiquid;
-    } else if (staticContactBehavior == 2) {
-        onContact = ZPParticleContactBehaviorExplosive;
-    }
+    b2Vec2 force = pos * shootImpulse;
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic
-                                              ContactBehavior:onContact
+                                       BecomesLiquidOnContact:becomesLiquidOnContact
                                       FreezeVelocityThreshold:freezeVelocityThreshold
                                                  GravityScale:gravityScale
                                                         Flags:flags
-                                              ExplosionRadius:explosionRadius];
+                                              ExplosionRadius:explosionRadius
+                                                 ShootImpulse:shootImpulse];
     
     def.initialForce = CGPointMake(force.x, force.y);
     
@@ -318,10 +326,10 @@ static float kCometShootImpulse = 1650000;
 - (int)createParticleAt:(b2Vec2)position Color:(b2ParticleColor)color UserData:(ZPParticle *)userData {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
-    uint32 resultFlags = userData->currentFlags;
+    uint32 resultFlags = userData->currentFlags | b2_staticPressureParticle;
     switch (userData->state) {
         case ZPParticleStateStatic:
-            resultFlags |= b2_wallParticle | b2_barrierParticle;
+            resultFlags = b2_wallParticle | b2_barrierParticle;
         default:
             break;
     }
@@ -354,11 +362,12 @@ static float kCometShootImpulse = 1650000;
     ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:ZPParticleStateStatic
-                                              ContactBehavior:userData->staticContactBehavior
+                                       BecomesLiquidOnContact:userData->becomesLiquidOnContact
                                       FreezeVelocityThreshold:userData->freezeVelocityThreshold
                                                  GravityScale:userData->gravityScale
                                                         Flags:userData->currentFlags
-                                              ExplosionRadius:userData->explosionRadius];
+                                              ExplosionRadius:userData->explosionRadius
+                                                 ShootImpulse:userData->shootImpulse];
     def.initialForce = force;
     
     b2Vec2 pos = _system->GetPositionBuffer()[index];
@@ -373,11 +382,12 @@ static float kCometShootImpulse = 1650000;
     ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:ZPParticleStateDynamic
-                                              ContactBehavior:userData->staticContactBehavior
+                                       BecomesLiquidOnContact:userData->becomesLiquidOnContact
                                       FreezeVelocityThreshold:userData->freezeVelocityThreshold
                                                  GravityScale:userData->gravityScale
                                                         Flags:userData->currentFlags
-                                              ExplosionRadius:userData->explosionRadius];
+                                              ExplosionRadius:userData->explosionRadius
+                                                 ShootImpulse:userData->shootImpulse];
     
     def.initialForce = force;
     

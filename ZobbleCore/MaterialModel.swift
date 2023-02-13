@@ -8,6 +8,13 @@
 import Foundation
 
 public enum MaterialType: String, Codable {
+    case lavaRed
+    case lavaYellow
+    case bomb
+    case coreLight
+    case coreDark
+    case water
+    
     private static let b2_waterParticle: UInt32 = 0
     private static let b2_springParticle: UInt32 = 1 << 3
     private static let b2_elasticParticle: UInt32 = 1 << 4
@@ -17,12 +24,6 @@ public enum MaterialType: String, Codable {
     private static let b2_colorMixingParticle: UInt32 = 1 << 8
     private static let b2_reactiveParticle: UInt32 = 1 << 12
     private static let b2_repulsiveParticle: UInt32 = 1 << 13
-    
-    case lavaRed
-    case lavaYellow
-    case bomb
-    case coreLight
-    case coreDark
     
     public var color: SIMD4<UInt8> {
         switch self {
@@ -36,34 +37,38 @@ public enum MaterialType: String, Codable {
             return SIMD4<UInt8>(200, 200, 200, 255)
         case .coreDark:
             return SIMD4<UInt8>(100, 100, 100, 255)
+        case .water:
+            return SIMD4<UInt8>(64, 128, 255, 255)
         }
-    }
-
-    public enum ParticleContactBehavior: Int {
-        case none = 0
-        case becomeLiquid = 1
-        case explosive = 2
     }
     
     /// 0 is zero gravity, 1 is planet gravity radius, and so on
     public var gravityScale: CGFloat {
-        return 0.5
+        switch self {
+        case .water:
+            return 0.7
+        default:
+            return 1.0
+        }
     }
     
     /// velocity threshold for liquid particle to become static
     public var freezeVelocityThreshold: CGFloat {
-        return 2
+        switch self {
+        case .water:
+            return -1
+        default:
+            return 2
+        }
     }
     
     /// behavior to be taken in case of contact with a static particle
-    public var staticContactBehavior: ParticleContactBehavior {
+    public var becomesLiquidOnContact: Bool {
         switch self {
         case .bomb:
-            return .explosive
-        case .lavaRed, .lavaYellow:
-            return .becomeLiquid
+            return false
         default:
-            return .none
+            return true
         }
     }
     
@@ -72,8 +77,10 @@ public enum MaterialType: String, Codable {
         var flags = UInt32(0)
         switch self {
         case .lavaRed, .lavaYellow, .coreLight, .coreDark:
-            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle
+            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle | Self.b2_colorMixingParticle
         case .bomb:
+            flags |= Self.b2_waterParticle
+        case .water:
             flags |= Self.b2_waterParticle
         }
                 

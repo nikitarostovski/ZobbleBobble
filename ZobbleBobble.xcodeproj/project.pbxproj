@@ -75,6 +75,9 @@
 		11909531295571E0006EE970 /* CircleMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11909530295571E0006EE970 /* CircleMesh.swift */; };
 		1190953429574456006EE970 /* TextureRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190953229573D61006EE970 /* TextureRender.metal */; };
 		1194330829892CD300AE56CA /* CGRect+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194330729892CD300AE56CA /* CGRect+Colors.swift */; };
+		1194C9BE29910E9500ACAF97 /* ZPWorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1194C9BF29910E9500ACAF97 /* ZPWorldDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */; };
+		1194D986299A0A4C00B28806 /* Missle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194D985299A0A4C00B28806 /* Missle.swift */; };
 		11955284295F44A2000C7A95 /* Voronoi.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB3F2791BDB400494CA0 /* Voronoi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11955285295F44A2000C7A95 /* SwiftClipper.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB502791BDCA00494CA0 /* SwiftClipper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11955286295F44A2000C7A95 /* PoissonDisk.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFBB02794274400494CA0 /* PoissonDisk.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -426,6 +429,9 @@
 		11909530295571E0006EE970 /* CircleMesh.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleMesh.swift; sourceTree = "<group>"; };
 		1190953229573D61006EE970 /* TextureRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureRender.metal; sourceTree = "<group>"; };
 		1194330729892CD300AE56CA /* CGRect+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Colors.swift"; sourceTree = "<group>"; };
+		1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPWorldDef.h; sourceTree = "<group>"; };
+		1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPWorldDef.mm; sourceTree = "<group>"; };
+		1194D985299A0A4C00B28806 /* Missle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missle.swift; sourceTree = "<group>"; };
 		119552892961CE85000C7A95 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		1195528B2961D162000C7A95 /* Easing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Easing.swift; sourceTree = "<group>"; };
 		1195528D2961E124000C7A95 /* SwipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeView.swift; sourceTree = "<group>"; };
@@ -888,6 +894,7 @@
 				11B8210529857832005300DC /* Background.swift */,
 				11FCBA9727A5D06B00A25665 /* World.swift */,
 				11B821092985972D005300DC /* Star.swift */,
+				1194D985299A0A4C00B28806 /* Missle.swift */,
 				11FEFEFC295DB7D300528A1C /* Menu.swift */,
 				11B8210729857B9F005300DC /* ObjectPositionProvider.swift */,
 			);
@@ -966,6 +973,8 @@
 				11DFF5092927BEE7001EA051 /* Box2D */,
 				11DFF68B2927C32B001EA051 /* ZPWorld.h */,
 				11DFF6892927C31C001EA051 /* ZPWorld.mm */,
+				1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */,
+				1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */,
 				1160EF5A2928E84100AFD08C /* ZPBody.h */,
 				1160EF582928E83900AFD08C /* ZPBody.mm */,
 				11B7D6DE2973E921008C5495 /* ZPParticle.h */,
@@ -1205,6 +1214,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11DFF6502927BEE8001EA051 /* b2IntrusiveList.h in Headers */,
+				1194C9BE29910E9500ACAF97 /* ZPWorldDef.h in Headers */,
 				1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */,
 				1160EF552928E14400AFD08C /* ZPWorld.h in Headers */,
 				1133D454294DAFA6009C8DBC /* Constants.h in Headers */,
@@ -1546,6 +1556,7 @@
 				11B8210629857832005300DC /* Background.swift in Sources */,
 				1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */,
 				1190953429574456006EE970 /* TextureRender.metal in Sources */,
+				1194D986299A0A4C00B28806 /* Missle.swift in Sources */,
 				11FEFF03295DEAA700528A1C /* RenderDataSource.swift in Sources */,
 				11FEFEFF295DEA7A00528A1C /* Game.swift in Sources */,
 				1195528E2961E124000C7A95 /* SwipeView.swift in Sources */,
@@ -1674,6 +1685,7 @@
 				11DFF68A2927C31C001EA051 /* ZPWorld.mm in Sources */,
 				11DFF6602927BEE8001EA051 /* b2StackAllocator.cpp in Sources */,
 				11DFF6882927BEE8001EA051 /* b2Collision.cpp in Sources */,
+				1194C9BF29910E9500ACAF97 /* ZPWorldDef.mm in Sources */,
 				11DFF66A2927BEE8001EA051 /* b2ParticleSystem.cpp in Sources */,
 				11DFF63C2927BEE8001EA051 /* b2GearJoint.cpp in Sources */,
 				11DFF67F2927BEE8001EA051 /* b2PolygonShape.cpp in Sources */,

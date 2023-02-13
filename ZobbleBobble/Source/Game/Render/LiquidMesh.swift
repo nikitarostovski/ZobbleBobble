@@ -125,7 +125,7 @@ class LiquidMesh: BaseMesh {
         linearSamplerDescriptor.minFilter = .linear
         self.linearSamplerState = device?.makeSamplerState(descriptor: linearSamplerDescriptor)
         
-        let blurRadius: Int = 2//Int(min(width, height) / 64)
+        let blurRadius: Int = 1//Int(min(width, height) / 64)
 //        let blurRadius: Int = Int(1.0 / textureScale)
         self.blurRadius = blurRadius
         self.blurRadiusBuffer = device?.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)

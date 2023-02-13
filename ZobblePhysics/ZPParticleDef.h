@@ -11,19 +11,21 @@
 @interface ZPParticleDef: NSObject
 
 @property ZPParticleState state;
-@property ZPParticleContactBehavior staticContactBehavior;
+@property BOOL becomesLiquidOnContact;
 @property CGFloat freezeVelocityThreshold;
 @property CGFloat gravityScale;
 @property uint32 currentFlags;
 @property CGFloat explosionRadius;
+@property CGFloat shootImpulse;
 
 @property CGPoint initialForce;
 
 - (id)initWithState:(ZPParticleState)state
-    ContactBehavior:(ZPParticleContactBehavior)staticContactBehavior
+BecomesLiquidOnContact:(BOOL)becomesLiquidOnContact
 FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
        GravityScale:(CGFloat)gravityScale
               Flags:(uint32)currentFlags
-    ExplosionRadius:(CGFloat)explosionRadius;
+    ExplosionRadius:(CGFloat)explosionRadius
+       ShootImpulse:(CGFloat)shootImpulse;
 
 @end

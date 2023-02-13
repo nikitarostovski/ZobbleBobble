@@ -32,11 +32,17 @@ protocol StarsRenderDataSource: AnyObject {
 
 protocol ObjectRenderDataSource: AnyObject {
     var particleRadius: Float { get }
+    
     var liquidFadeModifier: Float { get }
     var liquidCount: Int? { get }
     var liquidPositions: UnsafeMutableRawPointer? { get }
     var liquidVelocities: UnsafeMutableRawPointer? { get }
     var liquidColors: UnsafeMutableRawPointer? { get }
+    
+    var staticLiquidCount: Int? { get }
+    var staticLiquidPositions: UnsafeMutableRawPointer? { get }
+    var staticLiquidVelocities: UnsafeMutableRawPointer? { get }
+    var staticLiquidColors: UnsafeMutableRawPointer? { get }
     
     var circleBodyCount: Int? { get }
     var circleBodiesPositions: UnsafeMutableRawPointer? { get }

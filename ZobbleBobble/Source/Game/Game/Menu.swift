@@ -76,6 +76,12 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     var liquidColors: UnsafeMutableRawPointer?
     
     
+    var staticLiquidCount: Int?
+    var staticLiquidPositions: UnsafeMutableRawPointer?
+    var staticLiquidVelocities: UnsafeMutableRawPointer?
+    var staticLiquidColors: UnsafeMutableRawPointer?
+    
+    
     var starPositions: [UnsafeMutableRawPointer] = []
     var starRadii: [UnsafeMutableRawPointer] = []
     var starMainColors: [UnsafeMutableRawPointer] = []

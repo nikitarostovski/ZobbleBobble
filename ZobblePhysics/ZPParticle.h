@@ -22,10 +22,12 @@ enum ZPParticleContactBehavior {
 class ZPParticle {
 public:
     ZPParticleState state;
-    ZPParticleContactBehavior staticContactBehavior;
+//    ZPParticleContactBehavior staticContactBehavior;
     CGFloat freezeVelocityThreshold;
     CGFloat gravityScale;
     uint32 currentFlags;
     bool isDestroying = false;
     CGFloat explosionRadius;
+    bool becomesLiquidOnContact;
+    CGFloat shootImpulse;
 };

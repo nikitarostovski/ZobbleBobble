@@ -12,18 +12,20 @@
 @implementation ZPParticleDef
 
 - (id)initWithState:(ZPParticleState)state
-    ContactBehavior:(ZPParticleContactBehavior)staticContactBehavior
+BecomesLiquidOnContact:(BOOL)becomesLiquidOnContact
 FreezeVelocityThreshold:(CGFloat)freezeVelocityThreshold
        GravityScale:(CGFloat)gravityScale
               Flags:(uint32)currentFlags
-    ExplosionRadius:(CGFloat)explosionRadius;
+    ExplosionRadius:(CGFloat)explosionRadius
+       ShootImpulse:(CGFloat)shootImpulse
 {
     self.state = state;
-    self.staticContactBehavior = staticContactBehavior;
+    self.becomesLiquidOnContact = becomesLiquidOnContact;
     self.freezeVelocityThreshold = freezeVelocityThreshold;
     self.gravityScale = gravityScale;
     self.currentFlags = currentFlags;
     self.explosionRadius = explosionRadius;
+    self.shootImpulse = shootImpulse;
 
     self = [super init];
     return self;

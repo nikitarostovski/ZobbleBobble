@@ -36,6 +36,7 @@ final class Star {
     var mainColorPointer: UnsafeMutableRawPointer!
     var materialsPointer: UnsafeMutableRawPointer!
     
+    
     init(game: Game, number: Int) {
         let pack = game.levelManager.allLevelPacks[game.state.packIndex]
         

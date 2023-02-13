@@ -18,6 +18,8 @@ public struct ShapeModel: Codable {
     public let center: PointModel?
     public let points: [PointModel]?
     
+    public let boundingRadius: CGFloat
+    
     public var particleCenters: [CGPoint]
     public internal(set) var particleRadius: CGFloat {
         didSet {
@@ -34,6 +36,19 @@ public struct ShapeModel: Codable {
         
         self.particleCenters = []
         self.particleRadius = 0
+        
+        switch type {
+        case .circle:
+            self.boundingRadius = self.radius ?? 0
+        case .polygon:
+            var maxX: CGFloat = 0
+            var maxY: CGFloat = 0
+            for p in self.points ?? [] {
+                maxX = max(maxX, abs(p.x))
+                maxY = max(maxY, abs(p.y))
+            }
+            self.boundingRadius = max(maxX, maxY)
+        }
     }
     
     private mutating func recalculateParticleCenters() {

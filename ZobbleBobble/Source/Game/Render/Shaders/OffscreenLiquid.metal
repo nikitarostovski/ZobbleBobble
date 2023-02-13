@@ -124,7 +124,7 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
     
     float4 col1 = float4(oldColor.rgb, 1);
     
-    float threshold1 = 0.3;
+    float threshold1 = 0.5;
     
 //    output.write(oldColor, gid);
 //    return;
