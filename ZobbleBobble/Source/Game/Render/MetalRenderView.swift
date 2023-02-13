@@ -79,8 +79,10 @@ final class MetalRenderView: MTKView {
         if let starsDataSource = starsDataSource {
             starsMesh.updateMeshIfNeeded(positions: starsDataSource.starPositions,
                                          radii: starsDataSource.starRadii,
+                                         missleRadii: starsDataSource.starMissleRadii,
                                          mainColors: starsDataSource.starMainColors,
                                          materials: starsDataSource.starMaterials,
+                                         transitionProgress: starsDataSource.starTransitionProgress,
                                          materialCounts: starsDataSource.starMaterialCounts,
                                          hasChanges: starsDataSource.starsHasChanges,
                                          cameraScale: cameraScale,

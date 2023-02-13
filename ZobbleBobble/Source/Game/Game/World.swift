@@ -217,6 +217,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     private func spawnNextMissle(animated: Bool = true) {
         guard state.currentMissleIndex < level.missles.count else {
             self.missle = nil
+            self.star.missleRadius = 0
             return
         }
         
@@ -226,9 +227,14 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         let startMissleCount = CGFloat(state.currentMissleIndex)
         let endMissleCount = CGFloat(state.currentMissleIndex + 1)
         
+        let startMissleRadius = Float(star.missleRadius)
+        let endMissleRadius = Float(missleModel.shape.boundingRadius + Settings.starMissleDeadZone)
+        
         let animation = { (percentage: CGFloat) in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
+            let missleRadius = startMissleRadius + (endMissleRadius - startMissleRadius) * Float(percentage)
             self.star.missleIndicesToSkip = misslesFired
+            self.star.missleRadius = missleRadius
             self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.lastQueryStarHadChanges = true
             
@@ -237,6 +243,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         let completion = {
             self.star.missleIndicesToSkip = endMissleCount
+            self.star.missleRadius = endMissleRadius
             self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
             self.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
@@ -321,6 +328,10 @@ extension World: StarsRenderDataSource {
         [star.radiusPointer]
     }
     
+    var starMissleRadii: [UnsafeMutableRawPointer] {
+        [star.missleRadiusPointer]
+    }
+    
     var starMainColors: [UnsafeMutableRawPointer] {
         [star.mainColorPointer]
     }
@@ -331,5 +342,9 @@ extension World: StarsRenderDataSource {
     
     var starMaterialCounts: [Int] {
         [star.state.visibleMaterials.count]
+    }
+    
+    var starTransitionProgress: Float {
+        0
     }
 }

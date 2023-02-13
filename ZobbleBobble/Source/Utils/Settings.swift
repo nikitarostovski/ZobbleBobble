@@ -17,7 +17,9 @@ final class Settings {
     static let liquidMetaballsDownscale: Float = 0.75
     
     static let levelCenterOffset: CGFloat = 50
-    static let levelMissleCenterOffset: CGFloat = 20
+    
+    static let starMissleCenterOffset: CGFloat = 25
+    static let starMissleDeadZone: CGFloat = 40
     
     static let starLevelScale: CGFloat = 1
     static let starLevelMenuScale: CGFloat = 0.25
@@ -35,9 +37,9 @@ final class Settings {
     static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
     static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
     
-    static let menuAnimationDuration: Double = 0.3
+    static let menuAnimationDuration: Double = 1
     static let menuAnimationEasing: Curve = .sine
     
-    static let shotAnimationDuration: Double = 0.15
+    static let shotAnimationDuration: Double = 0.5
     static let shotAnimationEasing: Curve = .sine
 }

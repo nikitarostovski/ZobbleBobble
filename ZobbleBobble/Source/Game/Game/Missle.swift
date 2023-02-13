@@ -37,9 +37,9 @@ final class Missle {
     private func updateTargetPositions() {
         guard let star = star else { return }
         let missleSpawnCenter = CGPoint(x: CGFloat(star.position.x),
-                                        y: CGFloat(star.position.y) - CGFloat(star.radius) - Settings.levelMissleCenterOffset)
+                                        y: CGFloat(star.position.y) - CGFloat(star.radius) - Settings.starMissleCenterOffset)
         
-        let missleRadius = missleModel.shape.boundingRadius
+        let missleRadius = CGFloat(star.missleRadius)
         let idleAngleStart = CGFloat.pi
         let idleAngleEnd: CGFloat = 0
         
@@ -50,10 +50,10 @@ final class Missle {
             let center = missleModel.shape.particleCenters[i]
             
             let idleAngle = idleAngleStart + (idleAngleEnd - idleAngleStart) * CGFloat(i) / CGFloat(missleModel.shape.particleCenters.count - 1)
-            let idleRadius = missleRadius * 5
+            let idleRadius = missleRadius
             
             let idleX = missleSpawnCenter.x + idleRadius * cos(idleAngle)
-            let idleY = missleSpawnCenter.y + idleRadius * sin(idleAngle)
+            let idleY = missleSpawnCenter.y + idleRadius * sin(idleAngle) + Settings.starMissleDeadZone
             
             let idleCenter = SIMD2<Float32>(x: Float32(idleX),
                                             y: Float32(idleY))

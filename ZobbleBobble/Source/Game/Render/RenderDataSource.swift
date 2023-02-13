@@ -24,10 +24,12 @@ protocol BackgroundRenderDataSource: AnyObject {
 protocol StarsRenderDataSource: AnyObject {
     var starPositions: [UnsafeMutableRawPointer] { get }
     var starRadii: [UnsafeMutableRawPointer] { get }
+    var starMissleRadii: [UnsafeMutableRawPointer] { get }
     var starMainColors: [UnsafeMutableRawPointer] { get }
     var starMaterials: [UnsafeMutableRawPointer] { get }
     var starMaterialCounts: [Int] { get }
     var starsHasChanges: Bool { get }
+    var starTransitionProgress: Float { get }
 }
 
 protocol ObjectRenderDataSource: AnyObject {

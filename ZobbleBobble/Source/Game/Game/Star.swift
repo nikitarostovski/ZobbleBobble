@@ -30,9 +30,11 @@ final class Star {
     var position: SIMD2<Float>
     var radius: Float
     var mainColor: SIMD4<UInt8>
+    var missleRadius: Float
     
     var positionPointer: UnsafeMutableRawPointer!
     var radiusPointer: UnsafeMutableRawPointer!
+    var missleRadiusPointer: UnsafeMutableRawPointer!
     var mainColorPointer: UnsafeMutableRawPointer!
     var materialsPointer: UnsafeMutableRawPointer!
     
@@ -46,6 +48,7 @@ final class Star {
         self.position = SIMD2<Float>(Float(0), Float(0))
         self.radius = Float(pack.radius)
         self.mainColor = SIMD4<UInt8>(255, 255, 255, 255)
+        self.missleRadius = 0
         
         updateVisibleMissles(levelToPackProgress: Menu.levelsMenuCameraScale)
     }
@@ -104,6 +107,12 @@ final class Star {
         
         self.state.visibleMaterials = materialsData
         
+//        let missleIndex = missleIndicesToSkip % floor(missleIndicesToSkip)
+//        let missle = game.levelManager.allLevelPacks[game.state.packIndex].levels[game.state.levelIndex].missles[missleIndex]
+//        miss
+        
+        
+        
         updateRenderData()
     }
     
@@ -115,6 +124,10 @@ final class Star {
         self.radiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
                                                                 alignment: MemoryLayout<Float32>.alignment)
         self.radiusPointer.copyMemory(from: &self.radius, byteCount: MemoryLayout<Float32>.stride)
+        
+        self.missleRadiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
+                                                                alignment: MemoryLayout<Float32>.alignment)
+        self.missleRadiusPointer.copyMemory(from: &self.missleRadius, byteCount: MemoryLayout<Float32>.stride)
         
         self.mainColorPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD4<UInt8>>.stride,
                                                                 alignment: MemoryLayout<SIMD4<UInt8>>.alignment)

@@ -10,6 +10,8 @@ import MetalKit
 class StarsMesh: BaseMesh {
     struct Uniforms {
         let cameraScale: Float32
+        let transitionProgress: Float32
+        let missleOffset: Float32
         let camera: SIMD2<Float32>
     }
     
@@ -55,8 +57,10 @@ class StarsMesh: BaseMesh {
     
     func updateMeshIfNeeded(positions: [UnsafeMutableRawPointer],
                             radii: [UnsafeMutableRawPointer],
+                            missleRadii: [UnsafeMutableRawPointer],
                             mainColors: [UnsafeMutableRawPointer],
                             materials: [UnsafeMutableRawPointer],
+                            transitionProgress: Float,
                             materialCounts: [Int],
                             hasChanges: Bool,
                             cameraScale: Float,
@@ -69,7 +73,7 @@ class StarsMesh: BaseMesh {
         }
         
         let defaultScale = Float(renderSize.width / screenSize.width)
-        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, camera: camera)
+        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, transitionProgress: transitionProgress, missleOffset: Float32(Settings.starMissleCenterOffset), camera: camera)
         
         
         if hasChanges {
@@ -84,6 +88,10 @@ class StarsMesh: BaseMesh {
                     options: .storageModeShared)!
                 let radiusBuffer = device.makeBuffer(
                     bytes: radii[i],
+                    length: MemoryLayout<Float32>.stride,
+                    options: .storageModeShared)!
+                let missleRadiusBuffer = device.makeBuffer(
+                    bytes: missleRadii[i],
                     length: MemoryLayout<Float32>.stride,
                     options: .storageModeShared)!
                 let mainColorBuffer = device.makeBuffer(
@@ -105,7 +113,7 @@ class StarsMesh: BaseMesh {
                     length: MemoryLayout<Int>.stride,
                     options: .storageModeShared)!
                 
-                let starBuffers = [positionBuffer, radiusBuffer, mainColorBuffer, materialsBuffer, materialCountsBuffer]
+                let starBuffers = [positionBuffer, radiusBuffer, missleRadiusBuffer, mainColorBuffer, materialsBuffer, materialCountsBuffer]
                 self.vertexBuffers.append(starBuffers)
                 self.vertexCount = positions.count
             }
