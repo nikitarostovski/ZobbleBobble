@@ -106,9 +106,11 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         self.state = WorldState(angle: 0, camera: .zero, cameraScale: 1)
         
         self.star = star
+
+        let renderCenterVerticalOffset: CGFloat = -pack.radius - Settings.starMissleCenterOffset
         star.radius = Float(pack.radius)
         star.position = SIMD2<Float>(Float(starCenterPoint.x), Float(starCenterPoint.y))
-        star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
+        star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: 0, renderCenterVerticalOffset: renderCenterVerticalOffset)
         
         level.initialChunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
@@ -233,18 +235,15 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         let animation = { (percentage: CGFloat) in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
             let missleRadius = startMissleRadius + (endMissleRadius - startMissleRadius) * Float(percentage)
-            self.star.missleIndicesToSkip = misslesFired
-            self.star.missleRadius = missleRadius
-            self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
+            
+            self.star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: misslesFired, missleRadius: missleRadius)
             self.lastQueryStarHadChanges = true
             
             self.missle?.updateMisslePosition(percentage)
         }
         
         let completion = {
-            self.star.missleIndicesToSkip = endMissleCount
-            self.star.missleRadius = endMissleRadius
-            self.star.updateVisibleMissles(levelToPackProgress: Menu.levelCameraScale)
+            self.star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: endMissleCount, missleRadius: endMissleRadius)
             self.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
             self.userInteractionEnabled = true
@@ -320,6 +319,10 @@ extension World: ObjectPositionProvider {
 }
 
 extension World: StarsRenderDataSource {
+    var starCenterPositions: [UnsafeMutableRawPointer] {
+        [star.centerPositionPointer]
+    }
+    
     var starPositions: [UnsafeMutableRawPointer] {
         [star.positionPointer]
     }
@@ -332,10 +335,6 @@ extension World: StarsRenderDataSource {
         [star.missleRadiusPointer]
     }
     
-    var starMainColors: [UnsafeMutableRawPointer] {
-        [star.mainColorPointer]
-    }
-    
     var starMaterials: [UnsafeMutableRawPointer] {
         [star.materialsPointer]
     }
@@ -345,6 +344,6 @@ extension World: StarsRenderDataSource {
     }
     
     var starTransitionProgress: Float {
-        0
+        Float(Settings.levelsMenuCameraScale)
     }
 }

@@ -9,6 +9,10 @@ import Foundation
 
 // TODO: nested structs
 final class Settings {
+    static let levelCameraScale: CGFloat = 1
+    static let levelsMenuCameraScale: CGFloat = 2
+    static let packsMenuCameraScale: CGFloat = 3
+    
 //    static let physicsScale: CGFloat = 0.1
     static let worldWidth: CGFloat = 100
     
@@ -37,9 +41,9 @@ final class Settings {
     static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
     static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
     
-    static let menuAnimationDuration: Double = 1
+    static let menuAnimationDuration: Double = 0.3
     static let menuAnimationEasing: Curve = .sine
     
-    static let shotAnimationDuration: Double = 0.5
+    static let shotAnimationDuration: Double = 0.25
     static let shotAnimationEasing: Curve = .sine
 }

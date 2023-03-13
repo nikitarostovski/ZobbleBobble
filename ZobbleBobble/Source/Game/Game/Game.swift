@@ -94,7 +94,7 @@ final class Game {
     }
     
     func runMenu(isFromLevel: Bool = false) {
-        let from = isFromLevel ? Menu.levelCameraScale : Menu.levelsMenuCameraScale
+        let from = isFromLevel ? Settings.levelCameraScale : Settings.levelsMenuCameraScale
         let menu = Menu(game: self, from: from)
         self.menu = menu
         self.state.state = .menu

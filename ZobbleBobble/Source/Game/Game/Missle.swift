@@ -78,11 +78,16 @@ final class Missle {
         var newVelocities: [SIMD2<Float32>] = []
         
         for i in 0..<readyPositions.count {
+            var p = missleProgress
+//            let random
+//            if i % 3 == 0 {
+//
+//            }
+            
             let idle = idlePositions[i]
             let ready = readyPositions[i]
-            
-            let current = SIMD2<Float32>(idle.x + (ready.x - idle.x) * Float(missleProgress),
-                                         idle.y + (ready.y - idle.y) * Float(missleProgress))
+            let current = SIMD2<Float32>(idle.x + (ready.x - idle.x) * Float(p),
+                                         idle.y + (ready.y - idle.y) * Float(p))
             
             newVelocities.append(SIMD2<Float32>(0, 0))
             newColors.append(missleModel.material.color)

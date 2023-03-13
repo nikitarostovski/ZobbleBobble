@@ -56,9 +56,9 @@ class StarsMesh: BaseMesh {
     }
     
     func updateMeshIfNeeded(positions: [UnsafeMutableRawPointer],
+                            centerPositions: [UnsafeMutableRawPointer],
                             radii: [UnsafeMutableRawPointer],
                             missleRadii: [UnsafeMutableRawPointer],
-                            mainColors: [UnsafeMutableRawPointer],
                             materials: [UnsafeMutableRawPointer],
                             transitionProgress: Float,
                             materialCounts: [Int],
@@ -66,7 +66,7 @@ class StarsMesh: BaseMesh {
                             cameraScale: Float,
                             camera: SIMD2<Float>) {
         
-        guard let device = device, positions.count > 0, positions.count == radii.count, positions.count == mainColors.count, positions.count == materialCounts.count, positions.count == materials.count else {
+        guard let device = device, positions.count > 0, positions.count == radii.count, positions.count == materialCounts.count, positions.count == materials.count else {
             self.vertexBuffers = []
             self.vertexCount = 0
             return
@@ -86,6 +86,10 @@ class StarsMesh: BaseMesh {
                     bytes: positions[i],
                     length: MemoryLayout<SIMD2<Float32>>.stride,
                     options: .storageModeShared)!
+                let centerPositionBuffer = device.makeBuffer(
+                    bytes: centerPositions[i],
+                    length: MemoryLayout<SIMD2<Float32>>.stride,
+                    options: .storageModeShared)!
                 let radiusBuffer = device.makeBuffer(
                     bytes: radii[i],
                     length: MemoryLayout<Float32>.stride,
@@ -93,10 +97,6 @@ class StarsMesh: BaseMesh {
                 let missleRadiusBuffer = device.makeBuffer(
                     bytes: missleRadii[i],
                     length: MemoryLayout<Float32>.stride,
-                    options: .storageModeShared)!
-                let mainColorBuffer = device.makeBuffer(
-                    bytes: mainColors[i],
-                    length: MemoryLayout<SIMD4<UInt8>>.stride,
                     options: .storageModeShared)!
                 let materialsBuffer = device.makeBuffer(
                     bytes: materials[i],
@@ -113,7 +113,7 @@ class StarsMesh: BaseMesh {
                     length: MemoryLayout<Int>.stride,
                     options: .storageModeShared)!
                 
-                let starBuffers = [positionBuffer, radiusBuffer, missleRadiusBuffer, mainColorBuffer, materialsBuffer, materialCountsBuffer]
+                let starBuffers = [positionBuffer, centerPositionBuffer, radiusBuffer, missleRadiusBuffer, materialsBuffer, materialCountsBuffer]
                 self.vertexBuffers.append(starBuffers)
                 self.vertexCount = positions.count
             }
@@ -123,7 +123,6 @@ class StarsMesh: BaseMesh {
             bytes: &uniforms,
             length: MemoryLayout<Uniforms>.stride,
             options: [])!
-        
     }
     
     func render(commandBuffer: MTLCommandBuffer) -> MTLTexture? {

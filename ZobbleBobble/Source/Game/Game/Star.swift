@@ -22,20 +22,25 @@ final class Star {
     
     var state: StarState
     var number: Int
-    var missleIndicesToSkip: CGFloat = 0
+    
+    private(set) var missleIndicesToSkip: CGFloat = 0
     
     /// 0 is showing only current level missles, 1 is showing all level missles
-    var clipMisslesProgress: CGFloat = 0
+    private(set) var clipMisslesProgress: CGFloat = 0
+    
+    private(set) var renderCenterVerticalOffset: CGFloat = 0
     
     var position: SIMD2<Float>
     var radius: Float
     var mainColor: SIMD4<UInt8>
     var missleRadius: Float
     
+    var center: SIMD2<Float>
+    
     var positionPointer: UnsafeMutableRawPointer!
+    var centerPositionPointer: UnsafeMutableRawPointer!
     var radiusPointer: UnsafeMutableRawPointer!
     var missleRadiusPointer: UnsafeMutableRawPointer!
-    var mainColorPointer: UnsafeMutableRawPointer!
     var materialsPointer: UnsafeMutableRawPointer!
     
     
@@ -49,29 +54,36 @@ final class Star {
         self.radius = Float(pack.radius)
         self.mainColor = SIMD4<UInt8>(255, 255, 255, 255)
         self.missleRadius = 0
-        
-        updateVisibleMissles(levelToPackProgress: Menu.levelsMenuCameraScale)
+        self.center = SIMD2<Float>(0, 0)
     }
     
-    func updateVisibleMissles(levelToPackProgress: CGFloat) {
-        guard let game = game else { return }
+    func updateVisibleMissles(levelToPackProgress: CGFloat, missleIndicesToSkip: CGFloat? = nil, clipMisslesProgress: CGFloat? = nil, missleRadius: Float? = nil, renderCenterVerticalOffset: CGFloat? = nil) {
+        
+        self.missleRadius = missleRadius ?? self.missleRadius
+        self.missleIndicesToSkip = missleIndicesToSkip ?? self.missleIndicesToSkip
+        self.clipMisslesProgress = clipMisslesProgress ?? self.clipMisslesProgress
+        self.renderCenterVerticalOffset = renderCenterVerticalOffset ?? self.renderCenterVerticalOffset
+        
+        let missleRadius = self.missleRadius
+        let missleIndicesToSkip = self.missleIndicesToSkip
+        let renderCenterVerticalOffset = self.renderCenterVerticalOffset
+        
+        guard let game = game else {
+            return
+        }
+        
+        
+//        print(missleRadius)
+        let p = levelToPackProgress - 2
+        
+        let notchOffset: Float = (missleRadius - Float(Settings.starMissleCenterOffset)) / radius
+        let starEffectiveSize: Float = 1 - notchOffset
+//        print(notchOffset)
         
         let levelIndex = game.state.levelIndex
         let pack = game.levelManager.allLevelPacks[game.state.packIndex]
         
         var materialsData = [StarMaterialData]()
-        
-//        if levelToPackProgress <= 2 {
-//            // 0 == level, 1 == level selection
-//            let p = levelToPackProgress - 1
-//
-//        } else {
-//            // 0 == level selection, 1 == pack selection
-//            let p = levelToPackProgress - 2
-//
-//        }
-        
-        let p = min(1, levelToPackProgress - 1)
         
         var materialOffset = 0
         var previousMaterialPositionEnd: Float = 0
@@ -89,8 +101,10 @@ final class Star {
                 
                 guard materialScale != CGFloat(previousMaterialPositionEnd) else { continue }
                 
-                if 0...1 ~= materialScale || 0...1 ~= previousMaterialPositionEnd, materialScale > CGFloat(previousMaterialPositionEnd) {
-                    let pos = SIMD2<Float>(Float(1 - materialScale), 1 - previousMaterialPositionEnd)
+                let bounds: ClosedRange<Float> = 0 ... 1
+                
+                if bounds ~= Float(materialScale) || bounds ~= previousMaterialPositionEnd, materialScale > CGFloat(previousMaterialPositionEnd) {
+                    let pos = SIMD2<Float>(Float(previousMaterialPositionEnd), Float(materialScale))
                     let materialData = StarMaterialData(color: missle.material.color,
                                                         position: pos)
                     materialsData.append(materialData)
@@ -104,14 +118,11 @@ final class Star {
             }
             materialOffset += level.missles.count
         }
+        let rootMaterial = StarMaterialData(color: self.mainColor, position: SIMD2<Float>(0, 1))
+        materialsData.append(rootMaterial)
         
         self.state.visibleMaterials = materialsData
-        
-//        let missleIndex = missleIndicesToSkip % floor(missleIndicesToSkip)
-//        let missle = game.levelManager.allLevelPacks[game.state.packIndex].levels[game.state.levelIndex].missles[missleIndex]
-//        miss
-        
-        
+        self.center = SIMD2<Float32>(self.position.x, self.position.y + Float(renderCenterVerticalOffset))
         
         updateRenderData()
     }
@@ -121,6 +132,10 @@ final class Star {
                                                                 alignment: MemoryLayout<SIMD2<Float32>>.alignment)
         self.positionPointer.copyMemory(from: &self.position, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
         
+        self.centerPositionPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
+                                                                alignment: MemoryLayout<SIMD2<Float32>>.alignment)
+        self.centerPositionPointer.copyMemory(from: &self.center, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
+        
         self.radiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
                                                                 alignment: MemoryLayout<Float32>.alignment)
         self.radiusPointer.copyMemory(from: &self.radius, byteCount: MemoryLayout<Float32>.stride)
@@ -128,10 +143,6 @@ final class Star {
         self.missleRadiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
                                                                 alignment: MemoryLayout<Float32>.alignment)
         self.missleRadiusPointer.copyMemory(from: &self.missleRadius, byteCount: MemoryLayout<Float32>.stride)
-        
-        self.mainColorPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD4<UInt8>>.stride,
-                                                                alignment: MemoryLayout<SIMD4<UInt8>>.alignment)
-        self.mainColorPointer.copyMemory(from: &self.mainColor, byteCount: MemoryLayout<SIMD4<UInt8>>.stride)
         
         self.materialsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<StarMaterialData>.stride * state.visibleMaterials.count,
                                                                 alignment: MemoryLayout<StarMaterialData>.alignment)
