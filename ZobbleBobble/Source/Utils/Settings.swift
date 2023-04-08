@@ -33,6 +33,8 @@ final class Settings {
     static let planetLevelMenuScale: CGFloat = 0.25
     static let planetPackMenuScale: CGFloat = 0
     
+    static let planetMaterialsUpscaleInGame: CGFloat = 1.75
+    
     static let starLevelAngle: CGFloat = CGFloat(90).radians
     static let starLevelMenuAngle: CGFloat = CGFloat(30).radians
     static let starPackMenuAngle: CGFloat = CGFloat(20).radians

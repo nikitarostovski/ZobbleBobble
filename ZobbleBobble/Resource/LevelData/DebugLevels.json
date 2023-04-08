@@ -33,7 +33,23 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
+                            "radius": 30
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
                             "radius": 10
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 30
                         },
                     },
                     {
@@ -73,11 +89,11 @@
                         },
                     },
                     {
-                        "material": "lavaRed",
+                        "material": "bomb",
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 5
                         },
                     },
                     {
@@ -87,46 +103,49 @@
                             "type": "circle",
                             "radius": 10
                         },
-                    },
+                    }
                 ]
             },
             {
-                "rotationPerSecond": 30,
+                "rotationPerSecond": 120,
                 "gravityRadius": 180,
                 "particleRadius": 2.5,
                 "initialChunks": [
                     {
-                        "material": "coreDark",
+                        "material": "coreLight",
                         "shape": {
-                            "type": "polygon",
-                            "points": [
-                                {
-                                    "x": -30,
-                                    "y": -5
-                                },
-                                {
-                                    "x": -30,
-                                    "y": 5
-                                },
-                                {
-                                    "x": 30,
-                                    "y": 5
-                                },
-                                {
-                                    "x": 30,
-                                    "y": -5
-                                }
-                            ]
+                            "type": "circle",
+                            "radius": 20,
+                            "center": {
+                                "x": 0,
+                                "y": 0
+                            }
                         }
                     }
                 ],
                 "missles": [
                     {
-                        "material": "bomb",
-                        "startImpulse": 1650000,
+                        "material": "coreLight",
+                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 20
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "coreDark",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "coreLight",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
                         },
                     }
                 ]

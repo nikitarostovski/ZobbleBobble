@@ -10,8 +10,6 @@ import MetalKit
 class StarsMesh: BaseMesh {
     struct Uniforms {
         let cameraScale: Float32
-        let transitionProgress: Float32
-        let missleOffset: Float32
         let camera: SIMD2<Float32>
     }
     
@@ -56,7 +54,8 @@ class StarsMesh: BaseMesh {
     }
     
     func updateMeshIfNeeded(positions: [UnsafeMutableRawPointer],
-                            centerPositions: [UnsafeMutableRawPointer],
+                            renderCenters: [UnsafeMutableRawPointer],
+                            missleCenters: [UnsafeMutableRawPointer],
                             radii: [UnsafeMutableRawPointer],
                             missleRadii: [UnsafeMutableRawPointer],
                             materials: [UnsafeMutableRawPointer],
@@ -73,8 +72,7 @@ class StarsMesh: BaseMesh {
         }
         
         let defaultScale = Float(renderSize.width / screenSize.width)
-        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, transitionProgress: transitionProgress, missleOffset: Float32(Settings.starMissleCenterOffset), camera: camera)
-        
+        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, camera: camera)
         
         if hasChanges {
             self.vertexBuffers.removeAll()
@@ -82,19 +80,23 @@ class StarsMesh: BaseMesh {
                 var materialCount = materialCounts[i]
                 guard materialCount > 0 else { continue }
                 
-                let positionBuffer = device.makeBuffer(
+                let starCenterBuffer = device.makeBuffer(
                     bytes: positions[i],
                     length: MemoryLayout<SIMD2<Float32>>.stride,
                     options: .storageModeShared)!
-                let centerPositionBuffer = device.makeBuffer(
-                    bytes: centerPositions[i],
+                let renderCenterBuffer = device.makeBuffer(
+                    bytes: renderCenters[i],
                     length: MemoryLayout<SIMD2<Float32>>.stride,
                     options: .storageModeShared)!
-                let radiusBuffer = device.makeBuffer(
+                let missleCenterBuffer = device.makeBuffer(
+                    bytes: missleCenters[i],
+                    length: MemoryLayout<SIMD2<Float32>>.stride,
+                    options: .storageModeShared)!
+                let starRadiusBuffer = device.makeBuffer(
                     bytes: radii[i],
                     length: MemoryLayout<Float32>.stride,
                     options: .storageModeShared)!
-                let missleRadiusBuffer = device.makeBuffer(
+                let notchRadiusBuffer = device.makeBuffer(
                     bytes: missleRadii[i],
                     length: MemoryLayout<Float32>.stride,
                     options: .storageModeShared)!
@@ -102,7 +104,6 @@ class StarsMesh: BaseMesh {
                     bytes: materials[i],
                     length: MemoryLayout<StarMaterialData>.stride * materialCounts[i],
                     options: .storageModeShared)!
-                
                 
                 let materialsCountPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<StarMaterialData>.stride,
                                                                         alignment: MemoryLayout<Int>.alignment)
@@ -113,7 +114,7 @@ class StarsMesh: BaseMesh {
                     length: MemoryLayout<Int>.stride,
                     options: .storageModeShared)!
                 
-                let starBuffers = [positionBuffer, centerPositionBuffer, radiusBuffer, missleRadiusBuffer, materialsBuffer, materialCountsBuffer]
+                let starBuffers = [starCenterBuffer, missleCenterBuffer, renderCenterBuffer, starRadiusBuffer, notchRadiusBuffer, materialsBuffer, materialCountsBuffer]
                 self.vertexBuffers.append(starBuffers)
                 self.vertexCount = positions.count
             }
@@ -134,9 +135,6 @@ class StarsMesh: BaseMesh {
         
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
-        
-//        let circlesThreadgroupCount = MTLSize(width: 8, height: 1, depth: 1)
-//        let circlesThreadgroups = MTLSize(width: self.vertexCount / circlesThreadgroupCount.width + 1, height: 1, depth: 1)
         
         let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
         let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)

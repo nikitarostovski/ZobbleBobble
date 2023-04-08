@@ -15,6 +15,8 @@ public struct LevelModel: Codable {
     public let initialChunks: [ChunkModel]
     public let missles: [MissleModel]
     
+    public var misslesBefore: Int = 0
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.gravityRadius = try container.decode(CGFloat.self, forKey: .gravityRadius)

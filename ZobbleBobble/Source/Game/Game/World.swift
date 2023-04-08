@@ -107,16 +107,19 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         self.star = star
 
-        let renderCenterVerticalOffset: CGFloat = -pack.radius - Settings.starMissleCenterOffset
+//        let renderCenterVerticalOffset: CGFloat = -pack.radius - Settings.starMissleCenterOffset
         star.radius = Float(pack.radius)
         star.position = SIMD2<Float>(Float(starCenterPoint.x), Float(starCenterPoint.y))
-        star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: 0, renderCenterVerticalOffset: renderCenterVerticalOffset)
+        let missleRange = star.getWorldVisibleMissles(levelIndex: 0, misslesFired: 0)
+        star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+                                  levelIndex: 0,
+                                  visibleMissleRange: missleRange)
         
         level.initialChunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
         }
         
-        spawnNextMissle(animated: false)
+        spawnNextMissle(animated: true)
     }
     
     func update(_ time: CFTimeInterval) {
@@ -223,27 +226,31 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             return
         }
         
+        let currentLevel = CGFloat(game?.state.levelIndex ?? 0)
+        
         let missleModel = level.missles[state.currentMissleIndex]
         self.missle = Missle(missleModel: missleModel, star: star, game: game)
         
         let startMissleCount = CGFloat(state.currentMissleIndex)
         let endMissleCount = CGFloat(state.currentMissleIndex + 1)
         
-        let startMissleRadius = Float(star.missleRadius)
-        let endMissleRadius = Float(missleModel.shape.boundingRadius + Settings.starMissleDeadZone)
-        
         let animation = { (percentage: CGFloat) in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
-            let missleRadius = startMissleRadius + (endMissleRadius - startMissleRadius) * Float(percentage)
             
-            self.star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: misslesFired, missleRadius: missleRadius)
+            let missleRange = self.star.getWorldVisibleMissles(levelIndex: Int(currentLevel), misslesFired: misslesFired)
+            self.star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+                                           levelIndex: currentLevel,
+                                           visibleMissleRange: missleRange)
             self.lastQueryStarHadChanges = true
             
             self.missle?.updateMisslePosition(percentage)
         }
         
         let completion = {
-            self.star.updateVisibleMissles(levelToPackProgress: Settings.levelCameraScale, missleIndicesToSkip: endMissleCount, missleRadius: endMissleRadius)
+            let missleRange = self.star.getWorldVisibleMissles(levelIndex: Int(currentLevel), misslesFired: endMissleCount)
+            self.star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+                                           levelIndex: currentLevel,
+                                           visibleMissleRange: missleRange)
             self.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
             self.userInteractionEnabled = true
@@ -319,12 +326,16 @@ extension World: ObjectPositionProvider {
 }
 
 extension World: StarsRenderDataSource {
-    var starCenterPositions: [UnsafeMutableRawPointer] {
-        [star.centerPositionPointer]
-    }
-    
     var starPositions: [UnsafeMutableRawPointer] {
         [star.positionPointer]
+    }
+    
+    var starRenderCenters: [UnsafeMutableRawPointer] {
+        [star.renderCenterPointer]
+    }
+    
+    var starMissleCenters: [UnsafeMutableRawPointer] {
+        [star.missleCenterPointer]
     }
     
     var starRadii: [UnsafeMutableRawPointer] {

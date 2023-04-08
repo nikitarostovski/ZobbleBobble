@@ -23,7 +23,8 @@ protocol BackgroundRenderDataSource: AnyObject {
 
 protocol StarsRenderDataSource: AnyObject {
     var starPositions: [UnsafeMutableRawPointer] { get }
-    var starCenterPositions: [UnsafeMutableRawPointer] { get }
+    var starRenderCenters: [UnsafeMutableRawPointer] { get }
+    var starMissleCenters: [UnsafeMutableRawPointer] { get }
     var starRadii: [UnsafeMutableRawPointer] { get }
     var starMissleRadii: [UnsafeMutableRawPointer] { get }
     var starMaterials: [UnsafeMutableRawPointer] { get }

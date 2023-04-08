@@ -78,7 +78,8 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     
     
     var starPositions: [UnsafeMutableRawPointer] = []
-    var starCenterPositions: [UnsafeMutableRawPointer] = []
+    var starRenderCenters: [UnsafeMutableRawPointer] = []
+    var starMissleCenters: [UnsafeMutableRawPointer] = []
     var starRadii: [UnsafeMutableRawPointer] = []
     var starMissleRadii: [UnsafeMutableRawPointer] = []
     var starMaterials: [UnsafeMutableRawPointer] = []
@@ -187,23 +188,13 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         let startProgress = state.levelToPackProgress
         let targetProgress = Settings.levelCameraScale
         
-        let startClipMisslesProgress: CGFloat = currentStar.clipMisslesProgress
-        let targetClipMisslesProgress: CGFloat = 0
-        
-        let startStarMissleRadius = currentStar.missleRadius
-        let targetStarMissleRadius = Float(game!.levelManager.allLevelPacks[game!.state.packIndex].levels.first!.missles.first!.shape.boundingRadius + Settings.starMissleDeadZone)
-        
         Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
-            let clipMisslesProgress = startClipMisslesProgress + (targetClipMisslesProgress - startClipMisslesProgress) * percentage
-            let missleRadius = startStarMissleRadius + (targetStarMissleRadius - startStarMissleRadius) * Float(percentage)
-            currentStar.updateVisibleMissles(levelToPackProgress: self.state.levelToPackProgress, clipMisslesProgress: clipMisslesProgress, missleRadius: missleRadius)
             self.updateRenderData()
         } completion: { [weak self] in
             guard let self = self else { return }
             self.state.levelToPackProgress = targetProgress
-            currentStar.updateVisibleMissles(levelToPackProgress: targetProgress, clipMisslesProgress: targetClipMisslesProgress, missleRadius: targetStarMissleRadius)
             self.updateRenderData()
             self.game!.runGame()
         }
@@ -217,27 +208,13 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         
         state.currentLevelPagePosition = CGFloat(game!.state.levelIndex)
         
-        let startMissleCount = currentStar.missleIndicesToSkip
-        let targetMissleCount: CGFloat = 0
-        
-        let startClipMisslesProgress: CGFloat = currentStar.clipMisslesProgress
-        let targetClipMisslesProgress: CGFloat = 1
-        
-        let startStarMissleRadius = currentStar.missleRadius
-        let targetStarMissleRadius: Float = 0
-        
         Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
-            let missleIndicesToSkip = startMissleCount + (targetMissleCount - startMissleCount) * percentage
-            let clipMisslesProgress = startClipMisslesProgress + (targetClipMisslesProgress - startClipMisslesProgress) * percentage
-            let missleRadius = startStarMissleRadius + (targetStarMissleRadius - startStarMissleRadius) * Float(percentage)
-            currentStar.updateVisibleMissles(levelToPackProgress: self.state.levelToPackProgress, missleIndicesToSkip: missleIndicesToSkip, clipMisslesProgress: clipMisslesProgress, missleRadius: missleRadius)
             self.updateRenderData()
         } completion: { [weak self] in
             guard let self = self else { return }
             self.state.levelToPackProgress = targetProgress
-            currentStar.updateVisibleMissles(levelToPackProgress: self.state.levelToPackProgress, missleIndicesToSkip: targetMissleCount, clipMisslesProgress: targetClipMisslesProgress, missleRadius: targetStarMissleRadius)
             self.updateScroll()
             self.updateRenderData()
         }
@@ -424,7 +401,8 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     
     private func updateStarsData() {
         var starPositions: [UnsafeMutableRawPointer] = []
-        var starCenterPositions: [UnsafeMutableRawPointer] = []
+        var starRenderCenters: [UnsafeMutableRawPointer] = []
+        var starMissleCenters: [UnsafeMutableRawPointer] = []
         var starRadii: [UnsafeMutableRawPointer] = []
         var starMissleRadii: [UnsafeMutableRawPointer] = []
         var starMaterials: [UnsafeMutableRawPointer] = []
@@ -441,10 +419,15 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             star.position = SIMD2<Float>(Float(point.x), Float(point.y))
             star.radius = Float(radius)
             
-            star.updateVisibleMissles(levelToPackProgress: state.levelToPackProgress)
+            let range = star.getMenuVisibleMissles(levelToPackProgress: state.levelToPackProgress,
+                                                   levelIndex: state.currentLevelPagePosition)
+            star.updateStarAppearance(levelToPackProgress: state.levelToPackProgress,
+                                      levelIndex: state.currentLevelPagePosition,
+                                      visibleMissleRange: range)
 
             starPositions.append(star.positionPointer)
-            starCenterPositions.append(star.centerPositionPointer)
+            starRenderCenters.append(star.renderCenterPointer)
+            starMissleCenters.append(star.missleCenterPointer)
             starRadii.append(star.radiusPointer)
             starMissleRadii.append(star.missleRadiusPointer)
             starMaterials.append(star.materialsPointer)
@@ -452,7 +435,8 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         }
         
         self.starPositions = starPositions
-        self.starCenterPositions = starCenterPositions
+        self.starRenderCenters = starRenderCenters
+        self.starMissleCenters = starMissleCenters
         self.starRadii = starRadii
         self.starMissleRadii = starMissleRadii
         self.starMaterials = starMaterials

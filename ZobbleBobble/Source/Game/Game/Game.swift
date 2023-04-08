@@ -50,7 +50,7 @@ final class Game {
     
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
         let levelManager: LevelManager
-        if let levelDataPath = Bundle.main.path(forResource: "Levels", ofType: "json") {
+        if let levelDataPath = Bundle.main.path(forResource: "DebugLevels", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
                 levelManager = try LevelManager(levelData: data)
