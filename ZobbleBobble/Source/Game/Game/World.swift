@@ -107,12 +107,11 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         self.star = star
 
-//        let renderCenterVerticalOffset: CGFloat = -pack.radius - Settings.starMissleCenterOffset
         star.radius = Float(pack.radius)
         star.position = SIMD2<Float>(Float(starCenterPoint.x), Float(starCenterPoint.y))
-        let missleRange = star.getWorldVisibleMissles(levelIndex: 0, misslesFired: 0)
+        let missleRange = star.getWorldVisibleMissles(levelIndex: game.state.levelIndex, misslesFired: 0)
         star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
-                                  levelIndex: 0,
+                                  levelIndex: CGFloat(game.state.levelIndex),
                                   visibleMissleRange: missleRange)
         
         level.initialChunks.forEach { [weak self] chunk in
@@ -153,7 +152,6 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
 //            game?.runMenu(isFromLevel: true)
             return
         }
-        
         
         launchCurrentMissle(to: position)
         spawnNextMissle()

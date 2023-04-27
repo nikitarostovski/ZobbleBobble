@@ -14,11 +14,11 @@ final class Settings {
     static let packsMenuCameraScale: CGFloat = 3
     
 //    static let physicsScale: CGFloat = 0.1
-    static let worldWidth: CGFloat = 100
+//    static let worldWidth: CGFloat = 100
     
-    static let resolutionDownscale: CGFloat = 5
+    static let resolutionDownscale: CGFloat = 7
     
-    static let liquidMetaballsDownscale: Float = 0.75
+    static let liquidMetaballsDownscale: Float = 0.7
     
     static let levelCenterOffset: CGFloat = 50
     

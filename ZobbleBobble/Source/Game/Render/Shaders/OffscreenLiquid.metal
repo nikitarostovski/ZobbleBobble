@@ -99,7 +99,7 @@ kernel void fill_particle_colors(constant LiquidUniforms &uniforms [[buffer(0)]]
 
         if (dist < minDist || isInsideCircle) {
             minDist = dist;
-            resultColor = col + (float3(1) * velocity / 1000);
+            resultColor = col + (float3(1) * velocity / 300);
             if (isInsideCircle) {
                 break;
             }

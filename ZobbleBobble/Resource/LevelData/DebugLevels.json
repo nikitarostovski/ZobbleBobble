@@ -37,7 +37,7 @@
                         },
                     },
                     {
-                        "material": "lavaRed",
+                        "material": "water",
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",

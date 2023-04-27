@@ -54,8 +54,8 @@ kernel void draw_star(constant StarUniforms &uniforms [[buffer(0)]],
     // last material is root star material
     for (int i = 0; i < materialCount - 1; i++) {
         Material m = materials[i];
-        float mRadiusStart = m.position.x * sr;
-        float mRadiusEnd = m.position.y * sr;
+        float mRadiusStart = m.position.x * sr + nr;
+        float mRadiusEnd = m.position.y * sr + nr;
 
         if (drc >= mRadiusStart && drc <= mRadiusEnd) {
             float4 mColor = float4(m.color) / 255.0;

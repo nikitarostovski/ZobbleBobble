@@ -28,13 +28,6 @@ final class Star {
     
     private let initialMaterials: [StarMaterialData]
     
-//    private(set) var missleIndicesToSkip: CGFloat = 0
-//
-//    /// 0 is showing only current level missles, 1 is showing all level missles
-//    private(set) var clipMisslesProgress: CGFloat = 0
-//
-////    private(set) var renderCenterVerticalOffset: CGFloat = 0
-    
     var position: SIMD2<Float>
     var renderCenter: SIMD2<Float>
     var missleCenter: SIMD2<Float>
@@ -67,7 +60,7 @@ final class Star {
         for (i, l) in pack.levels.enumerated() {
             for (j, m) in l.missles.enumerated() {
                 let number = CGFloat(i) + CGFloat(j) / CGFloat(l.missles.count)
-                let next = number + CGFloat(1) / CGFloat(l.missles.count)
+                let next = number + CGFloat(1) / CGFloat(l.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
                 let material = StarMaterialData(color: m.material.color, position: SIMD2(Float(number), Float(next)))
                 materials.append(material)
             }
@@ -115,33 +108,26 @@ final class Star {
         return lo...hi
     }
     
-    func getMissleRadius(levelToPackProgress: CGFloat, missleIndex: CGFloat) -> Float {
-        let activeLevelIndex = Int(missleIndex)
-        guard 0..<pack.levels.count ~= activeLevelIndex else { return 0 }
-        
-        let level = pack.levels[activeLevelIndex]
-        
-        let missleProgress = missleIndex - CGFloat(activeLevelIndex)
-        
-        let activeMissleIndexFloating = missleProgress * CGFloat(level.missles.count) - 1
-        let activeMissleIndex = Int(activeMissleIndexFloating)
+    func getMissleRadius(levelToPackProgress: CGFloat, levelIndex: Int, missleIndexFloating: CGFloat) -> Float {
+        let missleIndexFloating = missleIndexFloating - 1
+        let missleIndex = max(0, Int(missleIndexFloating))
+        let level = pack.levels[levelIndex]
         
         var currentRadius: CGFloat = 0
         var nextRadius: CGFloat = 0
         
-        if 0..<level.missles.count ~= activeMissleIndex {
-            let currentMissle = level.missles[activeMissleIndex]
+        if 0..<level.missles.count ~= missleIndex {
+            let currentMissle = level.missles[missleIndex]
             currentRadius = currentMissle.shape.boundingRadius
         }
         
-        if 0..<(level.missles.count - 1) ~= activeMissleIndex {
-            let nextMissle = level.missles[activeMissleIndex + 1]
+        if 0..<(level.missles.count - 1) ~= missleIndex {
+            let nextMissle = level.missles[missleIndex + 1]
             nextRadius = nextMissle.shape.boundingRadius
         }
         
         let scaleProgress = levelToPackProgress - Settings.levelCameraScale
-        
-        let mp = activeMissleIndexFloating - CGFloat(activeMissleIndex)
+        let mp = missleIndexFloating - CGFloat(missleIndex)
         
         let levelsMissleRadius: CGFloat = 0
         let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.starMissleDeadZone
@@ -161,114 +147,42 @@ final class Star {
     }
     
     func updateStarAppearance(levelToPackProgress: CGFloat, levelIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
-//        guard visibleMissleRange.upperBound != visibleMissleRange.lowerBound else { return }
-        
         self.state.visibleMissleRange = visibleMissleRange
         self.state.currentLevelIndex = levelIndex
         
-        self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress, missleIndex: visibleMissleRange.lowerBound)
+        let level = pack.levels[Int(levelIndex)]
+        let missleIndex = CGFloat(level.missles.count) * (visibleMissleRange.lowerBound - CGFloat(Int(levelIndex)))
+        self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress,
+                                            levelIndex: Int(levelIndex),
+                                            missleIndexFloating: missleIndex)
+        
         self.renderCenter = getRenderCenter(levelToPackProgress: levelToPackProgress)
         self.missleCenter = getMissleCenter()
         
         let materialScale: CGFloat = min(max(1, Settings.packsMenuCameraScale - levelToPackProgress), Settings.planetMaterialsUpscaleInGame)
+        let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
         
         var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { i, m in
             let start = CGFloat(m.position.x)
             let end = CGFloat(m.position.y)
             
-            let rangeDist = visibleMissleRange.upperBound - visibleMissleRange.lowerBound
-            
-            let convertedStart = (start - visibleMissleRange.lowerBound) / rangeDist * materialScale
-            let convertedEnd = (end - visibleMissleRange.lowerBound) / rangeDist * materialScale
-            
-            let visibilityRange: ClosedRange<CGFloat> = 0...materialScale
+            let convertedStart = (start - visibleMissleRange.lowerBound) * materialScale
+            let convertedEnd = (end - visibleMissleRange.lowerBound) * materialScale
             
             if visibilityRange.contains(convertedStart) || visibilityRange.contains(convertedEnd) {
                 return StarMaterialData(color: m.color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
             }
-            
             return nil
         }
-        
-        let rootMaterial = StarMaterialData(color: self.mainColor, position: SIMD2<Float>(0, 1))
+        let rootMissleColor = visibleCorrectedMaterials.first?.color ?? self.mainColor
+        let rootPosition = SIMD2<Float>(Float(visibilityRange.lowerBound), Float(visibilityRange.upperBound))
+        let rootMaterial = StarMaterialData(color: rootMissleColor, position: rootPosition)
         visibleCorrectedMaterials.append(rootMaterial)
         
         self.state.visibleMaterials = visibleCorrectedMaterials
         
         updateRenderData()
     }
-    
-//    func updateVisibleMissles(levelToPackProgress: CGFloat, missleIndicesToSkip: CGFloat? = nil, clipMisslesProgress: CGFloat? = nil, missleRadius: Float? = nil) {
-//
-//        self.missleRadius = missleRadius ?? self.missleRadius
-//        self.missleIndicesToSkip = missleIndicesToSkip ?? self.missleIndicesToSkip
-//        self.clipMisslesProgress = clipMisslesProgress ?? self.clipMisslesProgress
-//
-//        let missleScale = 1 - max(0, min(1, levelToPackProgress - 1))
-//        self.renderCenterVerticalOffset = missleScale * (CGFloat(self.radius) + Settings.starMissleCenterOffset)
-//
-//        let missleRadius = self.missleRadius
-//        let missleIndicesToSkip = self.missleIndicesToSkip
-//        let renderCenterVerticalOffset = self.renderCenterVerticalOffset
-//
-//        guard let game = game else {
-//            return
-//        }
-//
-////        print(missleRadius)
-//        let p = levelToPackProgress - 2
-//
-////        let notchOffset: Float = (missleRadius - Float(Settings.starMissleCenterOffset)) / radius
-////        let starEffectiveSize: Float = 1 - notchOffset
-////        print(notchOffset)
-//
-//        let levelIndex = game.state.levelIndex
-//        let pack = game.levelManager.allLevelPacks[game.state.packIndex]
-//
-//        var materialsData = [StarMaterialData]()
-//
-//        var materialOffset = 0
-//        var previousMaterialPositionEnd: Float = 0
-//        for (i, level) in pack.levels.enumerated() {
-//            let missleIndicesToSkip = i == levelIndex ? missleIndicesToSkip : 0
-//
-//            for (j, missle) in level.missles.enumerated() {
-//                var materialLevelScale = CGFloat(i - levelIndex)
-//                materialLevelScale += (CGFloat(j + 1) - missleIndicesToSkip) / CGFloat(level.missles.count)
-//
-//                let totalIndex = CGFloat(j + materialOffset)
-//                let materialMenuScale = (totalIndex + 1) / CGFloat(pack.missleCount)
-//
-//                let materialScale = materialLevelScale + (materialMenuScale - materialLevelScale) * p
-//
-//                guard materialScale != CGFloat(previousMaterialPositionEnd) else { continue }
-//
-//                let bounds: ClosedRange<Float> = 0 ... 1
-//
-//                if bounds ~= Float(materialScale) || bounds ~= previousMaterialPositionEnd, materialScale > CGFloat(previousMaterialPositionEnd) {
-//                    let pos = SIMD2<Float>(Float(previousMaterialPositionEnd), Float(materialScale))
-//                    let materialData = StarMaterialData(color: missle.material.color,
-//                                                        position: pos)
-//                    materialsData.append(materialData)
-//                }
-//
-//                if j != level.missles.count - 1 {
-//                    previousMaterialPositionEnd = Float(materialScale)
-//                } else {
-//                    previousMaterialPositionEnd = -1
-//                }
-//            }
-//            materialOffset += level.missles.count
-//        }
-//        let rootMaterial = StarMaterialData(color: self.mainColor, position: SIMD2<Float>(0, 1))
-//        materialsData.append(rootMaterial)
-//
-//        self.state.visibleMaterials = materialsData
-//        self.renderCenter = SIMD2<Float32>(self.position.x, self.position.y - Float(renderCenterVerticalOffset))
-//        self.missleCenter = SIMD2<Float32>(self.position.x, self.position.y - self.radius - Float(Settings.starMissleCenterOffset))
-//
-//        updateRenderData()
-//    }
     
     private func updateRenderData() {
         self.positionPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,

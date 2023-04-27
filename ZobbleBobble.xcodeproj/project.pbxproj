@@ -101,6 +101,7 @@
 		11B8210829857B9F005300DC /* ObjectPositionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B8210729857B9F005300DC /* ObjectPositionProvider.swift */; };
 		11BA63542987F724008A4B56 /* OffscreenStars.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11BA63532987F724008A4B56 /* OffscreenStars.metal */; };
 		11BA63562987FC2D008A4B56 /* StarsMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BA63552987FC2D008A4B56 /* StarsMesh.swift */; };
+		11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */; };
 		11C0A7112922492E00CA7954 /* ZobbleCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 11C0A7102922492E00CA7954 /* ZobbleCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		11C0A7142922492E00CA7954 /* ZobbleCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11C0A70E2922492E00CA7954 /* ZobbleCore.framework */; };
 		11C0A7152922492E00CA7954 /* ZobbleCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11C0A70E2922492E00CA7954 /* ZobbleCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -456,6 +457,7 @@
 		11B8210729857B9F005300DC /* ObjectPositionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPositionProvider.swift; sourceTree = "<group>"; };
 		11BA63532987F724008A4B56 /* OffscreenStars.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenStars.metal; sourceTree = "<group>"; };
 		11BA63552987FC2D008A4B56 /* StarsMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsMesh.swift; sourceTree = "<group>"; };
+		11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Formatting.swift"; sourceTree = "<group>"; };
 		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C0A70E2922492E00CA7954 /* ZobbleCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobbleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C0A7102922492E00CA7954 /* ZobbleCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobbleCore.h; sourceTree = "<group>"; };
@@ -848,6 +850,7 @@
 			isa = PBXGroup;
 			children = (
 				1194330729892CD300AE56CA /* CGRect+Colors.swift */,
+				11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1551,6 +1554,7 @@
 				1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */,
 				11909531295571E0006EE970 /* CircleMesh.swift in Sources */,
 				11FCBA9827A5D06B00A25665 /* World.swift in Sources */,
+				11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */,
 				1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */,
 				11B3216D29645CB0000F4180 /* OffscreenBackground.metal in Sources */,
 				1194330829892CD300AE56CA /* CGRect+Colors.swift in Sources */,
