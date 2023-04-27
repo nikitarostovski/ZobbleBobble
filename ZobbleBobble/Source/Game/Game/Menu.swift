@@ -206,15 +206,20 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         let startProgress = state.levelToPackProgress
         let targetProgress = Settings.levelsMenuCameraScale
         
+        let startMissle = currentStar.state.currentMissleIndex
+        let targetMissle = CGFloat(0)
+        
         state.currentLevelPagePosition = CGFloat(game!.state.levelIndex)
         
         Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
+            currentStar.state.currentMissleIndex = startMissle + (targetMissle - startMissle) * percentage
             self.updateRenderData()
         } completion: { [weak self] in
             guard let self = self else { return }
             self.state.levelToPackProgress = targetProgress
+            currentStar.state.currentMissleIndex = targetMissle
             self.updateScroll()
             self.updateRenderData()
         }
@@ -420,7 +425,8 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             star.radius = Float(radius)
             
             let range = star.getMenuVisibleMissles(levelToPackProgress: state.levelToPackProgress,
-                                                   levelIndex: state.currentLevelPagePosition)
+                                                   levelIndex: state.currentLevelPagePosition,
+                                                   misslesFired: star.state.currentMissleIndex)
             star.updateStarAppearance(levelToPackProgress: state.levelToPackProgress,
                                       levelIndex: state.currentLevelPagePosition,
                                       visibleMissleRange: range)

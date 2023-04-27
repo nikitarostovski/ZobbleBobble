@@ -13,8 +13,6 @@ struct WorldState {
     var angle: CGFloat
     var camera: CGPoint
     var cameraScale: CGFloat
-    
-    var currentMissleIndex = 0
 }
 
 final class World: ObjectRenderDataSource, CameraRenderDataSource {
@@ -147,7 +145,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     func onTap(_ position: CGPoint) {
         guard userInteractionEnabled else { return }
         
-        guard state.currentMissleIndex <= level.missles.count else {
+        guard star.state.currentMissleIndex <= CGFloat(level.missles.count) else {
             // TODO: level finished
 //            game?.runMenu(isFromLevel: true)
             return
@@ -218,7 +216,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     }
     
     private func spawnNextMissle(animated: Bool = true) {
-        guard state.currentMissleIndex < level.missles.count else {
+        guard star.state.currentMissleIndex < CGFloat(level.missles.count) else {
             self.missle = nil
             self.star.missleRadius = 0
             return
@@ -226,11 +224,11 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         let currentLevel = CGFloat(game?.state.levelIndex ?? 0)
         
-        let missleModel = level.missles[state.currentMissleIndex]
+        let missleModel = level.missles[Int(star.state.currentMissleIndex)]
         self.missle = Missle(missleModel: missleModel, star: star, game: game)
         
-        let startMissleCount = CGFloat(state.currentMissleIndex)
-        let endMissleCount = CGFloat(state.currentMissleIndex + 1)
+        let startMissleCount = star.state.currentMissleIndex
+        let endMissleCount = star.state.currentMissleIndex + 1
         
         let animation = { (percentage: CGFloat) in
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
@@ -249,7 +247,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             self.star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
                                            levelIndex: currentLevel,
                                            visibleMissleRange: missleRange)
-            self.state.currentMissleIndex += 1
+            self.star.state.currentMissleIndex += 1
             self.lastQueryStarHadChanges = true
             self.userInteractionEnabled = true
             

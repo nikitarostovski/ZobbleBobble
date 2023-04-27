@@ -16,6 +16,7 @@ struct StarMaterialData {
 struct StarState {
     var visibleMaterials = [StarMaterialData]()
     var currentLevelIndex: CGFloat = 0
+    var currentMissleIndex: CGFloat = 0
     var visibleMissleRange: ClosedRange<CGFloat> = 0...0
 }
 
@@ -69,14 +70,17 @@ final class Star {
         updateRenderData()
     }
     
-    func getMenuVisibleMissles(levelToPackProgress: CGFloat, levelIndex: CGFloat) -> ClosedRange<CGFloat> {
+    func getMenuVisibleMissles(levelToPackProgress: CGFloat, levelIndex: CGFloat, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
+        let level = pack.levels[Int(levelIndex)]
+        let missleWeight = CGFloat(1) / CGFloat(level.missles.count)
+        
         let packsLo: CGFloat = 0
         let packsHi: CGFloat = CGFloat(pack.levels.count)
         
         let levelsLo = levelIndex
         let levelsHi = levelIndex + 1
         
-        let levelLo: CGFloat = levelIndex
+        let levelLo: CGFloat = levelIndex + misslesFired * missleWeight
         let levelHi: CGFloat = levelIndex + 1
         
         var lo: CGFloat = 0

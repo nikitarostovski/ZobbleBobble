@@ -899,9 +899,9 @@
 				11FEFEFE295DEA7A00528A1C /* Game.swift */,
 				11B8210529857832005300DC /* Background.swift */,
 				11FCBA9727A5D06B00A25665 /* World.swift */,
+				11FEFEFC295DB7D300528A1C /* Menu.swift */,
 				11CB837029C075DC0042B2F4 /* Star.swift */,
 				1194D985299A0A4C00B28806 /* Missle.swift */,
-				11FEFEFC295DB7D300528A1C /* Menu.swift */,
 				11B8210729857B9F005300DC /* ObjectPositionProvider.swift */,
 			);
 			path = Game;
