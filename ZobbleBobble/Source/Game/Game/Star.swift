@@ -166,15 +166,26 @@ final class Star {
         let materialScale: CGFloat = min(max(1, Settings.packsMenuCameraScale - levelToPackProgress), Settings.planetMaterialsUpscaleInGame)
         let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
         
-        var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { i, m in
+        let colorMixStrength: CGFloat = max(0, min(1, levelToPackProgress - Settings.levelCameraScale))
+        
+        var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { _, m in
+            var color = m.color
+            
             let start = CGFloat(m.position.x)
             let end = CGFloat(m.position.y)
+            
+            if Int(start) != Int(levelIndex) {
+                color = SIMD4<UInt8>(UInt8(CGFloat(mainColor.x) + (CGFloat(color.x) - CGFloat(mainColor.x)) * colorMixStrength),
+                                     UInt8(CGFloat(mainColor.y) + (CGFloat(color.y) - CGFloat(mainColor.y)) * colorMixStrength),
+                                     UInt8(CGFloat(mainColor.z) + (CGFloat(color.z) - CGFloat(mainColor.z)) * colorMixStrength),
+                                     UInt8(CGFloat(mainColor.w) + (CGFloat(color.w) - CGFloat(mainColor.w)) * colorMixStrength))
+            }
             
             let convertedStart = (start - visibleMissleRange.lowerBound) * materialScale
             let convertedEnd = (end - visibleMissleRange.lowerBound) * materialScale
             
             if visibilityRange.contains(convertedStart) || visibilityRange.contains(convertedEnd) {
-                return StarMaterialData(color: m.color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
+                return StarMaterialData(color: color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
             }
             return nil
         }

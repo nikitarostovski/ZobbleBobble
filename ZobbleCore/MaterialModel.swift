@@ -77,7 +77,7 @@ public enum MaterialType: String, Codable {
         var flags = UInt32(0)
         switch self {
         case .lavaRed, .lavaYellow, .coreLight, .coreDark:
-            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle | Self.b2_colorMixingParticle
+            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle | Self.b2_powderParticle | Self.b2_colorMixingParticle
         case .bomb:
             flags |= Self.b2_waterParticle
         case .water:

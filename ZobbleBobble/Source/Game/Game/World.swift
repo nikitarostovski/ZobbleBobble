@@ -91,7 +91,12 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         def.viscousStrength = 0.9
         def.repulsiveStrength = 0.2
         def.ejectionStrength = 0
-        def.powderStrength = 1.0
+        def.powderStrength = 0.0
+        
+        def.surfaceTensionNormalStrength = 0
+        def.surfaceTensionPressureStrength = 0.2
+        def.viscousStrength = 1.0
+        def.elasticStrength = 0.1
         
 //        def.staticPressureStrength = 0.2
 //        def.staticPressureRelaxation = 0.2
