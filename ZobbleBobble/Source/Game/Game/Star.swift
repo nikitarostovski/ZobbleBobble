@@ -185,9 +185,12 @@ final class Star {
             }
             return nil
         }
-        let rootMissleColor = visibleCorrectedMaterials.first?.color ?? self.mainColor
+        var rootColor = visibleCorrectedMaterials.first?.color ?? self.mainColor
+        if levelToPackProgress == Settings.levelCameraScale {
+            rootColor = mainColor
+        }
         let rootPosition = SIMD2<Float>(Float(visibilityRange.lowerBound), Float(visibilityRange.upperBound))
-        let rootMaterial = StarMaterialData(color: rootMissleColor, position: rootPosition)
+        let rootMaterial = StarMaterialData(color: rootColor, position: rootPosition)
         visibleCorrectedMaterials.append(rootMaterial)
         
         self.state.visibleMaterials = visibleCorrectedMaterials
