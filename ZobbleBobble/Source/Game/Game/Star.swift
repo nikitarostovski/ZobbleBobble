@@ -137,7 +137,7 @@ final class Star {
         let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.starMissleDeadZone
         let missleRadius = levelMissleRadius + (levelsMissleRadius - levelMissleRadius) * scaleProgress
         
-        return Float(missleRadius)
+        return Float(max(0, missleRadius))
     }
     
     func getRenderCenter(levelToPackProgress: CGFloat) -> SIMD2<Float> {
@@ -163,26 +163,22 @@ final class Star {
         self.renderCenter = getRenderCenter(levelToPackProgress: levelToPackProgress)
         self.missleCenter = getMissleCenter()
         
-        let materialScale: CGFloat = min(max(1, Settings.packsMenuCameraScale - levelToPackProgress), Settings.planetMaterialsUpscaleInGame)
-        let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
+        let p = max(0, min(1, levelToPackProgress - Settings.levelsMenuCameraScale))
+        let addScale = 1 + (visibleMissleRange.upperBound - visibleMissleRange.lowerBound - 1) * p // for packs menu
+        let materialScale = min(max(1, Settings.packsMenuCameraScale - levelToPackProgress), Settings.planetMaterialsUpscaleInGame)
         
-        let colorMixStrength: CGFloat = max(0, min(1, levelToPackProgress - Settings.levelCameraScale))
+        let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
+        let colorMixStrength: CGFloat = 1 - max(0, min(1, levelToPackProgress - Settings.levelCameraScale))
         
         var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { _, m in
-            var color = m.color
-            
             let start = CGFloat(m.position.x)
             let end = CGFloat(m.position.y)
             
-            if Int(start) != Int(levelIndex) {
-                color = SIMD4<UInt8>(UInt8(CGFloat(mainColor.x) + (CGFloat(color.x) - CGFloat(mainColor.x)) * colorMixStrength),
-                                     UInt8(CGFloat(mainColor.y) + (CGFloat(color.y) - CGFloat(mainColor.y)) * colorMixStrength),
-                                     UInt8(CGFloat(mainColor.z) + (CGFloat(color.z) - CGFloat(mainColor.z)) * colorMixStrength),
-                                     UInt8(CGFloat(mainColor.w) + (CGFloat(color.w) - CGFloat(mainColor.w)) * colorMixStrength))
-            }
+            let isInCurrentLevel = Int(start) == Int(levelIndex)
+            let color = isInCurrentLevel ? m.color : m.color.mix(with: mainColor, progress: colorMixStrength)
             
-            let convertedStart = (start - visibleMissleRange.lowerBound) * materialScale
-            let convertedEnd = (end - visibleMissleRange.lowerBound) * materialScale
+            let convertedStart = (start - visibleMissleRange.lowerBound) * materialScale / addScale
+            let convertedEnd = (end - visibleMissleRange.lowerBound) * materialScale / addScale
             
             if visibilityRange.contains(convertedStart) || visibilityRange.contains(convertedEnd) {
                 return StarMaterialData(color: color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
@@ -195,7 +191,6 @@ final class Star {
         visibleCorrectedMaterials.append(rootMaterial)
         
         self.state.visibleMaterials = visibleCorrectedMaterials
-        
         updateRenderData()
     }
     
