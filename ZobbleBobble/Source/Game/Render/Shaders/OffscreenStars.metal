@@ -22,14 +22,14 @@ struct Material {
     float2 position;
 };
 
-kernel void draw_star(constant StarUniforms &uniforms [[buffer(0)]],
-                      constant float2 &starCenter [[buffer(1)]],
-                      constant float2 &missleCenter [[buffer(2)]],
-                      constant float2 &renderCenter [[buffer(3)]],
-                      constant float &starRadius [[buffer(4)]],
-                      constant float &notchRadius [[buffer(5)]],
-                      constant Material *materials [[buffer(6)]],
-                      constant int &materialCount [[buffer(7)]],
+kernel void draw_star(device StarUniforms &uniforms [[buffer(0)]],
+                      device float2 &starCenter [[buffer(1)]],
+                      device float2 &missleCenter [[buffer(2)]],
+                      device float2 &renderCenter [[buffer(3)]],
+                      device float &starRadius [[buffer(4)]],
+                      device float &notchRadius [[buffer(5)]],
+                      device Material *materials [[buffer(6)]],
+                      device int &materialCount [[buffer(7)]],
                       texture2d<float, access::write> output [[texture(0)]],
                       uint2 gid [[thread_position_in_grid]])
 {

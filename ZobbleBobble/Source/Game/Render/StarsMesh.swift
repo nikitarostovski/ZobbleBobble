@@ -136,12 +136,9 @@ class StarsMesh: BaseMesh {
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
         
-        let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
-        let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)
-        
         computeEncoder.setComputePipelineState(clearPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         for buffers in vertexBuffers {
             computeEncoder.setComputePipelineState(computeDrawStarPipelineState)
@@ -150,7 +147,7 @@ class StarsMesh: BaseMesh {
             buffers.enumerated().forEach {
                 computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
             }
-            computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+            dispatchAuto(encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
         }
         
         computeEncoder.endEncoding()

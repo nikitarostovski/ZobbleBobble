@@ -16,7 +16,7 @@ final class Settings {
 //    static let physicsScale: CGFloat = 0.1
 //    static let worldWidth: CGFloat = 100
     
-    static let resolutionDownscale: CGFloat = 7
+    static let resolutionDownscale: CGFloat = 2
     
     static let liquidMetaballsDownscale: Float = 0.7
     

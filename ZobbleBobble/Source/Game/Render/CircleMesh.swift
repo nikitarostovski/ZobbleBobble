@@ -106,15 +106,9 @@ class CircleMesh: BaseMesh {
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
         
-        let circlesThreadgroupCount = MTLSize(width: 8, height: 1, depth: 1)
-        let circlesThreadgroups = MTLSize(width: self.vertexCount / circlesThreadgroupCount.width + 1, height: 1, depth: 1)
-        
-        let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
-        let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)
-        
         computeEncoder.setComputePipelineState(clearPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeDrawCirclesPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.setComputePipelineState(computeDrawCirclesPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
@@ -122,7 +116,7 @@ class CircleMesh: BaseMesh {
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
-        computeEncoder.dispatchThreadgroups(circlesThreadgroups, threadsPerThreadgroup: circlesThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeDrawCirclesPipelineState, width: vertexCount, height: 1)
         
         computeEncoder.endEncoding()
         

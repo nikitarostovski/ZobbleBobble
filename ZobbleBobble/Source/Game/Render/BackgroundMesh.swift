@@ -7,7 +7,7 @@
 
 import MetalKit
 
-class BackgroundMesh {
+class BackgroundMesh: BaseMesh {
     struct Uniforms {
         let cameraScale: Float
         let camera: SIMD2<Float>
@@ -20,7 +20,6 @@ class BackgroundMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "fill_background")!)
     }()
     
-    weak var device: MTLDevice?
     var vertexBuffers: [MTLBuffer]
     var uniformsBuffer: MTLBuffer?
     var vertexCount: Int
@@ -32,9 +31,10 @@ class BackgroundMesh {
     init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.screenSize = screenSize
         self.renderSize = renderSize
-        self.device = device
         self.vertexBuffers = []
         self.vertexCount = 0
+        super.init()
+        self.device = device
         
         let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .bgra8Unorm,
@@ -96,16 +96,13 @@ class BackgroundMesh {
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return nil }
         
-        let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
-        let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)
-        
         computeEncoder.setComputePipelineState(fillBackgroundPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: fillBackgroundPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.endEncoding()
         

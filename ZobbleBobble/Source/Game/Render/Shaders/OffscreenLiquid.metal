@@ -52,7 +52,7 @@ float getRadius(LiquidUniforms uniforms, bool shouldDownscale) {
 
 kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
                      texture2d<float, access::write> output [[texture(1)]],
-                     constant float *fadeMultiplier [[buffer(0)]],
+                     device float *fadeMultiplier [[buffer(0)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
     float4 oldColor = input.read(gid);
@@ -60,11 +60,11 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
     output.write(oldColor, gid);
 }
 
-kernel void metaballs(constant LiquidUniforms &uniforms [[buffer(0)]],
-                      constant float2 *positions [[buffer(1)]],
-                      constant float2 *velocities [[buffer(2)]],
-                      constant uchar4 *color [[buffer(3)]],
-                      constant int *pointCount [[buffer(4)]],
+kernel void metaballs(device LiquidUniforms &uniforms [[buffer(0)]],
+                      device float2 *positions [[buffer(1)]],
+                      device float2 *velocities [[buffer(2)]],
+                      device uchar4 *color [[buffer(3)]],
+                      device int *pointCount [[buffer(4)]],
                       texture2d<float, access::read> input [[texture(0)]],
                       texture2d<float, access::write> output [[texture(1)]],
                       uint2 gid [[thread_position_in_grid]])
@@ -77,11 +77,11 @@ kernel void metaballs(constant LiquidUniforms &uniforms [[buffer(0)]],
     drawMetaball(input, output, pos, radius);
 }
 
-kernel void fill_particle_colors(constant LiquidUniforms &uniforms [[buffer(0)]],
-                                 constant float2 *positions [[buffer(1)]],
-                                 constant float2 *velocities [[buffer(2)]],
-                                 constant uchar4 *color [[buffer(3)]],
-                                 constant int *pointCount [[buffer(4)]],
+kernel void fill_particle_colors(device LiquidUniforms &uniforms [[buffer(0)]],
+                                 device float2 *positions [[buffer(1)]],
+                                 device float2 *velocities [[buffer(2)]],
+                                 device uchar4 *color [[buffer(3)]],
+                                 device int *pointCount [[buffer(4)]],
                                  texture2d<float, access::write> output [[texture(0)]],
                                  uint2 gid [[thread_position_in_grid]])
 {

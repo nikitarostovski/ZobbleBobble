@@ -202,21 +202,11 @@ class LiquidMesh: BaseMesh {
         let computePassDescriptor = MTLComputePassDescriptor()
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return getClearTexture(commandBuffer: commandBuffer) }
 
-        let lowResThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
-        let lowResThreadgroups = MTLSize(width: lowResTexture.width / lowResThreadgroupCount.width + 1, height: lowResTexture.height / lowResThreadgroupCount.height + 1, depth: 1)
-        
-        let metaballsThreadgroupCount = MTLSize(width: 8, height: 1, depth: 1)
-        let metaballsThreadgroups = MTLSize(width: self.vertexCount / metaballsThreadgroupCount.width + 1, height: 1, depth: 1)
-        
-        let finalThreadgroupCount = MTLSize(width: 8, height: 8, depth: 1)
-        let finalThreadgroups = MTLSize(width: finalTexture.width / finalThreadgroupCount.width + 1, height: finalTexture.height / finalThreadgroupCount.height + 1, depth: 1)
-        
         computeEncoder.setComputePipelineState(initPipelineState)
         computeEncoder.setTexture(lowResTexture, index: 0)
         computeEncoder.setTexture(lowResTexture, index: 1)
         computeEncoder.setBuffer(fadeMultiplierBuffer, offset: 0, index: 0)
-        computeEncoder.dispatchThreadgroups(lowResThreadgroups, threadsPerThreadgroup: lowResThreadgroupCount)
-        
+        dispatchAuto(encoder: computeEncoder, state: initPipelineState, width: lowResTexture.width, height: lowResTexture.height)
         
         computeEncoder.setComputePipelineState(computeMetaballsPipelineState)
         computeEncoder.setTexture(lowResTexture, index: 0)
@@ -225,7 +215,7 @@ class LiquidMesh: BaseMesh {
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
-        computeEncoder.dispatchThreadgroups(metaballsThreadgroups, threadsPerThreadgroup: metaballsThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeMetaballsPipelineState, width: vertexCount, height: 1)
         
         computeEncoder.setComputePipelineState(computeParticleColorsPipelineState)
         computeEncoder.setTexture(colorTexture, index: 0)
@@ -233,20 +223,19 @@ class LiquidMesh: BaseMesh {
         vertexBuffers.enumerated().forEach {
             computeEncoder.setBuffer($1, offset: 0, index: $0 + 1)
         }
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
-        
+        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
         computeEncoder.setTexture(lowResTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setSamplerState(linearSamplerState, index: 0)
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
 
         computeEncoder.setComputePipelineState(computeBlurPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setBuffer(blurRadiusBuffer, offset: 0, index: 0)
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
 
         computeEncoder.setComputePipelineState(computeThresholdPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
@@ -254,7 +243,7 @@ class LiquidMesh: BaseMesh {
         computeEncoder.setTexture(finalTexture, index: 2)
         computeEncoder.setSamplerState(nearestSamplerState, index: 0)
         computeEncoder.setSamplerState(linearSamplerState, index: 1)
-        computeEncoder.dispatchThreadgroups(finalThreadgroups, threadsPerThreadgroup: finalThreadgroupCount)
+        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.endEncoding()
         
