@@ -72,7 +72,6 @@
 		1190952829549010006EE970 /* CommonShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190952729549010006EE970 /* CommonShaders.metal */; };
 		119095292954A22A006EE970 /* MetalRenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952129548AAB006EE970 /* MetalRenderView.swift */; };
 		1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952E2954AE2C006EE970 /* LiquidMesh.swift */; };
-		11909531295571E0006EE970 /* CircleMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11909530295571E0006EE970 /* CircleMesh.swift */; };
 		1190953429574456006EE970 /* TextureRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190953229573D61006EE970 /* TextureRender.metal */; };
 		1193428B29FE3721001707B4 /* SIMD+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1193428A29FE3721001707B4 /* SIMD+Extensions.swift */; };
 		1194330829892CD300AE56CA /* CGRect+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194330729892CD300AE56CA /* CGRect+Colors.swift */; };
@@ -93,9 +92,9 @@
 		1198BA04298D22CB00142DFD /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA03298D22CB00142DFD /* LevelModel.swift */; };
 		1198BA06298D22D200142DFD /* PackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA05298D22D200142DFD /* PackModel.swift */; };
 		1198BA08298D24F200142DFD /* MissleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA07298D24F200142DFD /* MissleModel.swift */; };
+		119B46CD29FFCC8600845D1B /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119B46CC29FFCC8600845D1B /* BufferProvider.swift */; };
 		11A8BE91296D3F8000DE77A3 /* ZPParticleDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */; };
 		11B3216D29645CB0000F4180 /* OffscreenBackground.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11B3216C29645CB0000F4180 /* OffscreenBackground.metal */; };
-		11B3216F29645CDD000F4180 /* BackgroundMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3216E29645CDD000F4180 /* BackgroundMesh.swift */; };
 		11B321712965CCA3000F4180 /* BaseMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B321702965CCA3000F4180 /* BaseMesh.swift */; };
 		11B3FD0D298012330058FFEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0C298012330058FFEB /* Settings.swift */; };
 		11B8210629857832005300DC /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B8210529857832005300DC /* Background.swift */; };
@@ -429,7 +428,6 @@
 		1190952129548AAB006EE970 /* MetalRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderView.swift; sourceTree = "<group>"; };
 		1190952729549010006EE970 /* CommonShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CommonShaders.metal; sourceTree = "<group>"; };
 		1190952E2954AE2C006EE970 /* LiquidMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidMesh.swift; sourceTree = "<group>"; };
-		11909530295571E0006EE970 /* CircleMesh.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleMesh.swift; sourceTree = "<group>"; };
 		1190953229573D61006EE970 /* TextureRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureRender.metal; sourceTree = "<group>"; };
 		1193428A29FE3721001707B4 /* SIMD+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMD+Extensions.swift"; sourceTree = "<group>"; };
 		1194330729892CD300AE56CA /* CGRect+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Colors.swift"; sourceTree = "<group>"; };
@@ -447,10 +445,10 @@
 		1198BA03298D22CB00142DFD /* LevelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
 		1198BA05298D22D200142DFD /* PackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackModel.swift; sourceTree = "<group>"; };
 		1198BA07298D24F200142DFD /* MissleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissleModel.swift; sourceTree = "<group>"; };
+		119B46CC29FFCC8600845D1B /* BufferProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
 		11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPParticleDef.mm; sourceTree = "<group>"; };
 		11A8BE92296D3F8800DE77A3 /* ZPParticleDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticleDef.h; sourceTree = "<group>"; };
 		11B3216C29645CB0000F4180 /* OffscreenBackground.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenBackground.metal; sourceTree = "<group>"; };
-		11B3216E29645CDD000F4180 /* BackgroundMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundMesh.swift; sourceTree = "<group>"; };
 		11B321702965CCA3000F4180 /* BaseMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMesh.swift; sourceTree = "<group>"; };
 		11B3FD0A297FBC540058FFEB /* CommonShaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonShaders.h; sourceTree = "<group>"; };
 		11B3FD0C298012330058FFEB /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -887,10 +885,9 @@
 				11FEFF02295DEAA700528A1C /* RenderDataSource.swift */,
 				1190952129548AAB006EE970 /* MetalRenderView.swift */,
 				11B321702965CCA3000F4180 /* BaseMesh.swift */,
-				11B3216E29645CDD000F4180 /* BackgroundMesh.swift */,
 				11BA63552987FC2D008A4B56 /* StarsMesh.swift */,
-				11909530295571E0006EE970 /* CircleMesh.swift */,
 				1190952E2954AE2C006EE970 /* LiquidMesh.swift */,
+				119B46CC29FFCC8600845D1B /* BufferProvider.swift */,
 				11B3FD0B297FBC5A0058FFEB /* Shaders */,
 			);
 			path = Render;
@@ -1550,12 +1547,10 @@
 			files = (
 				11FEFEF829589B1600528A1C /* OffscreenCircles.metal in Sources */,
 				1190952829549010006EE970 /* CommonShaders.metal in Sources */,
-				11B3216F29645CDD000F4180 /* BackgroundMesh.swift in Sources */,
 				11B8210829857B9F005300DC /* ObjectPositionProvider.swift in Sources */,
 				11BA63542987F724008A4B56 /* OffscreenStars.metal in Sources */,
 				11B321712965CCA3000F4180 /* BaseMesh.swift in Sources */,
 				1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */,
-				11909531295571E0006EE970 /* CircleMesh.swift in Sources */,
 				11FCBA9827A5D06B00A25665 /* World.swift in Sources */,
 				11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */,
 				1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */,
@@ -1568,6 +1563,7 @@
 				1193428B29FE3721001707B4 /* SIMD+Extensions.swift in Sources */,
 				1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */,
 				1190953429574456006EE970 /* TextureRender.metal in Sources */,
+				119B46CD29FFCC8600845D1B /* BufferProvider.swift in Sources */,
 				1194D986299A0A4C00B28806 /* Missle.swift in Sources */,
 				11FEFF03295DEAA700528A1C /* RenderDataSource.swift in Sources */,
 				11FEFEFF295DEA7A00528A1C /* Game.swift in Sources */,

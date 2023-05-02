@@ -116,14 +116,13 @@ final class GameViewController: UIViewController {
     @objc
     private func update(displayLink: CADisplayLink) {
         guard let game = game else { return }
-
+        
         game.update(displayLink.duration)
         
         renderView.backgroundDataSource = game.backgroundDataSource
         renderView.objectsDataSource = game.objectsDataSource
         renderView.starsDataSource = game.starsDataSource
         renderView.cameraDataSource = game.cameraDataSource
-        renderView.update()
     }
     
     @objc

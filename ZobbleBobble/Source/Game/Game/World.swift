@@ -81,6 +81,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         self.starCenterPoint = CGPoint(x: 0, y: game.screenSize.height * 0.6)
         
         let def = ZPWorldDef()
+        def.maxCount = int32(Settings.maxParticleCount)
         def.center = .zero
         def.gravityRadius = level.gravityRadius
         def.radius = Float(level.particleRadius)

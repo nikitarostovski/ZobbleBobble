@@ -62,9 +62,6 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
 
 kernel void metaballs(device LiquidUniforms &uniforms [[buffer(0)]],
                       device float2 *positions [[buffer(1)]],
-                      device float2 *velocities [[buffer(2)]],
-                      device uchar4 *color [[buffer(3)]],
-                      device int *pointCount [[buffer(4)]],
                       texture2d<float, access::read> input [[texture(0)]],
                       texture2d<float, access::write> output [[texture(1)]],
                       uint2 gid [[thread_position_in_grid]])

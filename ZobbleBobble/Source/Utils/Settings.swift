@@ -16,7 +16,7 @@ final class Settings {
 //    static let physicsScale: CGFloat = 0.1
 //    static let worldWidth: CGFloat = 100
     
-    static let resolutionDownscale: CGFloat = 2
+    static let resolutionDownscale: CGFloat = 4
     
     static let liquidMetaballsDownscale: Float = 0.7
     
@@ -48,4 +48,8 @@ final class Settings {
     
     static let shotAnimationDuration: Double = 0.25
     static let shotAnimationEasing: Curve = .sine
+    
+    static let inflightBufferCount = 3
+    static let maxParticleCount = 10000
+    static let maxMaterialCount = 50
 }

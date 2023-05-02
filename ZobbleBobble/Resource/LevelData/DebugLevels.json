@@ -13,26 +13,58 @@
                             "type": "polygon",
                             "points": [
                                 {
-                                    "x": -30,
-                                    "y": -30
+                                    "x": -20,
+                                    "y": -20
                                 },
                                 {
-                                    "x": 30,
-                                    "y": -30
+                                    "x": 20,
+                                    "y": -20
                                 },
                                 {
-                                    "x": 30,
-                                    "y": 30
+                                    "x": 20,
+                                    "y": 20
                                 },
                                 {
-                                    "x": -30,
-                                    "y": 30
+                                    "x": -20,
+                                    "y": 20
                                 }
                             ]
                         }
                     }
                 ],
                 "missles": [
+                    {
+                        "material": "lavaRed",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 10
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
                     {
                         "material": "lavaRed",
                         "startImpulse": 5000000,
