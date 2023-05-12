@@ -1,11 +1,11 @@
 [
     {
         "radius": 230,
+        "particleRadius": 2,
         "levels": [
             {
                 "rotationPerSecond": 120,
                 "gravityRadius": 180,
-                "particleRadius": 2.0,
                 "initialChunks": [
                     {
                         "material": "coreLight",
@@ -38,7 +38,7 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 20
                         },
                     },
                     {
@@ -54,7 +54,39 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "water",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "bomb",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
                         },
                     },
                     {
@@ -70,7 +102,7 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 20
                         },
                     },
                     {
@@ -86,7 +118,23 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaYellow",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "lavaRed",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
                         },
                     }
                 ]
@@ -94,7 +142,6 @@
             {
                 "rotationPerSecond": 120,
                 "gravityRadius": 180,
-                "particleRadius": 2.5,
                 "initialChunks": [
                     {
                         "material": "coreLight",
@@ -122,7 +169,22 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 5
+                            "radius": 15
+                        },
+                    },{
+                        "material": "water",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
+                        },
+                    },
+                    {
+                        "material": "bomb",
+                        "startImpulse": 5000000,
+                        "shape": {
+                            "type": "circle",
+                            "radius": 20
                         },
                     },
                     {
@@ -130,7 +192,7 @@
                         "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
-                            "radius": 10
+                            "radius": 30
                         },
                     }
                 ]
@@ -138,7 +200,6 @@
             {
                 "rotationPerSecond": 120,
                 "gravityRadius": 180,
-                "particleRadius": 2.5,
                 "initialChunks": [
                     {
                         "material": "coreLight",

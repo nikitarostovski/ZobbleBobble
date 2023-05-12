@@ -113,6 +113,8 @@ typedef float float32;
 @property CGPoint center;
 @property CGFloat gravityRadius;
 
+@property CGFloat rotationStep;
+
 - (id)init;
 
 @end

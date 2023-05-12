@@ -9,26 +9,23 @@
 #include "CommonShaders.h"
 using namespace metal;
 
-void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, float2 center, float radius) {
-    for (int y = floor(center.y - radius); y < ceil(center.y + radius); y++) {
-        for (int x = floor(center.x - radius); x < ceil(center.x + radius); x++) {
+void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, texture2d<float, access::write> colorOutput, float2 center, float radius, float3 color) {
+    for (int y = floor(center.y - 2 * radius); y < ceil(center.y + 2 * radius); y++) {
+        for (int x = floor(center.x - 2 * radius); x < ceil(center.x + 2 * radius); x++) {
             uint2 coords = uint2(x, y);
             float dist = distance(float2(x, y), center);
             
-            
-            float alpha = smoothstep(0, 1, radius / dist);
-            float4 color = float4(1, 1, 1, alpha);
-//            float4 color;
-//            if (dist == 0) {
-//                color = float4(1);
-//            } else {
-//                float alpha = radius / dist;
-//                color = float4(1, 1, 1, alpha);
-//            }
+//            float alpha = smoothstep(0, 1, 1 - dist / radius);
+            float alpha = 1 - dist / radius / 2;
             
             float4 oldColor = input.read(coords);
-            color += oldColor;
-            output.write(color, coords);
+            float4 alphaColor = float4(alpha + oldColor.r,
+                                       alpha + oldColor.g,
+                                       alpha + oldColor.b,
+                                       0);
+            
+            output.write(alphaColor, coords);
+            colorOutput.write(float4(color.r, color.g, color.b, 1), coords);
         }
     }
 }

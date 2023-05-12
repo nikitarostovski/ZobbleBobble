@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum MaterialType: String, Codable {
+public enum MaterialType: String, Codable, CaseIterable {
     case lavaRed
     case lavaYellow
     case bomb
@@ -28,17 +28,17 @@ public enum MaterialType: String, Codable {
     public var color: SIMD4<UInt8> {
         switch self {
         case .lavaRed:
-            return SIMD4<UInt8>(255, 96, 64, 255)
+            return SIMD4<UInt8>(255, 96, 64, 0)
         case .lavaYellow:
-            return SIMD4<UInt8>(220, 185, 10, 255)
+            return SIMD4<UInt8>(220, 185, 10, 1)
         case .bomb:
-            return SIMD4<UInt8>(100, 200, 170, 255)
+            return SIMD4<UInt8>(100, 200, 170, 2)
         case .coreLight:
-            return SIMD4<UInt8>(200, 200, 200, 255)
+            return SIMD4<UInt8>(200, 200, 200, 3)
         case .coreDark:
-            return SIMD4<UInt8>(100, 100, 100, 255)
+            return SIMD4<UInt8>(100, 100, 100, 4)
         case .water:
-            return SIMD4<UInt8>(64, 128, 255, 255)
+            return SIMD4<UInt8>(64, 128, 255, 5)
         }
     }
     
@@ -58,7 +58,7 @@ public enum MaterialType: String, Codable {
         case .water:
             return -1
         default:
-            return 2
+            return 50
         }
     }
     
@@ -77,7 +77,7 @@ public enum MaterialType: String, Codable {
         var flags = UInt32(0)
         switch self {
         case .lavaRed, .lavaYellow, .coreLight, .coreDark:
-            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle | Self.b2_powderParticle | Self.b2_colorMixingParticle
+            flags |= Self.b2_viscousParticle | Self.b2_tensileParticle// | Self.b2_colorMixingParticle
         case .bomb:
             flags |= Self.b2_waterParticle
         case .water:

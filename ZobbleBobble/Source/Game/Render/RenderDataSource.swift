@@ -11,7 +11,6 @@ protocol CameraRenderDataSource: AnyObject {
     var cameraX: Float { get }
     var cameraY: Float { get }
     var cameraScale: Float { get }
-    var cameraAngle: Float { get }
 }
 
 protocol BackgroundRenderDataSource: AnyObject {
@@ -46,9 +45,4 @@ protocol ObjectRenderDataSource: AnyObject {
     var staticLiquidPositions: UnsafeMutableRawPointer? { get }
     var staticLiquidVelocities: UnsafeMutableRawPointer? { get }
     var staticLiquidColors: UnsafeMutableRawPointer? { get }
-    
-    var circleBodyCount: Int? { get }
-    var circleBodiesPositions: UnsafeMutableRawPointer? { get }
-    var circleBodiesColors: UnsafeMutableRawPointer? { get }
-    var circleBodiesRadii: UnsafeMutableRawPointer? { get }
 }

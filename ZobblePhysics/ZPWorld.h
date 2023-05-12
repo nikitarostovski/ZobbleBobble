@@ -15,11 +15,6 @@
 @property (nonatomic) void *world;
 @property (nonatomic) void *particleSystem;
 
-@property (nonatomic) void *circleBodiesPositions;
-@property (nonatomic) void *circleBodiesRadii;
-@property (nonatomic) void *circleBodiesColors;
-@property (nonatomic) int circleBodyCount;
-
 @property void *liquidPositions;
 @property void *liquidColors;
 @property void *liquidVelocities;
@@ -27,7 +22,10 @@
 
 
 - (id)initWithWorldDef:(ZPWorldDef *)def;
-- (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations;
+- (void)worldStep:(CFTimeInterval)timeStep
+VelocityIterations:(int)velocityIterations
+PositionIterations:(int)positionIterations
+ParticleIterations:(int)particleIterations;
 
 
 /// Adds a particle with given parameters

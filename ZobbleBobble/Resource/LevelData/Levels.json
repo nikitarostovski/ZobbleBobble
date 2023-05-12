@@ -1,11 +1,11 @@
 [
     {
         "radius": 230,
+        "particleRadius": 2.5,
         "levels": [
             {
                 "rotationPerSecond": 120,
                 "gravityRadius": 180,
-                "particleRadius": 2.5,
                 "initialChunks": [
                     {
                         "material": "coreLight",
@@ -49,7 +49,6 @@
             {
                 "rotationPerSecond": 120,
                 "gravityRadius": 180,
-                "particleRadius": 2.5,
                 "initialChunks": [
                     {
                         "material": "coreLight",
@@ -93,7 +92,6 @@
             {
                 "rotationPerSecond": 30,
                 "gravityRadius": 180,
-                "particleRadius": 2.5,
                 "initialChunks": [
                     {
                         "material": "coreDark",

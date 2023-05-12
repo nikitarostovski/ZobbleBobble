@@ -16,9 +16,12 @@ final class Settings {
 //    static let physicsScale: CGFloat = 0.1
 //    static let worldWidth: CGFloat = 100
     
-    static let resolutionDownscale: CGFloat = 4
+    static let resolutionDownscale: CGFloat = 1
     
-    static let liquidMetaballsDownscale: Float = 0.7
+    static let liquidMetaballsDownscale: Float = 0.5
+    static let liquidMetaballsBlurKernelSize: Int = 2
+    
+    static let liquidFadeMultiplier: Float = 0.3
     
     static let levelCenterOffset: CGFloat = 50
     
@@ -52,4 +55,8 @@ final class Settings {
     static let inflightBufferCount = 3
     static let maxParticleCount = 10000
     static let maxMaterialCount = 50
+    
+    static let physicsVelocityIterations = 8
+    static let physicsPositionIterations = 3
+    static let physicsParticleIterations = 1
 }

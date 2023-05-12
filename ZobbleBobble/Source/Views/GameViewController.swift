@@ -26,6 +26,7 @@ final class GameViewController: UIViewController {
     
     lazy var renderView: MetalRenderView = {
         let view = MetalRenderView(screenSize: screenSize, renderSize: renderSize)
+        view.renderDelegate = self
         view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -96,9 +97,6 @@ final class GameViewController: UIViewController {
 //            NSLayoutConstraint(item: controlsBar, attribute: .trailing, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .trailing, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: controlsBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 100)
         ])
-        
-        let displayLink = CADisplayLink(target: self, selector: #selector(update(displayLink:)))
-        displayLink.add(to: .main, forMode: .common)
     }
     
     override func viewDidLayoutSubviews() {
@@ -114,24 +112,24 @@ final class GameViewController: UIViewController {
     }
     
     @objc
-    private func update(displayLink: CADisplayLink) {
-        guard let game = game else { return }
-        
-        game.update(displayLink.duration)
-        
-        renderView.backgroundDataSource = game.backgroundDataSource
-        renderView.objectsDataSource = game.objectsDataSource
-        renderView.starsDataSource = game.starsDataSource
-        renderView.cameraDataSource = game.cameraDataSource
-    }
-    
-    @objc
     private func onTap(gr: UIGestureRecognizer) {
         var position = gr.location(in: renderView)
         
         position.x = position.x - renderView.frame.width / 2
         position.y = position.y - renderView.frame.height / 2
         game?.onTap(at: position)
+    }
+}
+
+extension GameViewController: RenderViewDelegate {
+    func updateRenderData() {
+        guard let game = game else { return }
+        game.update(1.0 / 60.0)
+        
+        renderView.backgroundDataSource = game.backgroundDataSource
+        renderView.objectsDataSource = game.objectsDataSource
+        renderView.starsDataSource = game.starsDataSource
+        renderView.cameraDataSource = game.cameraDataSource
     }
 }
 
@@ -143,6 +141,7 @@ extension GameViewController: GameDelegate {
         default:
             controlsBar.isHidden = true
         }
+        renderView.renderer?.uniqueMaterials = game.visibleMaterials
     }
 }
 

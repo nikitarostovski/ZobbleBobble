@@ -29,5 +29,8 @@ public:
     bool isDestroying = false;
     CGFloat explosionRadius;
     bool becomesLiquidOnContact;
+    bool becomesStaticOnFreeze;
     CGFloat shootImpulse;
+    
+    bool hasContactWithCore = false;
 };

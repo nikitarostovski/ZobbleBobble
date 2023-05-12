@@ -11,17 +11,21 @@ public struct PackModel: Codable {
     public let radius: CGFloat
     public let levels: [LevelModel]
     
+    public let particleRadius: CGFloat
     public let missleCount: Int
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
+        let particleRadius = try container.decode(CGFloat.self, forKey: .particleRadius)
         var levels = try container.decode([LevelModel].self, forKey: .levels)
         self.radius = try container.decode(CGFloat.self, forKey: .radius)
+        self.particleRadius = particleRadius
         
         var misslesTotal = 0
         for i in 0..<levels.count {
             levels[i].misslesBefore = misslesTotal
+            levels[i].particleRadius = particleRadius
             misslesTotal += levels[i].missles.count
         }
         

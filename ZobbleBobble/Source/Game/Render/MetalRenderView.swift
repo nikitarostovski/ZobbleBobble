@@ -7,51 +7,41 @@
 
 import UIKit
 import MetalKit
+import ZobbleCore
+
+protocol RenderViewDelegate: AnyObject {
+    func updateRenderData()
+}
 
 final class MetalRenderView: MTKView {
-    var renderer: Renderer!
-    
-    var starsMesh: StarsMesh? {
-        get { renderer.starsMesh }
-        set { renderer.starsMesh = newValue }
+    var renderDelegate: RenderViewDelegate? {
+        get { renderer?.renderDelegate }
+        set { renderer?.renderDelegate = newValue }
     }
-    var liquidMesh: LiquidMesh? {
-        get { renderer.liquidMesh }
-        set { renderer.liquidMesh = newValue }
-    }
-    var missleMesh: LiquidMesh? {
-        get { renderer.missleMesh }
-        set { renderer.missleMesh = newValue }
-    }
+    var renderer: Renderer?
     
     var objectsDataSource: ObjectRenderDataSource? {
-        get { renderer.objectsDataSource }
-        set { renderer.objectsDataSource = newValue }
+        get { renderer?.objectsDataSource }
+        set { renderer?.objectsDataSource = newValue }
     }
     var cameraDataSource: CameraRenderDataSource? {
-        get { renderer.cameraDataSource }
-        set { renderer.cameraDataSource = newValue }
+        get { renderer?.cameraDataSource }
+        set { renderer?.cameraDataSource = newValue }
     }
     var backgroundDataSource: BackgroundRenderDataSource? {
-        get { renderer.backgroundDataSource }
-        set { renderer.backgroundDataSource = newValue }
+        get { renderer?.backgroundDataSource }
+        set { renderer?.backgroundDataSource = newValue }
     }
     var starsDataSource: StarsRenderDataSource? {
-        get { renderer.starsDataSource }
-        set { renderer.starsDataSource = newValue }
+        get { renderer?.starsDataSource }
+        set { renderer?.starsDataSource = newValue }
     }
     
     init(screenSize: CGSize, renderSize: CGSize) {
         let device = MTLCreateSystemDefaultDevice()!
         super.init(frame: .zero, device: device)
-        self.renderer = Renderer(device: device, view: self, renderSize: renderSize)
         
-        self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
-        self.missleMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
-        self.starsMesh = StarsMesh(device, screenSize: screenSize, renderSize: renderSize)
-        
-        self.delegate = renderer
-        
+        self.renderer = Renderer(device: device, view: self, renderSize: renderSize, screenSize: screenSize)
     }
     
     required init(coder: NSCoder) {
@@ -60,36 +50,57 @@ final class MetalRenderView: MTKView {
 }
 
 class Renderer: NSObject, MTKViewDelegate {
+    weak var renderDelegate: RenderViewDelegate?
+    
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
     var view: MTKView
     private var drawableRenderPipelineState: MTLRenderPipelineState!
     
-    private var screenSizeBuffer: MTLBuffer?
+    var uniqueMaterials: [SIMD4<UInt8>] = [] {
+        didSet {
+            resetTextures()
+        }
+    }
+    
+    private var textureCountBufferProvider: BufferProvider
     private var vertexBuffer: MTLBuffer?
     private var upscaleSamplerState: MTLSamplerState?
     private var vertexCount: Int = 0
     
     private let renderSize: CGSize
+    private let screenSize: CGSize
     
     var starsMesh: StarsMesh?
     var liquidMesh: LiquidMesh?
-    var missleMesh: LiquidMesh?
     
     weak var objectsDataSource: ObjectRenderDataSource?
     weak var cameraDataSource: CameraRenderDataSource?
     weak var backgroundDataSource: BackgroundRenderDataSource?
     weak var starsDataSource: StarsRenderDataSource?
     
-    init(device: MTLDevice, view: MTKView, renderSize: CGSize) {
+    init(device: MTLDevice, view: MTKView, renderSize: CGSize, screenSize: CGSize) {
+        self.screenSize = screenSize
         self.renderSize = renderSize
         self.device = device
         self.commandQueue = device.makeCommandQueue()!
         self.view = view
+        self.textureCountBufferProvider = BufferProvider(device: device,
+                                                         inflightBuffersCount: Settings.inflightBufferCount,
+                                                         bufferSize: MemoryLayout<Int>.stride)
         super.init()
         view.device = device
         view.delegate = self
+
+        self.starsMesh = StarsMesh(device, screenSize: screenSize, renderSize: renderSize)
+        self.liquidMesh = LiquidMesh(device, screenSize: screenSize, renderSize: renderSize)
+        
+        resetTextures()
         makePipeline()
+    }
+    
+    private func resetTextures() {
+        liquidMesh?.uniqueMaterials = uniqueMaterials
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
@@ -124,53 +135,41 @@ class Renderer: NSObject, MTKViewDelegate {
             options: .storageModeShared)!
         vertexCount = vertices.count
         
-        var size: SIMD2<Float> = SIMD2<Float>(Float(renderSize.width), Float(renderSize.height))
-        self.screenSizeBuffer = device.makeBuffer(bytes: &size, length: MemoryLayout<SIMD2<Float>>.stride)
-        
         let s = MTLSamplerDescriptor()
-//        s.magFilter = .linear
+        s.magFilter = .nearest
+        s.minFilter = .nearest
         self.upscaleSamplerState = device.makeSamplerState(descriptor: s)
     }
     
     func draw(in view: MTKView) {
+        renderDelegate?.updateRenderData()
         self.view = view
         
         guard let commandBuffer = commandQueue.makeCommandBuffer(),
-              let vertexBuffer = vertexBuffer,
-              let upscaleSamplerState = upscaleSamplerState,
               let objectsDataSource = objectsDataSource,
               let cameraDataSource = cameraDataSource,
-              let starsDataSource = starsDataSource
-        else {
+              let starsDataSource = starsDataSource else {
             return
         }
         
         let camera = SIMD2<Float32>(cameraDataSource.cameraX, cameraDataSource.cameraY)
         let cameraScale = cameraDataSource.cameraScale
-        let coreAngle = cameraDataSource.cameraAngle
         
-        let liquidTexture = liquidMesh?.render(commandBuffer: commandBuffer,
-                                               vertexCount: objectsDataSource.liquidCount,
-                                               fadeMultiplier: objectsDataSource.liquidFadeModifier,
-                                               vertices: objectsDataSource.liquidPositions,
-                                               velocities: objectsDataSource.liquidVelocities,
-                                               colors: objectsDataSource.liquidColors,
-                                               particleRadius: objectsDataSource.particleRadius,
-                                               cameraAngle: coreAngle,
-                                               cameraScale: cameraScale,
-                                               camera: camera)
+        let liquidTextures = liquidMesh?.render(commandBuffer: commandBuffer,
+                                                vertexCount: objectsDataSource.liquidCount,
+                                                staticVertexCount: objectsDataSource.staticLiquidCount,
+                                                fadeMultiplier: objectsDataSource.liquidFadeModifier,
+                                                vertices: objectsDataSource.liquidPositions,
+                                                staticVertices: objectsDataSource.staticLiquidPositions,
+                                                velocities: objectsDataSource.liquidVelocities,
+                                                staticVelocities: objectsDataSource.staticLiquidVelocities,
+                                                colors: objectsDataSource.liquidColors,
+                                                staticColors: objectsDataSource.staticLiquidColors,
+                                                particleRadius: objectsDataSource.particleRadius,
+                                                cameraScale: cameraScale,
+                                                camera: camera) ?? []
         
-        let missleTexture = missleMesh?.render(commandBuffer: commandBuffer,
-                                               vertexCount: objectsDataSource.staticLiquidCount,
-                                               fadeMultiplier: 0,
-                                               vertices: objectsDataSource.staticLiquidPositions,
-                                               velocities: objectsDataSource.staticLiquidVelocities,
-                                               colors: objectsDataSource.staticLiquidColors,
-                                               particleRadius: objectsDataSource.particleRadius,
-                                               cameraAngle: 0,
-                                               cameraScale: cameraScale,
-                                               camera: camera)
-        
+//        let starTexture = liquidMesh?.getClearTexture(commandBuffer: commandBuffer)
         let starTexture = starsMesh?.render(commandBuffer: commandBuffer,
                                             position: starsDataSource.starPositions.first,
                                             renderCenter: starsDataSource.starRenderCenters.first,
@@ -183,17 +182,28 @@ class Renderer: NSObject, MTKViewDelegate {
                                             cameraScale: cameraScale,
                                             camera: camera)
         
-        guard let renderPassDescriptor = view.currentRenderPassDescriptor,
+        let allTextures = [starTexture].compactMap { $0 } + liquidTextures
+        var textureCount = allTextures.count
+        
+        _ = textureCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let textureCountBuffer = textureCountBufferProvider.nextUniformsBuffer(data: &textureCount, length: MemoryLayout<Int>.stride)
+        
+        commandBuffer.addCompletedHandler { _ in
+            self.textureCountBufferProvider.avaliableResourcesSemaphore.signal()
+        }
+        
+        guard !allTextures.isEmpty,
+              let vertexBuffer = vertexBuffer,
+              let upscaleSamplerState = upscaleSamplerState,
+              let renderPassDescriptor = view.currentRenderPassDescriptor,
               let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else { return }
         
         renderEncoder.setRenderPipelineState(drawableRenderPipelineState)
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
         
-        renderEncoder.setFragmentTexture(liquidTexture, index: 0)
-        renderEncoder.setFragmentTexture(missleTexture, index: 1)
-        renderEncoder.setFragmentTexture(starTexture, index: 2)
-        renderEncoder.setFragmentBuffer(screenSizeBuffer, offset: 0, index: 0)
+        renderEncoder.setFragmentTextures(allTextures, range: 0..<textureCount)
+        renderEncoder.setFragmentBuffer(textureCountBuffer, offset: 0, index: 0)
         renderEncoder.setFragmentSamplerState(upscaleSamplerState, index: 0)
         
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount)

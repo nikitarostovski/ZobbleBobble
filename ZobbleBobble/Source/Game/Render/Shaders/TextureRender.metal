@@ -14,6 +14,22 @@ struct TexturePipelineRasterizerData {
 
 using namespace metal;
 
+float3 rgb2hsv(float3 c) {
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = mix(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));
+    float4 q = mix(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float3 hsv2rgb(float3 c) {
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    float3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 vertex TexturePipelineRasterizerData vertex_render(device float4 const* positions [[buffer(0)]],
                                                    constant float *angle [[buffer(1)]],
                                                    uint vertexID [[vertex_id]]) {
@@ -26,20 +42,34 @@ vertex TexturePipelineRasterizerData vertex_render(device float4 const* position
 }
 
 fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
-                                texture2d<float> texture1 [[texture(0)]],
-                                texture2d<float> texture2 [[texture(1)]],
-                                texture2d<float> texture3 [[texture(2)]],
-                                constant float2 *destSize [[buffer(0)]],
+                                array<texture2d<float, access::sample>, 100> textures [[texture(0)]],
+                                device int const &textureCount [[buffer(0)]],
                                 sampler s [[sampler(0)]]) {
-    float4 c1 = texture1.sample(s, in.texcoord);
-    float4 c2 = texture2.sample(s, in.texcoord);
-    float4 c3 = texture3.sample(s, in.texcoord);
-
-    if (c3.a > 0) {
-        return c3;
-    } else if (c2.a > 0) {
-        return c2;
+    
+    // max-alpha
+    float4 maxAlphaColor = float4(-1);
+    for (int i = 0; i < textureCount; i++) {
+        float4 col = textures[i].sample(s, in.texcoord);
+        if (col.a > maxAlphaColor.a) {
+            maxAlphaColor = col;
+        }
+    }
+    return maxAlphaColor;
+    
+    
+    // multiply by alpha:
+    float3 result = float3(0);
+    for (int i = 0; i < textureCount; i++) {
+        float4 col = textures[i].sample(s, in.texcoord);
+//        float3 hsvCol = rgb2hsv(col.rgb);
+//        result += hsvCol * col.a;
+        result += col.rgb * col.a;
+    }
+    if (result.r + result.g + result.b == 0) {
+        return float4(0.1, 0.0, 0.1, 1.0);
     } else {
-        return c1;
+//        float3 rgbColor = hsv2rgb(result);
+//        return float4(rgbColor, 1);
+        return float4(result, 1);
     }
 }

@@ -37,6 +37,8 @@
     self.destroyByAge = true;
     self.lifetimeGranularity = 1.0f / 60.0f;
     
+    self.rotationStep = 0;
+    
     return self;
 }
 

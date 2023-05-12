@@ -19,7 +19,7 @@
 
 using namespace metal;
 
-void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, float2 center, float radius);
+void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, texture2d<float, access::write> colorOutput, float2 center, float radius, float3 color);
 void drawCircle(texture2d<float, access::write> output, float2 center, float radius, float4 color);
 
 #endif /* CommonShaders_h */

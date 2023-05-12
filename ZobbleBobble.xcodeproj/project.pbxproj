@@ -69,6 +69,7 @@
 		1160EF552928E14400AFD08C /* ZPWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF68B2927C32B001EA051 /* ZPWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF592928E83900AFD08C /* ZPBody.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1160EF582928E83900AFD08C /* ZPBody.mm */; };
 		1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF5A2928E84100AFD08C /* ZPBody.h */; };
+		11720C692A0AA5EF00397C0F /* LiquidInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11720C682A0AA5EF00397C0F /* LiquidInstance.swift */; };
 		1190952829549010006EE970 /* CommonShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1190952729549010006EE970 /* CommonShaders.metal */; };
 		119095292954A22A006EE970 /* MetalRenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952129548AAB006EE970 /* MetalRenderView.swift */; };
 		1190952F2954AE2C006EE970 /* LiquidMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190952E2954AE2C006EE970 /* LiquidMesh.swift */; };
@@ -425,6 +426,7 @@
 		1160EF582928E83900AFD08C /* ZPBody.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPBody.mm; sourceTree = "<group>"; };
 		1160EF5A2928E84100AFD08C /* ZPBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPBody.h; sourceTree = "<group>"; };
 		1160EF77292B8A5600AFD08C /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		11720C682A0AA5EF00397C0F /* LiquidInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidInstance.swift; sourceTree = "<group>"; };
 		1190952129548AAB006EE970 /* MetalRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderView.swift; sourceTree = "<group>"; };
 		1190952729549010006EE970 /* CommonShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CommonShaders.metal; sourceTree = "<group>"; };
 		1190952E2954AE2C006EE970 /* LiquidMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidMesh.swift; sourceTree = "<group>"; };
@@ -887,6 +889,7 @@
 				11B321702965CCA3000F4180 /* BaseMesh.swift */,
 				11BA63552987FC2D008A4B56 /* StarsMesh.swift */,
 				1190952E2954AE2C006EE970 /* LiquidMesh.swift */,
+				11720C682A0AA5EF00397C0F /* LiquidInstance.swift */,
 				119B46CC29FFCC8600845D1B /* BufferProvider.swift */,
 				11B3FD0B297FBC5A0058FFEB /* Shaders */,
 			);
@@ -1571,6 +1574,7 @@
 				11B3FD0D298012330058FFEB /* Settings.swift in Sources */,
 				1195528C2961D162000C7A95 /* Easing.swift in Sources */,
 				11BA63562987FC2D008A4B56 /* StarsMesh.swift in Sources */,
+				11720C692A0AA5EF00397C0F /* LiquidInstance.swift in Sources */,
 				11CB837129C075DC0042B2F4 /* Star.swift in Sources */,
 				11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */,
 			);

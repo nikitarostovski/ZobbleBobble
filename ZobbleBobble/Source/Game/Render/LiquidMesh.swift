@@ -6,13 +6,14 @@
 //
 
 import MetalKit
+import ZobbleCore
+
 
 class LiquidMesh: BaseMesh {
     struct Uniforms {
         let particleRadius: Float32
         let downScale: Float32
         let cameraScale: Float32
-        let cameraAngle: Float32
         let camera: SIMD2<Float32>
     }
     
@@ -23,18 +24,24 @@ class LiquidMesh: BaseMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "fade_out")!)
     }()
     
-    private lazy var computeMetaballsPipelineState: MTLComputePipelineState? = {
+    private lazy var metaballsPipelineState: MTLRenderPipelineState? = {
         guard let device = device, let library = device.makeDefaultLibrary() else {
             fatalError("Unable to create default Metal library")
         }
-        return try? device.makeComputePipelineState(function: library.makeFunction(name: "metaballs")!)
-    }()
-    
-    private lazy var computeParticleColorsPipelineState: MTLComputePipelineState? = {
-        guard let device = device, let library = device.makeDefaultLibrary() else {
-            fatalError("Unable to create default Metal library")
-        }
-        return try? device.makeComputePipelineState(function: library.makeFunction(name: "fill_particle_colors")!)
+        let renderPipelineDescriptor = MTLRenderPipelineDescriptor()
+        renderPipelineDescriptor.vertexFunction = library.makeFunction(name: "metaballs_vertex")!
+        renderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "metaballs_fragment")!
+        renderPipelineDescriptor.colorAttachments[0].pixelFormat = .r8Unorm
+        renderPipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+        renderPipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
+        renderPipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
+        renderPipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
+        renderPipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
+        renderPipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .one
+        renderPipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .one
+        renderPipelineDescriptor.sampleCount = 1;
+        
+        return try? device.makeRenderPipelineState(descriptor: renderPipelineDescriptor)
     }()
     
     private lazy var computeBlurPipelineState: MTLComputePipelineState? = {
@@ -58,31 +65,44 @@ class LiquidMesh: BaseMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "threshold_filter")!)
     }()
     
+    private lazy var computeAlphaPipelineState: MTLComputePipelineState? = {
+        guard let device = device, let library = device.makeDefaultLibrary() else {
+            fatalError("Unable to create default Metal library")
+        }
+        return try? device.makeComputePipelineState(function: library.makeFunction(name: "crop_alpha_texture")!)
+    }()
+    
     let computePassDescriptor = MTLComputePassDescriptor()
+    
+    var uniqueMaterials: [SIMD4<UInt8>] = [] {
+        didSet {
+            updateInstances()
+        }
+    }
     
     let positionBufferProvider: BufferProvider
     let velocityBufferProvider: BufferProvider
     let colorBufferProvider: BufferProvider
     let uniformsBufferProvider: BufferProvider
-    let countBufferProvider: BufferProvider
     let fadeMultiplierBufferProvider: BufferProvider
+    let pointCountBufferProvider: BufferProvider
     
+    var pointCount = 0
     var blurRadius: Int?
     var fadeMultiplier: Float = 0
     
     let blurRadiusBuffer: MTLBuffer?
+    var mainColorBuffer: MTLBuffer?
     
     var nearestSamplerState: MTLSamplerState?
     var linearSamplerState: MTLSamplerState?
     
-    var lowResTexture: MTLTexture?
-    var colorTexture: MTLTexture?
-    var finalTexture: MTLTexture?
+    private(set) var instances = [LiquidInstance]()
     
     private let screenSize: CGSize
     private let renderSize: CGSize
     
-    init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
+    init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.positionBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.inflightBufferCount,
                                                      bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.maxParticleCount)
@@ -95,51 +115,25 @@ class LiquidMesh: BaseMesh {
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
-        self.countBufferProvider = BufferProvider(device: device,
-                                                  inflightBuffersCount: Settings.inflightBufferCount,
-                                                  bufferSize: MemoryLayout<Int32>.stride)
         self.fadeMultiplierBufferProvider = BufferProvider(device: device,
                                                            inflightBuffersCount: Settings.inflightBufferCount,
                                                            bufferSize: MemoryLayout<Float32>.stride)
+        self.pointCountBufferProvider = BufferProvider(device: device,
+                                                       inflightBuffersCount: Settings.inflightBufferCount,
+                                                       bufferSize: MemoryLayout<Int>.stride)
         self.screenSize = screenSize
         self.renderSize = renderSize
         
-        
-        let blurRadius: Int = 1//Int(min(width, height) / 64)
-//        let blurRadius: Int = Int(1.0 / textureScale)
-        self.blurRadius = blurRadius
+        self.blurRadius = Settings.liquidMetaballsBlurKernelSize
         self.blurRadiusBuffer = device?.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
         
-        super.init()
-        self.device = device
         
         let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
         let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
-        guard width > 0, height > 0 else { return }
+        guard width > 0, height > 0 else { return nil }
         
-        let lowResDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .bgra8Unorm,
-            width: width,
-            height: height,
-            mipmapped: false)
-        lowResDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
-        self.lowResTexture = device?.makeTexture(descriptor: lowResDesc)
-        
-        let colorDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .bgra8Unorm,
-            width: Int(renderSize.width),
-            height: Int(renderSize.height),
-            mipmapped: false)
-        colorDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
-        self.colorTexture = device?.makeTexture(descriptor: colorDesc)
-        
-        let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .bgra8Unorm,
-            width: Int(renderSize.width),
-            height: Int(renderSize.height),
-            mipmapped: false)
-        finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
-        self.finalTexture = device?.makeTexture(descriptor: finalDesc)
+        super.init()
+        self.device = device
         
         let nearestSamplerDescriptor = MTLSamplerDescriptor()
         nearestSamplerDescriptor.magFilter = .nearest
@@ -150,36 +144,58 @@ class LiquidMesh: BaseMesh {
         linearSamplerDescriptor.magFilter = .linear
         linearSamplerDescriptor.minFilter = .linear
         self.linearSamplerState = device?.makeSamplerState(descriptor: linearSamplerDescriptor)
+        
+        updateInstances()
+    }
+    
+    private func updateInstances() {
+        let currentColors = self.instances.map { $0.mainColor }
+        // remove old
+        self.instances = self.instances.compactMap {
+            uniqueMaterials.contains($0.mainColor) ? $0 : nil
+        }
+        // add new
+        self.instances += uniqueMaterials.compactMap {
+            guard !currentColors.contains($0) else { return nil }
+            return LiquidInstance(device, screenSize: screenSize, renderSize: renderSize, mainColor: $0)
+        }
     }
     
     func render(commandBuffer: MTLCommandBuffer,
                 vertexCount: Int?,
+                staticVertexCount: Int?,
                 fadeMultiplier: Float,
                 vertices: UnsafeMutableRawPointer?,
+                staticVertices: UnsafeMutableRawPointer?,
                 velocities: UnsafeMutableRawPointer?,
+                staticVelocities: UnsafeMutableRawPointer?,
                 colors: UnsafeMutableRawPointer?,
+                staticColors: UnsafeMutableRawPointer?,
                 particleRadius: Float32,
-                cameraAngle: Float32,
                 cameraScale: Float32,
-                camera: SIMD2<Float32>) -> MTLTexture? {
+                camera: SIMD2<Float32>) -> [MTLTexture] {
         
-        guard var vertexCount = vertexCount,
-              let vertices = vertices,
+        let vertexCount = vertexCount ?? 0
+        let staticVertexCount = staticVertexCount ?? 0
+        self.pointCount = vertexCount + staticVertexCount
+        
+        guard let vertices = vertices,
               let velocities = velocities,
               let colors = colors,
-              vertexCount > 0
+              let blurRadiusBuffer = blurRadiusBuffer,
+              let nearestSamplerState = nearestSamplerState,
+              let linearSamplerState = linearSamplerState,
+              pointCount > 0
         else {
-            return getClearTexture(commandBuffer: commandBuffer)
+            return []
         }
         
         self.fadeMultiplier = fadeMultiplier
         
         let defaultScale = Float(renderSize.width / screenSize.width)
-        
         var uniforms = Uniforms(particleRadius: particleRadius,
                                 downScale: Settings.liquidMetaballsDownscale,
                                 cameraScale: cameraScale * defaultScale,
-                                cameraAngle: cameraAngle,
                                 camera: camera)
         
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
@@ -187,19 +203,21 @@ class LiquidMesh: BaseMesh {
         
         _ = positionBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let positionBuffer = positionBufferProvider.nextUniformsBuffer(data: vertices,
-                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * vertexCount)
+                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * vertexCount,
+                                                                       data2: staticVertices,
+                                                                       length2: MemoryLayout<SIMD2<Float32>>.stride * staticVertexCount)
         
         _ = velocityBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let velocityBuffer = velocityBufferProvider.nextUniformsBuffer(data: velocities,
-                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * vertexCount)
+                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * vertexCount,
+                                                                       data2: staticVelocities,
+                                                                       length2: MemoryLayout<SIMD2<Float32>>.stride * staticVertexCount)
         
         _ = colorBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let colorBuffer = colorBufferProvider.nextUniformsBuffer(data: colors,
-                                                                 length: MemoryLayout<SIMD4<UInt8>>.stride * vertexCount)
-        
-        _ = countBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let countBuffer = countBufferProvider.nextUniformsBuffer(data: &vertexCount,
-                                                                 length: MemoryLayout<Int32>.stride)
+                                                                 length: MemoryLayout<SIMD4<UInt8>>.stride * vertexCount,
+                                                                 data2: staticColors,
+                                                                 length2: MemoryLayout<SIMD4<UInt8>>.stride * staticVertexCount)
         
         _ = fadeMultiplierBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let fadeMultiplierBuffer = fadeMultiplierBufferProvider.nextUniformsBuffer(data: &self.fadeMultiplier,
@@ -209,70 +227,59 @@ class LiquidMesh: BaseMesh {
             self.positionBufferProvider.avaliableResourcesSemaphore.signal()
             self.velocityBufferProvider.avaliableResourcesSemaphore.signal()
             self.colorBufferProvider.avaliableResourcesSemaphore.signal()
-            self.countBufferProvider.avaliableResourcesSemaphore.signal()
             self.uniformsBufferProvider.avaliableResourcesSemaphore.signal()
             self.fadeMultiplierBufferProvider.avaliableResourcesSemaphore.signal()
+            self.pointCountBufferProvider.avaliableResourcesSemaphore.signal()
         }
         
         guard let initPipelineState = initPipelineState,
-              let computeMetaballsPipelineState = computeMetaballsPipelineState,
+              let metaballsPipelineState = metaballsPipelineState,
               let computeThresholdPipelineState = computeThresholdPipelineState,
               let computeUpscalePipelineState = computeUpscalePipelineState,
-              let computeParticleColorsPipelineState = computeParticleColorsPipelineState,
-              let lowResTexture = lowResTexture,
-              let finalTexture = finalTexture,
-              let colorTexture = colorTexture,
               let computeBlurPipelineState = computeBlurPipelineState,
-              let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
+              let computeAlphaPipelineState = computeAlphaPipelineState
         else {
-            return getClearTexture(commandBuffer: commandBuffer)
+            return []
         }
+        
+        let alphaTextures = instances.compactMap {
+            $0.renderAlphaTexture(commandBuffer: commandBuffer,
+                                  uniformsBuffer: uniformsBuffer,
+                                  positionBuffer: positionBuffer,
+                                  velocityBuffer: velocityBuffer,
+                                  colorBuffer: colorBuffer,
+                                  blurRadiusBuffer: blurRadiusBuffer,
+                                  metaballsPipelineState: metaballsPipelineState,
+                                  computeUpscalePipelineState: computeUpscalePipelineState,
+                                  computeBlurPipelineState: computeBlurPipelineState,
+                                  linearSampler: linearSamplerState,
+                                  pointCount: pointCount)
+        }
+        
+        let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
+        for i in 0..<alphaTextures.count {
+            let texturesA = alphaTextures[i]
+            for j in (i + 1)..<alphaTextures.count {
+                let texturesB = alphaTextures[j]
 
-        computeEncoder.setComputePipelineState(initPipelineState)
-        computeEncoder.setTexture(lowResTexture, index: 0)
-        computeEncoder.setTexture(lowResTexture, index: 1)
-        computeEncoder.setBuffer(fadeMultiplierBuffer, offset: 0, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: initPipelineState, width: lowResTexture.width, height: lowResTexture.height)
-        
-        computeEncoder.setComputePipelineState(computeMetaballsPipelineState)
-        computeEncoder.setTexture(lowResTexture, index: 0)
-        computeEncoder.setTexture(lowResTexture, index: 1)
-        computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(positionBuffer, offset: 0, index: 1)
-        
-        dispatchAuto(encoder: computeEncoder, state: computeMetaballsPipelineState, width: vertexCount, height: 1)
-        
-        computeEncoder.setComputePipelineState(computeParticleColorsPipelineState)
-        computeEncoder.setTexture(colorTexture, index: 0)
-        computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(positionBuffer, offset: 0, index: 1)
-        computeEncoder.setBuffer(velocityBuffer, offset: 0, index: 2)
-        computeEncoder.setBuffer(colorBuffer, offset: 0, index: 3)
-        computeEncoder.setBuffer(countBuffer, offset: 0, index: 4)
-        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
-        
-        computeEncoder.setComputePipelineState(computeUpscalePipelineState)
-        computeEncoder.setTexture(lowResTexture, index: 0)
-        computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setSamplerState(linearSamplerState, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
-
-        computeEncoder.setComputePipelineState(computeBlurPipelineState)
-        computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setBuffer(blurRadiusBuffer, offset: 0, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
-
-        computeEncoder.setComputePipelineState(computeThresholdPipelineState)
-        computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.setTexture(colorTexture, index: 1)
-        computeEncoder.setTexture(finalTexture, index: 2)
-        computeEncoder.setSamplerState(nearestSamplerState, index: 0)
-        computeEncoder.setSamplerState(linearSamplerState, index: 1)
-        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalTexture.width, height: finalTexture.height)
-        
+                computeEncoder.setComputePipelineState(computeAlphaPipelineState)
+                computeEncoder.setTexture(texturesA.0, index: 0)
+                computeEncoder.setTexture(texturesB.0, index: 1)
+                computeEncoder.setTexture(texturesA.1, index: 2)
+                computeEncoder.setTexture(texturesB.1, index: 3)
+                computeEncoder.setSamplerState(linearSamplerState, index: 0)
+                dispatchAuto(encoder: computeEncoder, state: computeAlphaPipelineState, width: texturesA.1.width, height: texturesA.1.height)
+            }
+        }
         computeEncoder.endEncoding()
         
-        return finalTexture
+        return instances.compactMap {
+            $0.renderFinalTexture(commandBuffer: commandBuffer,
+                                  fadeMultiplierBuffer: fadeMultiplierBuffer,
+                                  initPipelineState: initPipelineState,
+                                  computeThresholdPipelineState: computeThresholdPipelineState,
+                                  linearSampler: linearSamplerState,
+                                  nearestSampler: nearestSamplerState)
+        }
     }
 }

@@ -43,6 +43,17 @@ final class Game {
     
     let levelManager: LevelManager
     
+    var visibleMaterials: [SIMD4<UInt8>] {
+        switch state.state {
+        case .level:
+            let level = levelManager.allLevelPacks[state.packIndex].levels[state.levelIndex]
+            let allMaterials = level.chunks.map { $0.material } + level.missles.map { $0.material }
+            return allMaterials.removeDuplicates().map { $0.color }
+        case .menu:
+            return MaterialType.allCases.map { $0.color }
+        }
+    }
+    
     private var background: Background?
     private var world: World?
     private var menu: Menu?

@@ -7,26 +7,25 @@
 
 #include <metal_stdlib>
 #include "CommonShaders.h"
+
+#define VIEWPORT_SIZE 2
+
 using namespace metal;
 
 struct LiquidUniforms {
     float particleRadius;
     float textureDownscale;
     float cameraScale;
-    float cameraAngle;
     float2 camera;
 };
 
+struct MetaballVertexOutput {
+    float4 position [[position]];
+    float3 color;
+    float radius [[point_size]];
+};
+
 float2 convertPosition(float2 pos, float outWidth, float outHeight, LiquidUniforms uniforms, bool shouldDownscale) {
-    float l = length(pos);
-    float2 norm = normalize(pos);
-    float a = atan2(norm.y, norm.x) + uniforms.cameraAngle;
-    float s = sin(a);
-    float c = cos(a);
-    
-    pos.x = l * c;
-    pos.y = l * s;
-    
     pos -= uniforms.camera;
     
     float2 result;
@@ -60,54 +59,83 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
     output.write(oldColor, gid);
 }
 
-kernel void metaballs(device LiquidUniforms &uniforms [[buffer(0)]],
-                      device float2 *positions [[buffer(1)]],
-                      texture2d<float, access::read> input [[texture(0)]],
-                      texture2d<float, access::write> output [[texture(1)]],
-                      uint2 gid [[thread_position_in_grid]])
-{
-    float radius = getRadius(uniforms, true);
-    int i = gid.x;
+kernel void crop_alpha_texture(texture2d<float, access::sample> textureA [[texture(0)]],
+                               texture2d<float, access::sample> textureB [[texture(1)]],
+                               texture2d<float, access::write> outputA [[texture(2)]],
+                               texture2d<float, access::write> outputB [[texture(3)]],
+                               sampler sampler [[sampler(0)]],
+                               uint2 gid [[thread_position_in_grid]]) {
     
-    float2 pos = convertPosition(positions[i], output.get_width(), output.get_height(), uniforms, true);
+    float2 coord = float2(gid);
+    coord.x /= outputA.get_width();
+    coord.y /= outputA.get_height();
     
-    drawMetaball(input, output, pos, radius);
+    float alphaA = textureA.sample(sampler, coord).r;
+    float alphaB = textureB.sample(sampler, coord).r;
+    
+    float newAlphaA = 0;
+    float newAlphaB = 0;
+    
+    if (alphaA > alphaB) {
+        newAlphaA = alphaA;
+        newAlphaB = 0;
+    } else if (alphaA < alphaB) {
+        newAlphaA = 0;
+        newAlphaB = alphaB;
+    } else {
+        newAlphaA = alphaA * 0.5;
+        newAlphaB = alphaB * 0.5;
+    }
+    
+    outputA.write(float4(newAlphaA, 0, 0, 0), gid);
+    outputB.write(float4(newAlphaB, 0, 0, 0), gid);
 }
 
-kernel void fill_particle_colors(device LiquidUniforms &uniforms [[buffer(0)]],
-                                 device float2 *positions [[buffer(1)]],
-                                 device float2 *velocities [[buffer(2)]],
-                                 device uchar4 *color [[buffer(3)]],
-                                 device int *pointCount [[buffer(4)]],
-                                 texture2d<float, access::write> output [[texture(0)]],
-                                 uint2 gid [[thread_position_in_grid]])
-{
-    float radius = getRadius(uniforms, false);
-    float3 resultColor = float3(0);
-    float minDist = MAXFLOAT;
+vertex MetaballVertexOutput metaballs_vertex(device LiquidUniforms const &uniforms [[buffer(0)]],
+                                             device float2 const* positions [[buffer(1)]],
+                                             device float2 const* velocities [[buffer(2)]],
+                                             device uchar4 const* colors [[buffer(3)]],
+                                             device float2 const &textureSize [[buffer(4)]],
+                                             device uchar4 const &mainColor [[buffer(5)]],
+                                             uint vertexID [[vertex_id]]) {
+    MetaballVertexOutput r;
+    uchar4 color = colors[vertexID];
 
-    for (int i = 0; i < *pointCount; i++) {
-        float velocity = length(velocities[i]);
-        float3 col = float4(color[i]).rgb / 255.0;
-        float2 pos = convertPosition(positions[i], output.get_width(), output.get_height(), uniforms, false);
-
-        float dist = distance(float2(gid), pos);
-        bool isInsideCircle = dist <= radius;
-
-        if (dist < minDist || isInsideCircle) {
-            minDist = dist;
-            resultColor = col + (float3(1) * velocity / 300);
-            if (isInsideCircle) {
-                break;
-            }
-        }
+    if (color.a != mainColor.a) {
+        r.radius = -1;
+        r.position = float4(0, 0, 0, -1);
+        return r;
     }
-    output.write(float4(resultColor, 1), gid);
+    
+    
+    float2 pos = convertPosition(positions[vertexID], textureSize.x, textureSize.y, uniforms, true) * VIEWPORT_SIZE / textureSize - VIEWPORT_SIZE / 2;
+    pos.y *= -1;
+    float radius = getRadius(uniforms, true) * VIEWPORT_SIZE;
+    
+//    float velocity = length(velocities[vertexID]);
+//    float3 resultColor = float4(colors[vertexID]).rgb / 255.0 + velocity / 500.0;
+
+    
+    r.position = float4(pos, 0, 1);
+    r.radius = 2 * radius;
+    return r;
+}
+
+fragment float metaballs_fragment(MetaballVertexOutput in [[stage_in]],
+                                   float2 pointCoord [[point_coord]]) {
+
+    if (in.radius < 0 || in.position.w < 0) {
+        discard_fragment();
+    }
+    float dist = length(pointCoord - float2(0.5));
+    float alpha = 1 - smoothstep(0, 1, dist * 2);
+    // TODO: magic number
+    return alpha * 0.18;
 }
 
 kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[texture(0)]],
-                             texture2d<float, access::sample> colorInput [[texture(1)]],
-                             texture2d<float, access::write> output [[texture(2)]],
+                             texture2d<float, access::write> output [[texture(1)]],
+                             device uchar4 const &materialColor[[buffer(0)]],
                              sampler nearestSampler [[sampler(0)]],
                              sampler linearSampler [[sampler(1)]],
                              uint2 gid [[thread_position_in_grid]])
@@ -116,18 +144,25 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
     coord.x /= output.get_width();
     coord.y /= output.get_height();
     
-    float4 oldColor = colorInput.sample(nearestSampler, coord);
+    float4 oldColor = float4(materialColor) / 255.0;
     float alpha = alphaInput.sample(linearSampler, coord).r;
     
-    float4 col1 = float4(oldColor.rgb, 1);
+    float4 col1 = float4(oldColor.rgb * 1.8, 1);
+    float4 col2 = float4(oldColor.rgb, 1);
     
-    float threshold1 = 0.5;
+    // TODO: move to uniforms buffer
+    float threshold1 = 0.3;
+    float threshold2 = 0.6;
     
 //    output.write(oldColor, gid);
 //    return;
 //    output.write(float4(alpha, alpha, alpha, 1), gid);
 //    return;
     
+    if (alpha > threshold2) {
+        output.write(col2, gid);
+        return;
+    }
     if (alpha > threshold1) {
         output.write(col1, gid);
         return;

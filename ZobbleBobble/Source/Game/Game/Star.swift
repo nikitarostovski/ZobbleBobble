@@ -62,7 +62,9 @@ final class Star {
             for (j, m) in l.missles.enumerated() {
                 let number = CGFloat(i) + CGFloat(j) / CGFloat(l.missles.count)
                 let next = number + CGFloat(1) / CGFloat(l.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
-                let material = StarMaterialData(color: m.material.color, position: SIMD2(Float(number), Float(next)))
+                var color = m.material.color
+                color.w = 255;
+                let material = StarMaterialData(color: color, position: SIMD2(Float(number), Float(next)))
                 materials.append(material)
             }
         }

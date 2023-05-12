@@ -58,11 +58,6 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     private(set) var state: MenuState
     private weak var game: Game?
     
-    var circleBodyCount: Int?
-    var circleBodiesPositions: UnsafeMutableRawPointer?
-    var circleBodiesColors: UnsafeMutableRawPointer?
-    var circleBodiesRadii: UnsafeMutableRawPointer?
-    
     var particleRadius: Float = 0
     var liquidFadeModifier: Float = 0
     var liquidCount: Int?
@@ -276,6 +271,11 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     }
     
     private func updatePositionsDataIfNeeded() {
+        let currentStar = stars[game!.state.packIndex]
+        let currentParticleRadius = currentStar.pack.particleRadius
+        
+        particleRadius = Float(currentParticleRadius)
+        
         if game!.screenSize != lastUpdateGameSize {
             lastUpdateGameSize = game!.screenSize
             
@@ -360,7 +360,7 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             for (levelIndex, level) in visibleLevels.enumerated() {
                 let levelNumber = visibleLevelIndices.lowerBound + levelIndex
                 let particleRadius = level.particleRadius
-                for chunk in level.initialChunks {
+                for chunk in level.chunks {
                     let particleCenters = chunk.shape.particleCenters
                     for center in particleCenters {
                         let point = convertPlanetChunkPosition(levelNumber, position: center)
@@ -506,9 +506,5 @@ extension Menu: CameraRenderDataSource {
     
     var cameraScale: Float {
         1
-    }
-    
-    var cameraAngle: Float {
-        0
     }
 }

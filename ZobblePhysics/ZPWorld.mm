@@ -13,32 +13,30 @@
 #import "Constants.h"
 #import "ZPParticle.h"
 #import "ZPParticleDef.h"
-//#import "ZPWorldDef.h"
 
 static NSString *kParticlePositionKey = @"particle_position";
 static NSString *kParticleColorKey = @"particle_color";
 static NSString *kParticleUserDataKey = @"particle_user_data";
 
-//static float kExplosiveDamageRadius = 20.0;
 static float kExplosiveImpulse = 1050000;
-//static float kCometShootImpulse = 1650000;
 
 @implementation ZPWorld {
+    CGFloat _rotationStep;
     CGPoint _gravityCenter;
     CGFloat _gravityRadius;
-    NSMutableArray<ZPBody *> *_bodies;
-    NSMutableArray *_bodiesToAdd;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
+    
+    b2ParticleGroup *_staticGroup;
+    b2ParticleGroup *_dynamicGroup;
 }
 
 - (id)initWithWorldDef:(ZPWorldDef *)def {
     self = [super init];
     
+    _rotationStep = def.rotationStep;
     _gravityRadius = def.gravityRadius;
     _gravityCenter = def.center;
-    _bodies = [NSMutableArray new];
-    _bodiesToAdd = [NSMutableArray new];
     _particleIndicesToDestroy = [NSMutableArray new];
     _particlesToAdd = [NSMutableArray new];
     
@@ -72,14 +70,28 @@ static float kExplosiveImpulse = 1050000;
     particleSystemDef.lifetimeGranularity = def.lifetimeGranularity;
     
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
-//    system->GetStuckCandidates()
     self.particleSystem = system;
+    
+    b2ParticleGroupDef staticGroupDef;
+    staticGroupDef.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup | b2_particleGroupCanBeEmpty;
+    _staticGroup = system->CreateParticleGroup(staticGroupDef);
+    
+    b2ParticleGroupDef dynamicGroupDef;
+    dynamicGroupDef.groupFlags = b2_particleGroupCanBeEmpty;
+    _dynamicGroup = system->CreateParticleGroup(dynamicGroupDef);
+    
     return self;
 }
 
-- (void)worldStep:(CFTimeInterval)timeStep velocityIterations:(int)velocityIterations positionIterations:(int)positionIterations {
+- (void)worldStep:(CFTimeInterval)timeStep
+VelocityIterations:(int)velocityIterations
+PositionIterations:(int)positionIterations
+ParticleIterations:(int)particleIterations {
+    
+    [self rotateCore];
+    
     b2World *_world = (b2World *)self.world;
-    _world->Step(timeStep, velocityIterations, positionIterations, 2);
+    _world->Step(timeStep, velocityIterations, positionIterations, particleIterations);
     
 //    int staticCount = 0;
 //    int dynamicCount = 0;
@@ -92,7 +104,7 @@ static float kExplosiveImpulse = 1050000;
 //            dynamicCount++;
 //        }
 //    }
-//    NSLog(@"Static: %d Dynamic: %d Stuck: %d", staticCount, dynamicCount, _system->GetStuckCandidateCount());
+//    NSLog(@"Total: %d Static: %d(%d) Dynamic: %d(%d) Stuck: %d", _system->GetParticleCount(), staticCount, _staticGroup->GetParticleCount(),  dynamicCount, _dynamicGroup->GetParticleCount(), _system->GetStuckCandidateCount());
     
     [self updateGravity];
     [self processContacts];
@@ -100,6 +112,26 @@ static float kExplosiveImpulse = 1050000;
     [self updateRenderData];
     
     [self createAndRemoveBodies];
+}
+
+- (void)rotateCore {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    b2Vec2 *position = _system->GetPositionBuffer();
+    
+    int count = _staticGroup->GetParticleCount();
+    int offset = _staticGroup->GetBufferIndex();
+    
+    b2Vec2 center = b2Vec2_zero;
+    float angleStep = _rotationStep;
+    
+    for (int i = 0; i < count; i++) {
+        b2Vec2 pos = position[i + offset];
+        float length = b2Distance(pos, center);
+        float angle = atan2(pos.y - center.y, pos.x - center.x);
+        
+        b2Vec2 newPos = b2Vec2(length * cos(angle + angleStep), length * sin(angle + angleStep));
+        position[i + offset] = newPos;
+    }
 }
 
 - (void)updateGravity {
@@ -112,6 +144,7 @@ static float kExplosiveImpulse = 1050000;
     // Liquids
     for (int i = 0; i < particleCount; i++) {
         ZPParticle *userData = (ZPParticle *)ud[i];
+        userData->hasContactWithCore = NO;
         if (userData->gravityScale <= 0) { continue; }
         
         b2Vec2 v = positionBuffer[i];
@@ -148,6 +181,12 @@ static float kExplosiveImpulse = 1050000;
             continue;
         }
         
+        if (userDataA->state == ZPParticleStateDynamic && userDataB->state == ZPParticleStateStatic) {
+            userDataA->hasContactWithCore = YES;
+        } else if (userDataB->state == ZPParticleStateDynamic && userDataA->state == ZPParticleStateStatic) {
+            userDataB->hasContactWithCore = YES;
+        }
+        continue;
         if (userDataA->state == ZPParticleStateDynamic &&
             userDataA->becomesLiquidOnContact &&
             userDataB->state == ZPParticleStateStatic) {
@@ -208,7 +247,7 @@ static float kExplosiveImpulse = 1050000;
         float velocity = velocityBuffer[i].Length();
         
         if (userData->state == ZPParticleStateDynamic &&
-            userData->becomesLiquidOnContact &&
+            userData->hasContactWithCore &&
             velocity < userData->freezeVelocityThreshold) {
             
             [self makeCoreAt:i Force:CGPointMake(0, 0)];
@@ -231,7 +270,7 @@ static float kExplosiveImpulse = 1050000;
         CGRect col = [dict[kParticleColorKey] CGRectValue];
         
         b2ParticleColor color;
-        color.Set(col.origin.x, col.origin.y, col.size.width, 1);
+        color.Set(col.origin.x, col.origin.y, col.size.width, col.size.height);
         
         ZPParticle *userData = new ZPParticle();
         userData->state = def.state;
@@ -258,31 +297,6 @@ static float kExplosiveImpulse = 1050000;
     self.liquidVelocities = _system->GetVelocityBuffer();
     self.liquidColors = _system->GetColorBuffer();
     self.liquidCount = _system->GetParticleCount();
-    
-    int circleBodyCount = (int)_bodies.count;
-    b2Vec2 *circleBodiesPositions = new b2Vec2[circleBodyCount];
-    float32 *circleBodiesRadii = new float32[circleBodyCount];
-    b2ParticleColor *circleBodiesColors = new b2ParticleColor[circleBodyCount];
-    
-    for (int i = 0; i < circleBodyCount; i++) {
-        CGPoint pos = _bodies[i].position;
-        CGRect col = _bodies[i].color;
-        b2ParticleColor color;
-        color.Set(col.origin.x, col.origin.y, col.size.width, 1);
-        
-        circleBodiesPositions[i] = b2Vec2(pos.x, pos.y);
-        circleBodiesColors[i] = color;
-        circleBodiesRadii[i] = _bodies[i].radius;
-    }
-    
-    self.circleBodiesPositions = circleBodiesPositions;
-    self.circleBodiesRadii = circleBodiesRadii;
-    self.circleBodiesColors = circleBodiesColors;
-    self.circleBodyCount = circleBodyCount;
-    
-    delete[] circleBodiesPositions;
-    delete[] circleBodiesColors;
-    delete[] circleBodiesRadii;
 }
 
 - (void)addParticleWithPosition:(CGPoint)position
@@ -326,11 +340,16 @@ static float kExplosiveImpulse = 1050000;
 - (int)createParticleAt:(b2Vec2)position Color:(b2ParticleColor)color UserData:(ZPParticle *)userData {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
-    uint32 resultFlags = userData->currentFlags | b2_staticPressureParticle;
+    uint32 resultFlags = 0;
+    b2ParticleGroup *group = NULL;
     switch (userData->state) {
         case ZPParticleStateStatic:
             resultFlags = b2_wallParticle | b2_barrierParticle;
-        default:
+            group = _staticGroup;
+            break;
+        case ZPParticleStateDynamic:
+            resultFlags = userData->currentFlags | b2_staticPressureParticle;
+            group = _dynamicGroup;
             break;
     }
     
@@ -339,6 +358,7 @@ static float kExplosiveImpulse = 1050000;
     particleDef.position = position;
     particleDef.color = color;
     particleDef.userData = userData;
+    particleDef.group = group;
     return _system->CreateParticle(particleDef);
 }
 
@@ -360,7 +380,7 @@ static float kExplosiveImpulse = 1050000;
 - (void)makeCoreAt:(int)index Force:(CGPoint)force {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
-    
+
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:ZPParticleStateStatic
                                        BecomesLiquidOnContact:userData->becomesLiquidOnContact
                                       FreezeVelocityThreshold:userData->freezeVelocityThreshold
@@ -369,10 +389,10 @@ static float kExplosiveImpulse = 1050000;
                                               ExplosionRadius:userData->explosionRadius
                                                  ShootImpulse:userData->shootImpulse];
     def.initialForce = force;
-    
+
     b2Vec2 pos = _system->GetPositionBuffer()[index];
     b2ParticleColor col = _system->GetColorBuffer()[index];
-    
+
     [self removeParticleAt:index];
     [self addParticleAt:CGPointMake(pos.x, pos.y) Color:CGRectMake(col.r, col.g, col.b, col.a) UserData:def];
 }
