@@ -21,6 +21,7 @@ static NSString *kParticleUserDataKey = @"particle_user_data";
 static float kExplosiveImpulse = 1050000;
 
 @implementation ZPWorld {
+    CGFloat _maxCenterToStaticParticle;
     CGFloat _rotationStep;
     CGPoint _gravityCenter;
     CGFloat _gravityRadius;
@@ -34,6 +35,7 @@ static float kExplosiveImpulse = 1050000;
 - (id)initWithWorldDef:(ZPWorldDef *)def {
     self = [super init];
     
+    _maxCenterToStaticParticle = 0;
     _rotationStep = def.rotationStep;
     _gravityRadius = def.gravityRadius;
     _gravityCenter = def.center;
@@ -89,6 +91,7 @@ PositionIterations:(int)positionIterations
 ParticleIterations:(int)particleIterations {
     
     [self rotateCore];
+    [self rotateDynamicParticles];
     
     b2World *_world = (b2World *)self.world;
     _world->Step(timeStep, velocityIterations, positionIterations, particleIterations);
@@ -130,6 +133,28 @@ ParticleIterations:(int)particleIterations {
         float angle = atan2(pos.y - center.y, pos.x - center.x);
         
         b2Vec2 newPos = b2Vec2(length * cos(angle + angleStep), length * sin(angle + angleStep));
+        position[i + offset] = newPos;
+    }
+}
+
+- (void)rotateDynamicParticles {
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    b2Vec2 *position = _system->GetPositionBuffer();
+    
+    int count = _dynamicGroup->GetParticleCount();
+    int offset = _dynamicGroup->GetBufferIndex();
+    
+    b2Vec2 center = b2Vec2_zero;
+    float angleStep = _rotationStep;
+    
+    for (int i = 0; i < count; i++) {
+        b2Vec2 pos = position[i + offset];
+        float length = b2Distance(pos, center);
+        float angle = atan2(pos.y - center.y, pos.x - center.x);
+        
+        float targetAngle = angle + angleStep * (length > _maxCenterToStaticParticle ? 0 : 1);
+        
+        b2Vec2 newPos = b2Vec2(length * cos(targetAngle), length * sin(targetAngle));
         position[i + offset] = newPos;
     }
 }
@@ -343,14 +368,20 @@ ParticleIterations:(int)particleIterations {
     uint32 resultFlags = 0;
     b2ParticleGroup *group = NULL;
     switch (userData->state) {
-        case ZPParticleStateStatic:
+        case ZPParticleStateStatic: {
             resultFlags = b2_wallParticle | b2_barrierParticle;
             group = _staticGroup;
+            
+            b2Vec2 center = b2Vec2_zero;
+            CGFloat distToCenter = b2Distance(position, center);
+            _maxCenterToStaticParticle = fmax(_maxCenterToStaticParticle, distToCenter);
             break;
-        case ZPParticleStateDynamic:
+        }
+        case ZPParticleStateDynamic: {
             resultFlags = userData->currentFlags | b2_staticPressureParticle;
             group = _dynamicGroup;
             break;
+        }
     }
     
     b2ParticleDef particleDef;
