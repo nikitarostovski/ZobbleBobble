@@ -42,7 +42,7 @@ vertex TexturePipelineRasterizerData vertex_render(device float4 const* position
 }
 
 fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
-                                array<texture2d<float, access::sample>, 100> textures [[texture(0)]],
+                                array<texture2d<float, access::sample>, 96> textures [[texture(0)]],
                                 device int const &textureCount [[buffer(0)]],
                                 sampler s [[sampler(0)]]) {
     
