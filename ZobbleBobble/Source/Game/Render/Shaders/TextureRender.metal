@@ -54,6 +54,9 @@ fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
             maxAlphaColor = col;
         }
     }
+    if (maxAlphaColor.r + maxAlphaColor.g + maxAlphaColor.b == 0) {
+        return float4(0.1, 0.0, 0.1, 1.0);
+    }
     return maxAlphaColor;
     
     

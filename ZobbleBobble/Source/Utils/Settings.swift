@@ -18,8 +18,8 @@ final class Settings {
     
     static let resolutionDownscale: CGFloat = 1
     
-    static let liquidMetaballsDownscale: Float = 0.5
-    static let liquidMetaballsBlurKernelSize: Int = 2
+    static let liquidMetaballsDownscale: Float = 0.35
+    static let liquidMetaballsBlurKernelSize: Int = 1
     
     static let liquidFadeMultiplier: Float = 0.3
     
@@ -58,5 +58,10 @@ final class Settings {
     
     static let physicsVelocityIterations = 8
     static let physicsPositionIterations = 3
-    static let physicsParticleIterations = 1
+    static let physicsParticleIterations = 2
+    
+    static let physicsGravityModifier: CGFloat = 5
+    static let physicsMissleShotImpulseModifier: CGFloat = 100_000
+    
+    static let physicsSpeedThresholdModifier: CGFloat = 35
 }

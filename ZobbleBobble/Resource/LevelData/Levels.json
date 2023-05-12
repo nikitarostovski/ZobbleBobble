@@ -22,7 +22,6 @@
                 "missles": [
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -30,7 +29,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -38,7 +36,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -65,7 +62,6 @@
                 "missles": [
                     {
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -73,7 +69,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -81,7 +76,6 @@
                     },
                     {
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10

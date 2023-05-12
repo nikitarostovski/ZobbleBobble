@@ -32,16 +32,17 @@ final class BufferProvider {
         let buffer = uniformsBuffers[avaliableBufferIndex]
         let bufferPointer = buffer.contents()
 
+        avaliableBufferIndex += 1
+        if avaliableBufferIndex == inflightBuffersCount {
+            avaliableBufferIndex = 0
+        }
+        
+        // TODO: EXC_BAD_ACCESS on high loads
         memcpy(bufferPointer, data, length)
         
         if let data2 = data2, length2 > 0 {
             let start = bufferPointer.advanced(by: length)
             memcpy(start, data2, length2)
-        }
-
-        avaliableBufferIndex += 1
-        if avaliableBufferIndex == inflightBuffersCount {
-            avaliableBufferIndex = 0
         }
 
         return buffer

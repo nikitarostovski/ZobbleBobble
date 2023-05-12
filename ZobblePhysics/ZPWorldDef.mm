@@ -38,6 +38,7 @@
     self.lifetimeGranularity = 1.0f / 60.0f;
     
     self.rotationStep = 0;
+    self.shotImpulseModifier = 1;
     
     return self;
 }

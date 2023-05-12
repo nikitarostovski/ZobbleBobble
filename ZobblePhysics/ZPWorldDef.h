@@ -115,6 +115,8 @@ typedef float float32;
 
 @property CGFloat rotationStep;
 
+@property CGFloat shotImpulseModifier;
+
 - (id)init;
 
 @end

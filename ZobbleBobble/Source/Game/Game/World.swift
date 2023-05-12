@@ -75,6 +75,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         self.starCenterPoint = CGPoint(x: 0, y: game.screenSize.height * 0.6)
         
         let def = ZPWorldDef()
+        def.gravityScale = float32(Settings.physicsGravityModifier);
         def.rotationStep = level.rotationPerSecond.radians / 60.0;
         def.maxCount = int32(Settings.maxParticleCount)
         def.center = .zero
@@ -83,10 +84,6 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         def.destroyByAge = false
         def.ejectionStrength = 8
-        def.dampingStrength = 0
-        def.surfaceTensionNormalStrength = 0
-        def.surfaceTensionPressureStrength = 0
-        def.viscousStrength = 0.5
         
         self.world = ZPWorld(worldDef: def)
         self.state = WorldState(camera: .zero, cameraScale: 1)
@@ -149,7 +146,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         let flags = chunk.material.physicsFlags
         let isStatic = true
         let gravityScale = chunk.material.gravityScale
-        let freezeVelocityThreshold = chunk.material.freezeVelocityThreshold
+        let freezeVelocityThreshold = chunk.material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
         let staticContactBehavior = chunk.material.becomesLiquidOnContact
         
         particleCenters.forEach { [weak self] center in
@@ -219,7 +216,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         let flags = missle.missleModel.material.physicsFlags
         let isStatic = false
         let gravityScale = missle.missleModel.material.gravityScale
-        let freezeVelocityThreshold = missle.missleModel.material.freezeVelocityThreshold
+        let freezeVelocityThreshold = missle.missleModel.material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
         let staticContactBehavior = missle.missleModel.material.becomesLiquidOnContact
         
         missle.positions.forEach { [weak self] center in
@@ -238,7 +235,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
                                     freezeVelocityThreshold: freezeVelocityThreshold,
                                     becomesLiquidOnContact: staticContactBehavior,
                                     explosionRadius: missle.missleModel.material.explosionRadius,
-                                    shootImpulse: missle.missleModel.startImpulse)
+                                    shootImpulse: missle.missleModel.startImpulse * Settings.physicsMissleShotImpulseModifier)
         }
     }
 }

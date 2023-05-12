@@ -21,6 +21,8 @@ static NSString *kParticleUserDataKey = @"particle_user_data";
 static float kExplosiveImpulse = 1050000;
 
 @implementation ZPWorld {
+    CGFloat _shotImpulseModifier;
+    
     CGFloat _maxCenterToStaticParticle;
     CGFloat _rotationStep;
     CGPoint _gravityCenter;
@@ -36,6 +38,7 @@ static float kExplosiveImpulse = 1050000;
     self = [super init];
     
     _maxCenterToStaticParticle = 0;
+    _shotImpulseModifier = def.shotImpulseModifier;
     _rotationStep = def.rotationStep;
     _gravityRadius = def.gravityRadius;
     _gravityCenter = def.center;
@@ -176,7 +179,7 @@ ParticleIterations:(int)particleIterations {
         b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
         
         d.Normalize();
-        float mass = 10;//_system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
+        float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius() * _system->GetGravityScale();
         float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared() * userData->gravityScale;
         _system->ParticleApplyForce(i, d * force);
     }
@@ -339,7 +342,11 @@ ParticleIterations:(int)particleIterations {
     pos.x = (pos.x - _gravityCenter.x) * -1;
     pos.y = (pos.y - _gravityCenter.y) * -1;
     pos.Normalize();
-    b2Vec2 force = pos * shootImpulse;
+
+    
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius() * _system->GetGravityScale();
+    b2Vec2 force = pos * mass * 2 * shootImpulse * _shotImpulseModifier;
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic
                                        BecomesLiquidOnContact:becomesLiquidOnContact

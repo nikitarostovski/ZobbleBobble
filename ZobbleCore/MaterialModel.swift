@@ -57,8 +57,10 @@ public enum MaterialType: String, Codable, CaseIterable {
         switch self {
         case .water:
             return -1
+        case .lavaRed:
+            return 5
         default:
-            return 50
+            return 10
         }
     }
     

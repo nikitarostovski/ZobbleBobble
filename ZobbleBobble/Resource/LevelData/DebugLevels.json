@@ -35,7 +35,6 @@
                 "missles": [
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -43,7 +42,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -51,7 +49,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -59,7 +56,6 @@
                     },
                     {
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -67,7 +63,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -75,7 +70,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -83,7 +77,6 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -91,7 +84,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -99,7 +91,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -107,7 +98,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -115,7 +105,6 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -123,7 +112,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -131,7 +119,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -139,7 +126,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -147,7 +133,6 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -155,7 +140,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -163,7 +147,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -171,7 +154,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -179,7 +161,6 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -187,7 +168,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -195,7 +175,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 40
@@ -203,7 +182,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -211,7 +189,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -219,7 +196,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -227,7 +203,6 @@
                     },
                     {
                         "material": "lavaYellow",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -235,7 +210,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -243,7 +217,6 @@
                     },
                     {
                         "material": "lavaRed",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 60
@@ -270,7 +243,6 @@
                 "missles": [
                     {
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -278,14 +250,12 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 15
                         },
                     },{
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -293,7 +263,6 @@
                     },
                     {
                         "material": "bomb",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 20
@@ -301,7 +270,6 @@
                     },
                     {
                         "material": "water",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 30
@@ -328,7 +296,6 @@
                 "missles": [
                     {
                         "material": "coreLight",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -336,7 +303,6 @@
                     },
                     {
                         "material": "coreDark",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
@@ -344,7 +310,6 @@
                     },
                     {
                         "material": "coreLight",
-                        "startImpulse": 5000000,
                         "shape": {
                             "type": "circle",
                             "radius": 10
