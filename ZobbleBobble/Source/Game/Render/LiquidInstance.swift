@@ -110,14 +110,14 @@ class LiquidInstance: BaseMesh {
             computeEncoder.setTexture(lowResAlphaTexture, index: 0)
             computeEncoder.setTexture(lowResAlphaTexture, index: 1)
             computeEncoder.setBuffer(blurRadiusBuffer, offset: 0, index: 0)
-            dispatchAuto(encoder: computeEncoder, state: computeBlurPipelineState, width: lowResAlphaTexture.width, height: lowResAlphaTexture.height)
+            ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeBlurPipelineState, width: lowResAlphaTexture.width, height: lowResAlphaTexture.height)
         }
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
         computeEncoder.setTexture(lowResAlphaTexture, index: 0)
         computeEncoder.setTexture(finalAlphaCorrectedTexture, index: 1)
         computeEncoder.setSamplerState(linearSampler, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: computeUpscalePipelineState, width: finalAlphaCorrectedTexture.width, height: finalAlphaCorrectedTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeUpscalePipelineState, width: finalAlphaCorrectedTexture.width, height: finalAlphaCorrectedTexture.height)
         
         computeEncoder.endEncoding()
         return (lowResAlphaTexture, finalAlphaCorrectedTexture)
@@ -145,13 +145,13 @@ class LiquidInstance: BaseMesh {
         computeEncoder.setBuffer(mainColorBuffer, offset: 0, index: 0)
         computeEncoder.setSamplerState(nearestSampler, index: 0)
         computeEncoder.setSamplerState(linearSampler, index: 1)
-        dispatchAuto(encoder: computeEncoder, state: computeThresholdPipelineState, width: finalTexture.width, height: finalTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeThresholdPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.setComputePipelineState(initPipelineState)
         computeEncoder.setTexture(lowResAlphaTexture, index: 0)
         computeEncoder.setTexture(lowResAlphaTexture, index: 1)
         computeEncoder.setBuffer(fadeMultiplierBuffer, offset: 0, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: initPipelineState, width: lowResAlphaTexture.width, height: lowResAlphaTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: initPipelineState, width: lowResAlphaTexture.width, height: lowResAlphaTexture.height)
         
         computeEncoder.endEncoding()
         return finalTexture

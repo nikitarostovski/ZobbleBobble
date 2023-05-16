@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import ZobbleCore
+import Levels
 
 final class Missle {
-    var missleModel: MissleModel
+    var missleModel: ChunkModel
     weak var game: Game?
     weak var star: Star?
     
@@ -25,7 +25,7 @@ final class Missle {
     private var idlePositions: [SIMD2<Float32>] = []
     private var readyPositions: [SIMD2<Float32>] = []
     
-    init(missleModel: MissleModel, star: Star, game: Game?) {
+    init(missleModel: ChunkModel, star: Star, game: Game?) {
         self.missleModel = missleModel
         self.game = game
         self.star = star
@@ -46,10 +46,10 @@ final class Missle {
         var newIdle = [SIMD2<Float32>]()
         var newReady = [SIMD2<Float32>]()
         
-        for i in 0 ..< missleModel.shape.particleCenters.count {
-            let center = missleModel.shape.particleCenters[i]
+        for i in 0 ..< missleModel.particles.count {
+            let center = missleModel.particles[i].position
             
-            let idleAngle = idleAngleStart + (idleAngleEnd - idleAngleStart) * CGFloat(i) / CGFloat(missleModel.shape.particleCenters.count - 1)
+            let idleAngle = idleAngleStart + (idleAngleEnd - idleAngleStart) * CGFloat(i) / CGFloat(missleModel.particles.count - 1)
             let idleRadius = missleRadius
             
             let idleX = missleSpawnCenter.x + idleRadius * cos(idleAngle)
@@ -78,6 +78,7 @@ final class Missle {
         var newVelocities: [SIMD2<Float32>] = []
         
         for i in 0..<readyPositions.count {
+            let color = missleModel.particles[i].material.color
             var p = missleProgress
 //            let random
 //            if i % 3 == 0 {
@@ -90,7 +91,7 @@ final class Missle {
                                          idle.y + (ready.y - idle.y) * Float(p))
             
             newVelocities.append(SIMD2<Float32>(0, 0))
-            newColors.append(missleModel.material.color)
+            newColors.append(color)
             newPositions.append(current)
         }
         self.positions = newPositions
@@ -132,6 +133,5 @@ final class Missle {
         self.staticLiquidColors = colors
         self.staticLiquidVelocities = velocities
         self.staticLiquidCount = self.positions.count
-
     }
 }

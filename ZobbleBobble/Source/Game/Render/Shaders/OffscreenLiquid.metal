@@ -151,7 +151,7 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
     float4 col2 = float4(oldColor.rgb, 1);
     
     // TODO: move to uniforms buffer
-    float threshold1 = 0.3;
+    float threshold1 = 0.4;
     float threshold2 = 0.6;
     
 //    output.write(oldColor, gid);

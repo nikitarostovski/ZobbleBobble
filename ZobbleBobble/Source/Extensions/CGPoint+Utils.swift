@@ -8,6 +8,11 @@
 import CoreGraphics
 
 public extension CGPoint {
+    func distance(to: CGPoint) -> CGFloat {
+        let d = (self.x - to.x) * (self.x - to.x) + (self.y - to.y) * (self.y - to.y)
+        return sqrt(d)
+    }
+    
     func angle(to comparisonPoint: CGPoint) -> CGFloat {
         let originX = comparisonPoint.x - x
         let originY = comparisonPoint.y - y

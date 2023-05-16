@@ -6,8 +6,8 @@
 //
 
 import SpriteKit
-import ZobbleCore
 import ZobblePhysics
+import Levels
 
 struct WorldState {
     var camera: CGPoint
@@ -97,7 +97,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
                                   levelIndex: CGFloat(game.state.levelIndex),
                                   visibleMissleRange: missleRange)
         
-        level.chunks.forEach { [weak self] chunk in
+        level.initialChunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
         }
         
@@ -126,7 +126,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     func onTap(_ position: CGPoint) {
         guard userInteractionEnabled else { return }
         
-        guard star.state.currentMissleIndex <= CGFloat(level.missles.count) else {
+        guard star.state.currentMissleIndex <= CGFloat(level.missleChunks.count) else {
             // TODO: level finished
 //            game?.runMenu(isFromLevel: true)
             return
@@ -141,29 +141,30 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     }
     
     private func spawnChunk(_ chunk: ChunkModel) {
-        let particleCenters = chunk.shape.particleCenters
-        
-        let flags = chunk.material.physicsFlags
-        let isStatic = true
-        let gravityScale = chunk.material.gravityScale
-        let freezeVelocityThreshold = chunk.material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
-        let staticContactBehavior = chunk.material.becomesLiquidOnContact
-        
-        particleCenters.forEach { [weak self] center in
-            self?.world.addParticle(withPosition: center,
-                                    color: CGRect(chunk.material.color),
-                                    flags: flags,
-                                    isStatic: isStatic,
-                                    gravityScale: gravityScale,
-                                    freezeVelocityThreshold: freezeVelocityThreshold,
-                                    becomesLiquidOnContact: staticContactBehavior,
-                                    explosionRadius: chunk.material.explosionRadius,
-                                    shootImpulse: 0)
+        for i in 0 ..< chunk.particles.count {
+            let center = chunk.particles[i].position
+            let material = chunk.particles[i].material
+            
+            let flags = material.physicsFlags
+            let isStatic = true
+            let gravityScale = material.gravityScale
+            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
+            let staticContactBehavior = material.becomesLiquidOnContact
+            
+            world.addParticle(withPosition: center,
+                              color: CGRect(material.color),
+                              flags: flags,
+                              isStatic: isStatic,
+                              gravityScale: gravityScale,
+                              freezeVelocityThreshold: freezeVelocityThreshold,
+                              becomesLiquidOnContact: staticContactBehavior,
+                              explosionRadius: material.explosionRadius,
+                              shootImpulse: 0)
         }
     }
     
     private func spawnNextMissle(animated: Bool = true) {
-        guard star.state.currentMissleIndex < CGFloat(level.missles.count) else {
+        guard star.state.currentMissleIndex < CGFloat(level.missleChunks.count) else {
             self.missle = nil
             self.star.missleRadius = 0
             return
@@ -171,7 +172,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         let currentLevel = CGFloat(game?.state.levelIndex ?? 0)
         
-        let missleModel = level.missles[Int(star.state.currentMissleIndex)]
+        let missleModel = level.missleChunks[Int(star.state.currentMissleIndex)]
         self.missle = Missle(missleModel: missleModel, star: star, game: game)
         
         let startMissleCount = star.state.currentMissleIndex
@@ -213,14 +214,17 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         userInteractionEnabled = false
         
-        let flags = missle.missleModel.material.physicsFlags
-        let isStatic = false
-        let gravityScale = missle.missleModel.material.gravityScale
-        let freezeVelocityThreshold = missle.missleModel.material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
-        let staticContactBehavior = missle.missleModel.material.becomesLiquidOnContact
-        
-        missle.positions.forEach { [weak self] center in
+        missle.positions.enumerated().forEach { [weak self] i, center in
+            let material = missle.missleModel.particles[i].material
+            
+            let flags = material.physicsFlags
+            let isStatic = false
+            let gravityScale = material.gravityScale
+            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
+            let staticContactBehavior = material.becomesLiquidOnContact
+            
             var pos = CGPoint(x: CGFloat(center.x), y: CGFloat(center.y))
+            
             let dist = pos.distance(to: .zero)
             let angle = pos.angle(to: .zero) * .pi / 180 + .pi
             
@@ -228,13 +232,13 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             pos.y = dist * sin(angle)
             
             self?.world.addParticle(withPosition: pos,
-                                    color: CGRect(missle.missleModel.material.color),
+                                    color: CGRect(material.color),
                                     flags: flags,
                                     isStatic: isStatic,
                                     gravityScale: gravityScale,
                                     freezeVelocityThreshold: freezeVelocityThreshold,
                                     becomesLiquidOnContact: staticContactBehavior,
-                                    explosionRadius: missle.missleModel.material.explosionRadius,
+                                    explosionRadius: material.explosionRadius,
                                     shootImpulse: missle.missleModel.startImpulse * Settings.physicsMissleShotImpulseModifier)
         }
     }

@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import ZobbleCore
 import ZobblePhysics
+import Levels
 
 protocol GameDelegate: AnyObject {
     func gameDidChangeState(_ game: Game)
@@ -47,8 +47,7 @@ final class Game {
         switch state.state {
         case .level:
             let level = levelManager.allLevelPacks[state.packIndex].levels[state.levelIndex]
-            let allMaterials = level.chunks.map { $0.material } + level.missles.map { $0.material }
-            return allMaterials.removeDuplicates().map { $0.color }
+            return level.allMaterials.map { $0.color }
         case .menu:
             return MaterialType.allCases.map { $0.color }
         }
@@ -61,7 +60,7 @@ final class Game {
     
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
         let levelManager: LevelManager
-        if let levelDataPath = Bundle.main.path(forResource: "DebugLevels", ofType: "json") {
+        if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
                 levelManager = try LevelManager(levelData: data)

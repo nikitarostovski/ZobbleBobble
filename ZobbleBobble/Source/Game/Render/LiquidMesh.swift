@@ -6,8 +6,6 @@
 //
 
 import MetalKit
-import ZobbleCore
-
 
 class LiquidMesh: BaseMesh {
     struct Uniforms {
@@ -268,7 +266,7 @@ class LiquidMesh: BaseMesh {
                 computeEncoder.setTexture(texturesA.1, index: 2)
                 computeEncoder.setTexture(texturesB.1, index: 3)
                 computeEncoder.setSamplerState(linearSamplerState, index: 0)
-                dispatchAuto(encoder: computeEncoder, state: computeAlphaPipelineState, width: texturesA.1.width, height: texturesA.1.height)
+                ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeAlphaPipelineState, width: texturesA.1.width, height: texturesA.1.height)
             }
         }
         computeEncoder.endEncoding()

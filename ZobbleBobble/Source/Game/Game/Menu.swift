@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ZobbleCore
+import Levels
 
 struct MenuState {
     /// progress from level state to menuPacks state [1...3] (1 is level state, 2 is level selection, 3 is pack selection)
@@ -360,16 +360,17 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             for (levelIndex, level) in visibleLevels.enumerated() {
                 let levelNumber = visibleLevelIndices.lowerBound + levelIndex
                 let particleRadius = level.particleRadius
-                for chunk in level.chunks {
-                    let particleCenters = chunk.shape.particleCenters
-                    for center in particleCenters {
+                for chunk in level.initialChunks {
+                    for particle in chunk.particles {
+                        let center = particle.position
                         let point = convertPlanetChunkPosition(levelNumber, position: center)
                         let radius = self.convertPlanetRadius(particleRadius) ?? 0
                         
                         if isPointVisible(point, radius: radius) {
+                            let color = particle.material.color
                             allPositions.append(SIMD2<Float32>(Float32(point.x), Float32(point.y)))
                             allVelocities.append(SIMD2<Float32>(Float32(0), Float32(0)))
-                            allColors.append(chunk.material.color)
+                            allColors.append(color)
                             allRadii.append(Float(radius))
                         }
                     }

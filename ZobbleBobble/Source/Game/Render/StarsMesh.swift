@@ -151,7 +151,7 @@ class StarsMesh: BaseMesh {
         
         computeEncoder.setComputePipelineState(clearPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
-        dispatchAuto(encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.setComputePipelineState(computeDrawStarPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
@@ -163,7 +163,7 @@ class StarsMesh: BaseMesh {
         computeEncoder.setBuffer(notchRadiusBuffer, offset: 0, index: 5)
         computeEncoder.setBuffer(materialsBuffer, offset: 0, index: 6)
         computeEncoder.setBuffer(materialCountBuffer, offset: 0, index: 7)
-        dispatchAuto(encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.endEncoding()
         

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ZobbleCore
+import Levels
 
 struct StarMaterialData {
     let color: SIMD4<UInt8>
@@ -59,10 +59,10 @@ final class Star {
         
         var materials = [StarMaterialData]()
         for (i, l) in pack.levels.enumerated() {
-            for (j, m) in l.missles.enumerated() {
-                let number = CGFloat(i) + CGFloat(j) / CGFloat(l.missles.count)
-                let next = number + CGFloat(1) / CGFloat(l.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
-                var color = m.material.color
+            for (j, m) in l.missleChunks.enumerated() {
+                let number = CGFloat(i) + CGFloat(j) / CGFloat(l.missleChunks.count)
+                let next = number + CGFloat(1) / CGFloat(l.missleChunks.count)// - 0.01//CGFloat.leastNonzeroMagnitude
+                var color = m.particles.first?.material.color ?? SIMD4<UInt8>(repeating: 0)//m.material.color
                 color.w = 255;
                 let material = StarMaterialData(color: color, position: SIMD2(Float(number), Float(next)))
                 materials.append(material)
@@ -74,7 +74,7 @@ final class Star {
     
     func getMenuVisibleMissles(levelToPackProgress: CGFloat, levelIndex: CGFloat, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
         let level = pack.levels[Int(levelIndex)]
-        let missleWeight = CGFloat(1) / CGFloat(level.missles.count)
+        let missleWeight = CGFloat(1) / CGFloat(level.missleChunks.count)
         
         let packsLo: CGFloat = 0
         let packsHi: CGFloat = CGFloat(pack.levels.count)
@@ -104,7 +104,7 @@ final class Star {
     func getWorldVisibleMissles(levelIndex: Int, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
         guard 0..<pack.levels.count ~= levelIndex else { return 0...0 }
         let level = pack.levels[levelIndex]
-        let missleWeight = CGFloat(1) / CGFloat(level.missles.count)
+        let missleWeight = CGFloat(1) / CGFloat(level.missleChunks.count)
         
         let lo = CGFloat(levelIndex) + misslesFired * missleWeight
         let hi = CGFloat(Int(levelIndex)) + 1
@@ -122,14 +122,14 @@ final class Star {
         var currentRadius: CGFloat = 0
         var nextRadius: CGFloat = 0
         
-        if 0..<level.missles.count ~= missleIndex {
-            let currentMissle = level.missles[missleIndex]
-            currentRadius = currentMissle.shape.boundingRadius
+        if 0..<level.missleChunks.count ~= missleIndex {
+            let currentMissle = level.missleChunks[missleIndex]
+            currentRadius = currentMissle.boundingRadius//.shape.boundingRadius
         }
         
-        if 0..<(level.missles.count - 1) ~= missleIndex {
-            let nextMissle = level.missles[missleIndex + 1]
-            nextRadius = nextMissle.shape.boundingRadius
+        if 0..<(level.missleChunks.count - 1) ~= missleIndex {
+            let nextMissle = level.missleChunks[missleIndex + 1]
+            nextRadius = nextMissle.boundingRadius
         }
         
         let scaleProgress = levelToPackProgress - Settings.levelCameraScale
@@ -157,7 +157,7 @@ final class Star {
         self.state.currentLevelIndex = levelIndex
         
         let level = pack.levels[Int(levelIndex)]
-        let missleIndex = CGFloat(level.missles.count) * (visibleMissleRange.lowerBound - CGFloat(Int(levelIndex)))
+        let missleIndex = CGFloat(level.missleChunks.count) * (visibleMissleRange.lowerBound - CGFloat(Int(levelIndex)))
         self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress,
                                             levelIndex: Int(levelIndex),
                                             missleIndexFloating: missleIndex)

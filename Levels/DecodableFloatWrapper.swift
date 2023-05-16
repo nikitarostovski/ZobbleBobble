@@ -1,8 +1,8 @@
 //
-//  MissleModel.swift
+//  DecodableFloatWrapper.swift
 //  ZobbleCore
 //
-//  Created by Rost on 03.02.2023.
+//  Created by Rost on 13.05.2023.
 //
 
 import Foundation
@@ -19,12 +19,6 @@ extension DecodableFloat: Codable {
         let container = try decoder.singleValueContainer()
         wrappedValue = try container.decode(CGFloat.self)
     }
-}
-
-public struct MissleModel: Codable {
-    public let material: MaterialType
-    public internal(set) var shape: ShapeModel
-    @DecodableFloat public var startImpulse: CGFloat
 }
 
 extension KeyedDecodingContainer {

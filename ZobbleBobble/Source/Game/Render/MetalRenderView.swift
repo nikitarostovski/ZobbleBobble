@@ -7,7 +7,6 @@
 
 import UIKit
 import MetalKit
-import ZobbleCore
 
 protocol RenderViewDelegate: AnyObject {
     func updateRenderData()

@@ -8,6 +8,8 @@
 import Foundation
 
 public enum MaterialType: String, Codable, CaseIterable {
+    private static let colorDiffThreshold: Float = 0.5
+    
     case lavaRed
     case lavaYellow
     case bomb
@@ -96,5 +98,29 @@ public enum MaterialType: String, Codable, CaseIterable {
         default:
             return -1
         }
+    }
+    
+    public static func parseColor(_ color: SIMD4<UInt8>) -> MaterialType? {
+        guard color.w > 0 else { return nil }
+        
+        let total: Float = sqrt(255 * 255 * 3)
+        
+        let materialsDiff: [(Float, MaterialType)] = MaterialType.allCases.compactMap {
+            let rdiff = Int($0.color.x) - Int(color.x)
+            let gdiff = Int($0.color.y) - Int(color.y)
+            let bdiff = Int($0.color.z) - Int(color.z)
+            
+            
+            let d = sqrt(Float(rdiff * rdiff + gdiff * gdiff + bdiff * bdiff))
+            let p = d / total
+            
+            guard p < Self.colorDiffThreshold else { return nil }
+            return (p, $0)
+        }
+        
+        let sorted = materialsDiff.sorted(by: { $0.0 < $1.0 })
+        
+        let closest = sorted.first?.1
+        return closest
     }
 }
