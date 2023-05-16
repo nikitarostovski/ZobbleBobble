@@ -8,8 +8,65 @@
                 "gravityRadius": 180,
                 "initialChunks": [
                     {
-                        "source": "Level",
+                        "source": "Level1",
                         "scale": 0.5
+                    }
+                ],
+                "missleChunks": [
+                    {
+                        "source": "Missle1",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle2",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle1",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle1",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle1",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle3",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle4",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle1",
+                        "scale": 1,
+                        "startImpulse": 1
+                    },
+                    {
+                        "source": "Missle5",
+                        "scale": 1,
+                        "startImpulse": 1
+                    }
+                ]
+            },
+            {
+                "rotationPerSecond": 120,
+                "gravityRadius": 180,
+                "initialChunks": [
+                    {
+                        "source": "Level2",
+                        "scale": 1
                     }
                 ],
                 "missleChunks": [
