@@ -7,6 +7,7 @@
 
 import UIKit
 import MetalKit
+import Levels
 
 protocol RenderViewDelegate: AnyObject {
     func updateRenderData()
@@ -56,7 +57,7 @@ class Renderer: NSObject, MTKViewDelegate {
     var view: MTKView
     private var drawableRenderPipelineState: MTLRenderPipelineState!
     
-    var uniqueMaterials: [SIMD4<UInt8>] = [] {
+    var uniqueMaterials: [MaterialType] = [] {
         didSet {
             resetTextures()
         }

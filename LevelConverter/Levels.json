@@ -9,12 +9,12 @@
                 "initialChunks": [
                     {
                         "source": "Level1",
-                        "scale": 0.5
+                        "scale": 1.25
                     }
                 ],
                 "missleChunks": [
                     {
-                        "source": "Missle1",
+                        "source": "Missle2",
                         "scale": 1,
                         "startImpulse": 1
                     },

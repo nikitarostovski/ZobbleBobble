@@ -55,24 +55,7 @@ fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
         }
     }
     if (maxAlphaColor.r + maxAlphaColor.g + maxAlphaColor.b == 0) {
-        return float4(0.1, 0.0, 0.1, 1.0);
+        return float4(0, 0, 0, 1.0);
     }
     return maxAlphaColor;
-    
-    
-    // multiply by alpha:
-    float3 result = float3(0);
-    for (int i = 0; i < textureCount; i++) {
-        float4 col = textures[i].sample(s, in.texcoord);
-//        float3 hsvCol = rgb2hsv(col.rgb);
-//        result += hsvCol * col.a;
-        result += col.rgb * col.a;
-    }
-    if (result.r + result.g + result.b == 0) {
-        return float4(0.1, 0.0, 0.1, 1.0);
-    } else {
-//        float3 rgbColor = hsv2rgb(result);
-//        return float4(rgbColor, 1);
-        return float4(result, 1);
-    }
 }

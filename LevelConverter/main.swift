@@ -64,18 +64,30 @@ let particles = fileNames.compactMap { (s: String) -> (String, [ParticleModel])?
         return nil
     }
     var result = [ParticleModel]()
-
+    
+    var boundingRadius: CGFloat = 0
+    
     var index = 0
     for y in stride(from: floor(aabb.minY / particleStride) * particleStride, to: aabb.maxY, by: particleStride) {
         for x in stride(from: floor(aabb.minX / particleStride) * particleStride, to: aabb.maxX, by: particleStride) {
             if let material = materials[index] {
                 let point = CGPoint(x: x - aabb.width / 2, y: y - aabb.height / 2)
+                let dist = sqrt(point.y * point.y + point.x * point.x)
+                boundingRadius = max(boundingRadius, dist)
                 let model = ParticleModel(position: point, material: material)
                 result.append(model)
             }
             index += 1
         }
     }
+    
+    
+    result = result.sorted(by: {
+        let xp1 = $0.position.x / boundingRadius
+        let xp2 = $1.position.x / boundingRadius
+        return xp1 < xp2
+    })
+    
     return (s, result)
 }
 

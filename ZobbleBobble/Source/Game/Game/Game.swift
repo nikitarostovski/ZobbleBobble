@@ -43,13 +43,13 @@ final class Game {
     
     let levelManager: LevelManager
     
-    var visibleMaterials: [SIMD4<UInt8>] {
+    var visibleMaterials: [MaterialType] {
         switch state.state {
         case .level:
             let level = levelManager.allLevelPacks[state.packIndex].levels[state.levelIndex]
-            return level.allMaterials.map { $0.color }
+            return level.allMaterials
         case .menu:
-            return MaterialType.allCases.map { $0.color }
+            return MaterialType.allCases
         }
     }
     

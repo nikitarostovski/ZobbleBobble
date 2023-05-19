@@ -85,6 +85,8 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         def.destroyByAge = false
         def.ejectionStrength = 8
         
+        def.powderStrength = 2
+        
         self.world = ZPWorld(worldDef: def)
         self.state = WorldState(camera: .zero, cameraScale: 1)
         

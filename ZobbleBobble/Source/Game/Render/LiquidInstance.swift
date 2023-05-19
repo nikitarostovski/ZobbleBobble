@@ -6,16 +6,22 @@
 //
 
 import MetalKit
+import Levels
 
 class LiquidInstance: BaseMesh {
     let computePassDescriptor = MTLComputePassDescriptor()
     let metaballsRenderPassDescriptor = MTLRenderPassDescriptor()
     
     var pointCount = 0
-    var mainColor: SIMD4<UInt8>
+    var material: MaterialType
+    var mainColor: SIMD4<UInt8> { material.color }
+    var blurRadius: Int?
+    var threshold: Float
     
     var mainColorBuffer: MTLBuffer?
     var lowResSizeBuffer: MTLBuffer?
+    var blurRadiusBuffer: MTLBuffer?
+    var thresholdBuffer: MTLBuffer?
     
     var lowResAlphaTexture: MTLTexture?
     var finalAlphaCorrectedTexture: MTLTexture?
@@ -24,16 +30,23 @@ class LiquidInstance: BaseMesh {
     private let screenSize: CGSize
     private let renderSize: CGSize
     
-    init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize, mainColor: SIMD4<UInt8>) {
+    init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize, material: MaterialType) {
         guard let device = device else { return nil }
         
-        self.mainColor = mainColor
-        
+        self.material = material
         self.screenSize = screenSize
         self.renderSize = renderSize
+        self.threshold = material.cropThreshold
+        self.thresholdBuffer = device.makeBuffer(bytes: &self.threshold, length: MemoryLayout<Float>.stride)
         
-        self.mainColorBuffer = device.makeBuffer(bytes: &self.mainColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
+        var mainColor = material.color
+        self.mainColorBuffer = device.makeBuffer(bytes: &mainColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
         
+        let blurRadius = Int(CGFloat(Settings.liquidMetaballsBlurKernelSize) * material.blurModifier)
+        self.blurRadius = blurRadius
+        if blurRadius > 0 {
+            self.blurRadiusBuffer = device.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
+        }
         
         let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
         let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
@@ -80,7 +93,6 @@ class LiquidInstance: BaseMesh {
                             positionBuffer: MTLBuffer,
                             velocityBuffer: MTLBuffer,
                             colorBuffer: MTLBuffer,
-                            blurRadiusBuffer: MTLBuffer?,
                             metaballsPipelineState: MTLRenderPipelineState,
                             computeUpscalePipelineState: MTLComputePipelineState,
                             computeBlurPipelineState: MTLComputePipelineState,
@@ -143,6 +155,7 @@ class LiquidInstance: BaseMesh {
         computeEncoder.setTexture(finalAlphaCorrectedTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setBuffer(mainColorBuffer, offset: 0, index: 0)
+        computeEncoder.setBuffer(thresholdBuffer, offset: 0, index: 1)
         computeEncoder.setSamplerState(nearestSampler, index: 0)
         computeEncoder.setSamplerState(linearSampler, index: 1)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeThresholdPipelineState, width: finalTexture.width, height: finalTexture.height)

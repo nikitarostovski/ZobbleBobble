@@ -40,11 +40,10 @@ final class ImageSampler {
         else { return nil }
         
         let textureLoader = MTKTextureLoader(device: device)
-        guard let texture = try? textureLoader.newTexture(URL: file, options: [
-//            .textureStorageMode: MTLStorageMode.shared.rawValue,
+        guard var texture = try? textureLoader.newTexture(URL: file, options: [
             .textureUsage: MTLTextureUsage.shaderRead.rawValue
-        ])
-        else { return nil }
+        ]) else { return nil }
+        texture = texture.makeTextureView(pixelFormat: .bgra8Unorm) ?? texture
         
         self.positionBufferProvider = BufferProvider(device: device, inflightBuffersCount: 1, bufferSize: MemoryLayout<SIMD2<Float>>.stride * maxPointCount)
         self.resultBufferProvider = BufferProvider(device: device, inflightBuffersCount: 1, bufferSize: MemoryLayout<SIMD4<Float>>.stride * maxPointCount)

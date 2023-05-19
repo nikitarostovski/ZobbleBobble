@@ -54,7 +54,7 @@ final class Star {
         self.renderCenter = SIMD2<Float>(0, 0)
         self.missleCenter = SIMD2<Float>(0, 0)
         self.radius = Float(pack.radius)
-        self.mainColor = SIMD4<UInt8>(255, 255, 255, 255)
+        self.mainColor = Colors.Stars.mainColor
         self.missleRadius = 0
         
         var materials = [StarMaterialData]()

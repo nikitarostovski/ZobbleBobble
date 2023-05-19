@@ -82,9 +82,16 @@ kernel void crop_alpha_texture(texture2d<float, access::sample> textureA [[textu
     } else if (alphaA < alphaB) {
         newAlphaA = 0;
         newAlphaB = alphaB;
-    } else {
-        newAlphaA = alphaA * 0.5;
-        newAlphaB = alphaB * 0.5;
+    } else if (alphaA != 0 && alphaB != 0) {
+        float shiftX = (gid.x / 8) % 2;
+        float shiftY = (gid.y / 8) % 2;
+        if (shiftX == shiftY) {
+            newAlphaA = 1;
+            newAlphaB = 0;
+        } else {
+            newAlphaA = 0;
+            newAlphaB = 1;
+        }
     }
     
     outputA.write(float4(newAlphaA, 0, 0, 0), gid);
@@ -130,12 +137,13 @@ fragment float metaballs_fragment(MetaballVertexOutput in [[stage_in]],
     float dist = length(pointCoord - float2(0.5));
     float alpha = 1 - smoothstep(0, 1, dist * 2);
     // TODO: magic number
-    return alpha * 0.18;
+    return alpha * 0.5;// * 0.18;
 }
 
 kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[texture(0)]],
                              texture2d<float, access::write> output [[texture(1)]],
-                             device uchar4 const &materialColor[[buffer(0)]],
+                             device uchar4 const &materialColor [[buffer(0)]],
+                             device float const &threshold [[buffer(1)]],
                              sampler nearestSampler [[sampler(0)]],
                              sampler linearSampler [[sampler(1)]],
                              uint2 gid [[thread_position_in_grid]])
@@ -147,24 +155,9 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
     float4 oldColor = float4(materialColor) / 255.0;
     float alpha = alphaInput.sample(linearSampler, coord).r;
     
-    float4 col1 = float4(oldColor.rgb * 1.8, 1);
-    float4 col2 = float4(oldColor.rgb, 1);
-    
-    // TODO: move to uniforms buffer
-    float threshold1 = 0.4;
-    float threshold2 = 0.6;
-    
-//    output.write(oldColor, gid);
-//    return;
-//    output.write(float4(alpha, alpha, alpha, 1), gid);
-//    return;
-    
-    if (alpha > threshold2) {
-        output.write(col2, gid);
-        return;
-    }
-    if (alpha > threshold1) {
-        output.write(col1, gid);
+    if (alpha > threshold) {
+        float4 col = float4(oldColor.rgb, 1);
+        output.write(col, gid);
         return;
     }
     output.write(float4(0), gid);

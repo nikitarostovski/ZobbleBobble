@@ -90,6 +90,8 @@
 		11A850AC2A1389A400574368 /* ParticleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BE62A0F6A0A000F322C /* ParticleModel.swift */; };
 		11A850AD2A1389A400574368 /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA03298D22CB00142DFD /* LevelModel.swift */; };
 		11A8BE91296D3F8000DE77A3 /* ZPParticleDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */; };
+		11AF7D962A167792000FB177 /* SIMD4+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AF7D952A167792000FB177 /* SIMD4+Colors.swift */; };
+		11AF7D992A1679B5000FB177 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AF7D972A16794B000FB177 /* Colors.swift */; };
 		11B3216D29645CB0000F4180 /* OffscreenBackground.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11B3216C29645CB0000F4180 /* OffscreenBackground.metal */; };
 		11B321712965CCA3000F4180 /* BaseMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B321702965CCA3000F4180 /* BaseMesh.swift */; };
 		11B3FD0D298012330058FFEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0C298012330058FFEB /* Settings.swift */; };
@@ -438,6 +440,8 @@
 		11A8509F2A13899100574368 /* Levels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Levels.h; sourceTree = "<group>"; };
 		11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPParticleDef.mm; sourceTree = "<group>"; };
 		11A8BE92296D3F8800DE77A3 /* ZPParticleDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticleDef.h; sourceTree = "<group>"; };
+		11AF7D952A167792000FB177 /* SIMD4+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMD4+Colors.swift"; sourceTree = "<group>"; };
+		11AF7D972A16794B000FB177 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		11B3216C29645CB0000F4180 /* OffscreenBackground.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenBackground.metal; sourceTree = "<group>"; };
 		11B321702965CCA3000F4180 /* BaseMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMesh.swift; sourceTree = "<group>"; };
 		11B3FD0A297FBC540058FFEB /* CommonShaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonShaders.h; sourceTree = "<group>"; };
@@ -849,8 +853,8 @@
 		11A850862A13880900574368 /* LevelConverter */ = {
 			isa = PBXGroup;
 			children = (
-				11C39E932A13AF8D007B0371 /* Images */,
 				11A850932A1388C800574368 /* Levels.json */,
+				11C39E932A13AF8D007B0371 /* Images */,
 				11A850872A13880900574368 /* main.swift */,
 				11A850942A1388F600574368 /* ImageSampler.swift */,
 				11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */,
@@ -867,12 +871,14 @@
 				11C39E902A13AE85007B0371 /* Data */,
 				11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */,
 				11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */,
+				11AF7D972A16794B000FB177 /* Colors.swift */,
 				11C0A707292248D100CA7954 /* LevelManager.swift */,
 				1198BA05298D22D200142DFD /* PackModel.swift */,
 				1198BA03298D22CB00142DFD /* LevelModel.swift */,
 				1198BA01298D22BF00142DFD /* ChunkModel.swift */,
 				1198B9FF298D22B800142DFD /* MaterialModel.swift */,
 				11EC8BE62A0F6A0A000F322C /* ParticleModel.swift */,
+				11AF7D952A167792000FB177 /* SIMD4+Colors.swift */,
 			);
 			path = Levels;
 			sourceTree = "<group>";
@@ -1683,6 +1689,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11A850AD2A1389A400574368 /* LevelModel.swift in Sources */,
+				11AF7D992A1679B5000FB177 /* Colors.swift in Sources */,
 				11B643AB2A13A85800DCC56C /* Array+Duplicates.swift in Sources */,
 				11A850AA2A1389A400574368 /* PackModel.swift in Sources */,
 				11A850AB2A1389A400574368 /* ChunkModel.swift in Sources */,
@@ -1690,6 +1697,7 @@
 				11B643AA2A13A84500DCC56C /* DecodableFloatWrapper.swift in Sources */,
 				11A850A92A1389A400574368 /* LevelManager.swift in Sources */,
 				11A850A82A1389A400574368 /* MaterialModel.swift in Sources */,
+				11AF7D962A167792000FB177 /* SIMD4+Colors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

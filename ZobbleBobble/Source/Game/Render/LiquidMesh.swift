@@ -6,6 +6,7 @@
 //
 
 import MetalKit
+import Levels
 
 class LiquidMesh: BaseMesh {
     struct Uniforms {
@@ -72,7 +73,7 @@ class LiquidMesh: BaseMesh {
     
     let computePassDescriptor = MTLComputePassDescriptor()
     
-    var uniqueMaterials: [SIMD4<UInt8>] = [] {
+    var uniqueMaterials: [MaterialType] = [] {
         didSet {
             updateInstances()
         }
@@ -86,10 +87,8 @@ class LiquidMesh: BaseMesh {
     let pointCountBufferProvider: BufferProvider
     
     var pointCount = 0
-    var blurRadius: Int?
     var fadeMultiplier: Float = 0
     
-    let blurRadiusBuffer: MTLBuffer?
     var mainColorBuffer: MTLBuffer?
     
     var nearestSamplerState: MTLSamplerState?
@@ -122,9 +121,6 @@ class LiquidMesh: BaseMesh {
         self.screenSize = screenSize
         self.renderSize = renderSize
         
-        self.blurRadius = Settings.liquidMetaballsBlurKernelSize
-        self.blurRadiusBuffer = device?.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
-        
         
         let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
         let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
@@ -147,15 +143,15 @@ class LiquidMesh: BaseMesh {
     }
     
     private func updateInstances() {
-        let currentColors = self.instances.map { $0.mainColor }
+        let currentMaterials = self.instances.map { $0.material }
         // remove old
         self.instances = self.instances.compactMap {
-            uniqueMaterials.contains($0.mainColor) ? $0 : nil
+            uniqueMaterials.contains($0.material) ? $0 : nil
         }
         // add new
-        self.instances += uniqueMaterials.compactMap {
-            guard !currentColors.contains($0) else { return nil }
-            return LiquidInstance(device, screenSize: screenSize, renderSize: renderSize, mainColor: $0)
+        self.instances += uniqueMaterials.compactMap { m -> LiquidInstance? in
+            guard !currentMaterials.contains(m) else { return nil }
+            return LiquidInstance(device, screenSize: screenSize, renderSize: renderSize, material: m)
         }
     }
     
@@ -180,7 +176,6 @@ class LiquidMesh: BaseMesh {
         guard let vertices = vertices,
               let velocities = velocities,
               let colors = colors,
-              let blurRadiusBuffer = blurRadiusBuffer,
               let nearestSamplerState = nearestSamplerState,
               let linearSamplerState = linearSamplerState,
               pointCount > 0
@@ -246,7 +241,6 @@ class LiquidMesh: BaseMesh {
                                   positionBuffer: positionBuffer,
                                   velocityBuffer: velocityBuffer,
                                   colorBuffer: colorBuffer,
-                                  blurRadiusBuffer: blurRadiusBuffer,
                                   metaballsPipelineState: metaballsPipelineState,
                                   computeUpscalePipelineState: computeUpscalePipelineState,
                                   computeBlurPipelineState: computeBlurPipelineState,
