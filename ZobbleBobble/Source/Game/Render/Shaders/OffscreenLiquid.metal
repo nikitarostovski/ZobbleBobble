@@ -83,15 +83,20 @@ kernel void crop_alpha_texture(texture2d<float, access::sample> textureA [[textu
         newAlphaA = 0;
         newAlphaB = alphaB;
     } else if (alphaA != 0 && alphaB != 0) {
-        float shiftX = (gid.x / 8) % 2;
-        float shiftY = (gid.y / 8) % 2;
-        if (shiftX == shiftY) {
-            newAlphaA = 1;
-            newAlphaB = 0;
-        } else {
-            newAlphaA = 0;
-            newAlphaB = 1;
-        }
+        // alpha:
+        newAlphaA = alphaA * 0.5;
+        newAlphaB = alphaB * 0.5;
+        
+        // checkmarks:
+//        float shiftX = (gid.x / 8) % 2;
+//        float shiftY = (gid.y / 8) % 2;
+//        if (shiftX == shiftY) {
+//            newAlphaA = 1;
+//            newAlphaB = 0;
+//        } else {
+//            newAlphaA = 0;
+//            newAlphaB = 1;
+//        }
     }
     
     outputA.write(float4(newAlphaA, 0, 0, 0), gid);
@@ -161,4 +166,93 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
         return;
     }
     output.write(float4(0), gid);
+}
+
+
+
+float pixel_alpha(texture2d<float, access::sample> texture, sampler s, uint2 p) {
+    float2 coord = float2(p);
+    coord.x /= texture.get_width();
+    coord.y /= texture.get_height();
+    return texture.sample(s, coord).r;
+}
+
+kernel void surface_filter(array<texture2d<float, access::read>, 96> textures [[texture(1)]],
+                           texture2d<float, access::write> output [[texture(0)]],
+                           device int const &textureCount [[buffer(0)]],
+                           device uint const &thickness [[buffer(1)]],
+                           uint2 gid [[thread_position_in_grid]]) {
+    
+    float mCenter = 0;
+    float mRight = 0;
+    float mTopRight = 0;
+    float mTop = 0;
+    float mBottom = 0;
+    float mLeft = 0;
+    float mTopLeft = 0;
+    float mBottomLeft = 0;
+    float mBottomRight = 0;
+    
+    float3 color = float3(0);
+    
+    for (int i = 0; i < textureCount; i++) {
+        float4 centerColor = textures[i].read(gid);
+        mCenter += centerColor.a;
+        mRight += textures[i].read(uint2(gid.x + thickness, gid.y)).a;
+        mTopRight += textures[i].read(uint2(gid.x + thickness, gid.y - thickness)).a;
+        mTop += textures[i].read(uint2(gid.x, gid.y - thickness)).a;
+        mBottom += textures[i].read(uint2(gid.x, gid.y + thickness)).a;
+        mLeft += textures[i].read(uint2(gid.x - thickness, gid.y)).a;
+        mTopLeft += textures[i].read(uint2(gid.x - thickness, gid.y - thickness)).a;
+        mBottomLeft += textures[i].read(uint2(gid.x - thickness, gid.y + thickness)).a;
+        mBottomRight += textures[i].read(uint2(gid.x + thickness, gid.y + thickness)).a;
+        
+        float3 col = centerColor.rgb;
+        if (col.r + col.g + col.b > 0) {
+            color = col;
+        }
+    }
+    
+    mCenter = min(1.0, mCenter);
+    mRight = min(1.0, mRight);
+    mTopRight = min(1.0, mTopRight);
+    mTop = min(1.0, mTop);
+    mBottom = min(1.0, mBottom);
+    mLeft = min(1.0, mLeft);
+    mTopLeft = min(1.0, mTopLeft);
+    mBottomLeft = min(1.0, mBottomLeft);
+    mBottomRight = min(1.0, mBottomRight);
+    
+//    mCenter = clamp(mCenter, 0.0, 1.0);
+//    mTop = clamp(mTop, 0.0, 1.0);
+//    mBottom = clamp(mBottom, 0.0, 1.0);
+//    mLeft = clamp(mLeft, 0.0, 1.0);
+//    mRight = clamp(mRight, 0.0, 1.0);
+//    mTopRight = clamp(mTopRight, 0.0, 1.0);
+//    mTopLeft = clamp(mTopLeft, 0.0, 1.0);
+//    mBottomLeft = clamp(mBottomLeft, 0.0, 1.0);
+//    mBottomRight = clamp(mBottomRight, 0.0, 1.0);
+
+    float dT  = abs(mCenter - mTop);
+    float dR  = abs(mCenter - mRight);
+    float dTR = abs(mCenter - mTopRight);
+    float dB  = abs(mCenter - mBottom);
+    float dL  = abs(mCenter - mLeft);
+    float dTL = abs(mCenter - mTopLeft);
+    float dBR = abs(mCenter - mBottomRight);
+    float dBL = abs(mCenter - mBottomLeft);
+
+    float delta = 0.0;
+    delta = max(delta, dT);
+    delta = max(delta, dR);
+    delta = max(delta, dTR);
+    delta = max(delta, dL);
+    delta = max(delta, dB);
+    delta = max(delta, dTL);
+    delta = max(delta, dBR);
+    delta = max(delta, dBL);
+
+    if (delta > 0.5) {
+        output.write(float4(color * 1.8, 1), gid);
+    }
 }

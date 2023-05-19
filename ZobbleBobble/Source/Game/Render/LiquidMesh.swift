@@ -71,6 +71,13 @@ class LiquidMesh: BaseMesh {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "crop_alpha_texture")!)
     }()
     
+    private lazy var computeSufraceFilterPipelineState: MTLComputePipelineState? = {
+        guard let device = device, let library = device.makeDefaultLibrary() else {
+            fatalError("Unable to create default Metal library")
+        }
+        return try? device.makeComputePipelineState(function: library.makeFunction(name: "surface_filter")!)
+    }()
+    
     let computePassDescriptor = MTLComputePassDescriptor()
     
     var uniqueMaterials: [MaterialType] = [] {
@@ -85,6 +92,8 @@ class LiquidMesh: BaseMesh {
     let uniformsBufferProvider: BufferProvider
     let fadeMultiplierBufferProvider: BufferProvider
     let pointCountBufferProvider: BufferProvider
+    let surfaceThicknessBufferProvider: BufferProvider
+    let textureCountBufferProvider: BufferProvider
     
     var pointCount = 0
     var fadeMultiplier: Float = 0
@@ -98,6 +107,16 @@ class LiquidMesh: BaseMesh {
     
     private let screenSize: CGSize
     private let renderSize: CGSize
+    
+    private lazy var surfaceTexture: MTLTexture? = {
+        let desc = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .bgra8Unorm,
+            width: Int(renderSize.width),
+            height: Int(renderSize.height),
+            mipmapped: false)
+        desc.usage = [.shaderRead, .shaderWrite, .renderTarget]
+        return device?.makeTexture(descriptor: desc)
+    }()
     
     init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.positionBufferProvider = BufferProvider(device: device,
@@ -118,6 +137,12 @@ class LiquidMesh: BaseMesh {
         self.pointCountBufferProvider = BufferProvider(device: device,
                                                        inflightBuffersCount: Settings.inflightBufferCount,
                                                        bufferSize: MemoryLayout<Int>.stride)
+        self.surfaceThicknessBufferProvider = BufferProvider(device: device,
+                                                             inflightBuffersCount: Settings.inflightBufferCount,
+                                                             bufferSize: MemoryLayout<Int>.stride)
+        self.textureCountBufferProvider = BufferProvider(device: device,
+                                                             inflightBuffersCount: Settings.inflightBufferCount,
+                                                             bufferSize: MemoryLayout<Int>.stride)
         self.screenSize = screenSize
         self.renderSize = renderSize
         
@@ -167,7 +192,8 @@ class LiquidMesh: BaseMesh {
                 staticColors: UnsafeMutableRawPointer?,
                 particleRadius: Float32,
                 cameraScale: Float32,
-                camera: SIMD2<Float32>) -> [MTLTexture] {
+                camera: SIMD2<Float32>,
+                planetActualScale: Float) -> [MTLTexture] {
         
         let vertexCount = vertexCount ?? 0
         let staticVertexCount = staticVertexCount ?? 0
@@ -186,7 +212,7 @@ class LiquidMesh: BaseMesh {
         self.fadeMultiplier = fadeMultiplier
         
         let defaultScale = Float(renderSize.width / screenSize.width)
-        var uniforms = Uniforms(particleRadius: particleRadius,
+        var uniforms = Uniforms(particleRadius: particleRadius * planetActualScale,
                                 downScale: Settings.liquidMetaballsDownscale,
                                 cameraScale: cameraScale * defaultScale,
                                 camera: camera)
@@ -230,7 +256,9 @@ class LiquidMesh: BaseMesh {
               let computeThresholdPipelineState = computeThresholdPipelineState,
               let computeUpscalePipelineState = computeUpscalePipelineState,
               let computeBlurPipelineState = computeBlurPipelineState,
-              let computeAlphaPipelineState = computeAlphaPipelineState
+              let computeAlphaPipelineState = computeAlphaPipelineState,
+              let surfaceTexture = surfaceTexture,
+              let computeSufraceFilterPipelineState = computeSufraceFilterPipelineState
         else {
             return []
         }
@@ -263,9 +291,16 @@ class LiquidMesh: BaseMesh {
                 ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeAlphaPipelineState, width: texturesA.1.width, height: texturesA.1.height)
             }
         }
+        
+        computeEncoder.setComputePipelineState(initPipelineState)
+        computeEncoder.setTexture(surfaceTexture, index: 0)
+        computeEncoder.setTexture(surfaceTexture, index: 1)
+        computeEncoder.setBuffer(fadeMultiplierBuffer, offset: 0, index: 0)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: initPipelineState, width: surfaceTexture.width, height: surfaceTexture.height)
+        
         computeEncoder.endEncoding()
         
-        return instances.compactMap {
+        let finalTextures = instances.compactMap {
             $0.renderFinalTexture(commandBuffer: commandBuffer,
                                   fadeMultiplierBuffer: fadeMultiplierBuffer,
                                   initPipelineState: initPipelineState,
@@ -273,5 +308,34 @@ class LiquidMesh: BaseMesh {
                                   linearSampler: linearSamplerState,
                                   nearestSampler: nearestSamplerState)
         }
+        
+        let computeEncoderSurface = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
+        let allTextures = [surfaceTexture] + finalTextures
+        var textureCount = allTextures.count
+        
+        _ = textureCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let textureCountBuffer = textureCountBufferProvider.nextUniformsBuffer(data: &textureCount,
+                                                                                   length: MemoryLayout<Int>.stride)
+        
+        
+        
+        var thickness = Int(Float(Settings.planetSurfaceThickness) * planetActualScale)
+        _ = surfaceThicknessBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let surfaceThicknessBuffer = surfaceThicknessBufferProvider.nextUniformsBuffer(data: &thickness,
+                                                                                   length: MemoryLayout<Int>.stride)
+        
+        commandBuffer.addCompletedHandler { _ in
+            self.textureCountBufferProvider.avaliableResourcesSemaphore.signal()
+            self.surfaceThicknessBufferProvider.avaliableResourcesSemaphore.signal()
+        }
+        
+        computeEncoderSurface.setComputePipelineState(computeSufraceFilterPipelineState)
+        computeEncoderSurface.setTextures(allTextures, range: 0..<allTextures.count)
+        computeEncoderSurface.setBuffer(textureCountBuffer, offset: 0, index: 0)
+        computeEncoderSurface.setBuffer(surfaceThicknessBuffer, offset: 0, index: 1)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoderSurface, state: computeSufraceFilterPipelineState, width: surfaceTexture.width, height: surfaceTexture.height)
+        computeEncoderSurface.endEncoding()
+        
+        return allTextures
     }
 }

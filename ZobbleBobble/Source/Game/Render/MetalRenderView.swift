@@ -154,6 +154,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         let camera = SIMD2<Float32>(cameraDataSource.cameraX, cameraDataSource.cameraY)
         let cameraScale = cameraDataSource.cameraScale
+        let planetActualScale = cameraDataSource.planetActualScale
         
         let liquidTextures = liquidMesh?.render(commandBuffer: commandBuffer,
                                                 vertexCount: objectsDataSource.liquidCount,
@@ -167,7 +168,8 @@ class Renderer: NSObject, MTKViewDelegate {
                                                 staticColors: objectsDataSource.staticLiquidColors,
                                                 particleRadius: objectsDataSource.particleRadius,
                                                 cameraScale: cameraScale,
-                                                camera: camera) ?? []
+                                                camera: camera,
+                                                planetActualScale: planetActualScale) ?? []
         
 //        let starTexture = liquidMesh?.getClearTexture(commandBuffer: commandBuffer)
         let starTexture = starsMesh?.render(commandBuffer: commandBuffer,

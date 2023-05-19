@@ -497,6 +497,10 @@ extension Menu: ObjectPositionProvider {
 }
 
 extension Menu: CameraRenderDataSource {
+    var planetActualScale: Float {
+        1 / Float(state.levelToPackProgress)
+    }
+    
     var cameraX: Float {
         0
     }

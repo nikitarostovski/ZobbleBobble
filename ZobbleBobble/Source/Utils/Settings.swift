@@ -21,7 +21,9 @@ final class Settings {
     static let liquidMetaballsDownscale: Float = 0.25
     static let liquidMetaballsBlurKernelSize: Int = 2
     
-    static let liquidFadeMultiplier: Float = 0.1//0.3
+    static let liquidFadeMultiplier: Float = 0.2//0.3
+    
+    static let planetSurfaceThickness: Int = 12
     
     static let levelCenterOffset: CGFloat = 50
     

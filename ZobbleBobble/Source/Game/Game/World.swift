@@ -39,6 +39,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     var cameraX: Float { Float(state.camera.x + levelCenterPoint.x) }
     var cameraY: Float { Float(state.camera.y + levelCenterPoint.y) }
     var cameraScale: Float { Float(state.cameraScale) }
+    var planetActualScale: Float { 1 }
     
     var userInteractionEnabled = true
     

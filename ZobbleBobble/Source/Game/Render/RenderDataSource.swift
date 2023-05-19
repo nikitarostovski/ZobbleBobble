@@ -11,6 +11,7 @@ protocol CameraRenderDataSource: AnyObject {
     var cameraX: Float { get }
     var cameraY: Float { get }
     var cameraScale: Float { get }
+    var planetActualScale: Float { get }
 }
 
 protocol BackgroundRenderDataSource: AnyObject {
