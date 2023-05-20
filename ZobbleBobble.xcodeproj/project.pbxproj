@@ -3,60 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C1A42773AFAF00C26BEC /* AppDelegate.swift */; };
 		1126C1B22773AFB100C26BEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B12773AFB100C26BEC /* Assets.xcassets */; };
 		1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B32773AFB100C26BEC /* LaunchScreen.storyboard */; };
-		112EFB422791BDB400494CA0 /* Voronoi.h in Headers */ = {isa = PBXBuildFile; fileRef = 112EFB412791BDB400494CA0 /* Voronoi.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		112EFB532791BDCA00494CA0 /* SwiftClipper.h in Headers */ = {isa = PBXBuildFile; fileRef = 112EFB522791BDCA00494CA0 /* SwiftClipper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		112EFB682791BE0100494CA0 /* TEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB5B2791BE0000494CA0 /* TEdge.swift */; };
-		112EFB692791BE0100494CA0 /* Rect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB5C2791BE0000494CA0 /* Rect.swift */; };
-		112EFB6A2791BE0100494CA0 /* SwiftClipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB5D2791BE0000494CA0 /* SwiftClipper.swift */; };
-		112EFB6B2791BE0100494CA0 /* Defines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB5E2791BE0000494CA0 /* Defines.swift */; };
-		112EFB6C2791BE0100494CA0 /* PolyNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB5F2791BE0000494CA0 /* PolyNode.swift */; };
-		112EFB6D2791BE0100494CA0 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB602791BE0000494CA0 /* Point.swift */; };
-		112EFB6E2791BE0100494CA0 /* Path+Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB612791BE0000494CA0 /* Path+Offsetter.swift */; };
-		112EFB6F2791BE0100494CA0 /* Offsetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB622791BE0000494CA0 /* Offsetter.swift */; };
-		112EFB702791BE0100494CA0 /* OutRec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB632791BE0100494CA0 /* OutRec.swift */; };
-		112EFB712791BE0100494CA0 /* Path+Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB642791BE0100494CA0 /* Path+Clipper.swift */; };
-		112EFB722791BE0100494CA0 /* Path+Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB652791BE0100494CA0 /* Path+Geometry.swift */; };
-		112EFB732791BE0100494CA0 /* Clipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB662791BE0100494CA0 /* Clipper.swift */; };
-		112EFB742791BE0100494CA0 /* ClipperBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB672791BE0100494CA0 /* ClipperBase.swift */; };
-		112EFB902791BE1D00494CA0 /* FortuneSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB772791BE1D00494CA0 /* FortuneSite.swift */; };
-		112EFB912791BE1D00494CA0 /* VEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB782791BE1D00494CA0 /* VEdge.swift */; };
-		112EFB922791BE1D00494CA0 /* HashSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB792791BE1D00494CA0 /* HashSet.swift */; };
-		112EFB932791BE1D00494CA0 /* VPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7A2791BE1D00494CA0 /* VPoint.swift */; };
-		112EFB942791BE1D00494CA0 /* BorderInfoAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7B2791BE1D00494CA0 /* BorderInfoAggregator.swift */; };
-		112EFB952791BE1D00494CA0 /* MinHeap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7C2791BE1D00494CA0 /* MinHeap.swift */; };
-		112EFB962791BE1D00494CA0 /* FortuneCircleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7D2791BE1D00494CA0 /* FortuneCircleEvent.swift */; };
-		112EFB972791BE1D00494CA0 /* FortuneEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7E2791BE1D00494CA0 /* FortuneEvent.swift */; };
-		112EFB982791BE1D00494CA0 /* FortuneSiteEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB7F2791BE1D00494CA0 /* FortuneSiteEvent.swift */; };
-		112EFB992791BE1D00494CA0 /* RBTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB802791BE1D00494CA0 /* RBTree.swift */; };
-		112EFB9A2791BE1D00494CA0 /* BeachLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB812791BE1D00494CA0 /* BeachLine.swift */; };
-		112EFB9B2791BE1D00494CA0 /* PolygonCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB832791BE1D00494CA0 /* PolygonCalculation.swift */; };
-		112EFB9C2791BE1D00494CA0 /* ParabolaMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB842791BE1D00494CA0 /* ParabolaMath.swift */; };
-		112EFB9D2791BE1D00494CA0 /* Approx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB852791BE1D00494CA0 /* Approx.swift */; };
-		112EFB9E2791BE1D00494CA0 /* ClipRectInternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB862791BE1D00494CA0 /* ClipRectInternal.swift */; };
-		112EFB9F2791BE1D00494CA0 /* ClipBorderEdgeCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB872791BE1D00494CA0 /* ClipBorderEdgeCalculation.swift */; };
-		112EFBA02791BE1D00494CA0 /* FortunesAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB882791BE1D00494CA0 /* FortunesAlgorithm.swift */; };
-		112EFBA12791BE1D00494CA0 /* LineSegmentIntersection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB892791BE1D00494CA0 /* LineSegmentIntersection.swift */; };
-		112EFBA22791BE1D00494CA0 /* Edge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB8B2791BE1D00494CA0 /* Edge.swift */; };
-		112EFBA32791BE1D00494CA0 /* Voronoi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB8C2791BE1D00494CA0 /* Voronoi.swift */; };
-		112EFBA42791BE1D00494CA0 /* SitePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB8D2791BE1D00494CA0 /* SitePoint.swift */; };
-		112EFBA52791BE1D00494CA0 /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB8E2791BE1D00494CA0 /* Site.swift */; };
-		112EFBA62791BE1D00494CA0 /* ClipRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFB8F2791BE1D00494CA0 /* ClipRect.swift */; };
-		112EFBC127944D7400494CA0 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBBD27944D7400494CA0 /* Grid.swift */; };
-		112EFBC227944D7400494CA0 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBBE27944D7400494CA0 /* Point.swift */; };
-		112EFBC327944D7400494CA0 /* PoissonDiskSampling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBBF27944D7400494CA0 /* PoissonDiskSampling.swift */; };
-		112EFBC427944D7400494CA0 /* GridPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112EFBC027944D7400494CA0 /* GridPoint.swift */; };
 		1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* GameViewController.swift */; };
 		1133D454294DAFA6009C8DBC /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF77292B8A5600AFD08C /* Constants.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1133D4A629531E83009C8DBC /* Delaunay.h in Headers */ = {isa = PBXBuildFile; fileRef = 1133D4A529531E83009C8DBC /* Delaunay.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1133D4A929531E83009C8DBC /* Delaunay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1133D4A329531E83009C8DBC /* Delaunay.framework */; };
-		1133D4AA29531E83009C8DBC /* Delaunay.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1133D4A329531E83009C8DBC /* Delaunay.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1160EF552928E14400AFD08C /* ZPWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF68B2927C32B001EA051 /* ZPWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF592928E83900AFD08C /* ZPBody.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1160EF582928E83900AFD08C /* ZPBody.mm */; };
 		1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF5A2928E84100AFD08C /* ZPBody.h */; };
@@ -70,9 +25,6 @@
 		1194C9BE29910E9500ACAF97 /* ZPWorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1194C9BF29910E9500ACAF97 /* ZPWorldDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */; };
 		1194D986299A0A4C00B28806 /* Missle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194D985299A0A4C00B28806 /* Missle.swift */; };
-		11955284295F44A2000C7A95 /* Voronoi.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB3F2791BDB400494CA0 /* Voronoi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		11955285295F44A2000C7A95 /* SwiftClipper.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFB502791BDCA00494CA0 /* SwiftClipper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		11955286295F44A2000C7A95 /* PoissonDisk.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 112EFBB02794274400494CA0 /* PoissonDisk.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1195528A2961CE85000C7A95 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119552892961CE85000C7A95 /* Animator.swift */; };
 		1195528C2961D162000C7A95 /* Easing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528B2961D162000C7A95 /* Easing.swift */; };
 		1195528E2961E124000C7A95 /* SwipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528D2961E124000C7A95 /* SwipeView.swift */; };
@@ -102,7 +54,6 @@
 		11BA63542987F724008A4B56 /* OffscreenStars.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11BA63532987F724008A4B56 /* OffscreenStars.metal */; };
 		11BA63562987FC2D008A4B56 /* StarsMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BA63552987FC2D008A4B56 /* StarsMesh.swift */; };
 		11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */; };
-		11C0A724292253C400CA7954 /* PoissonDisk.h in Headers */ = {isa = PBXBuildFile; fileRef = 112EFBB22794274400494CA0 /* PoissonDisk.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		11C39E872A13AB23007B0371 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; };
 		11C39E882A13AB23007B0371 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11C39E8D2A13ABF8007B0371 /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */; };
@@ -239,45 +190,7 @@
 		11FEFF03295DEAA700528A1C /* RenderDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FEFF02295DEAA700528A1C /* RenderDataSource.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXBuildRule section */
-		1160EF75292B804100AFD08C /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = "*.ci.metal";
-			fileType = pattern.proxy;
-			inputFiles = (
-			);
-			isEditable = 1;
-			outputFiles = (
-				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).air",
-			);
-			runOncePerArchitecture = 0;
-			script = "xcrun metal -c $MTL_HEADER_SEARCH_PATHS -fcikernel  \"${INPUT_FILE_PATH}\" -o \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-		};
-		1160EF76292B809800AFD08C /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = "*.ci.air";
-			fileType = pattern.proxy;
-			inputFiles = (
-			);
-			isEditable = 1;
-			outputFiles = (
-				"$(METAL_LIBRARY_OUTPUT_DIR)/$(INPUT_FILE_BASE).metallib",
-			);
-			runOncePerArchitecture = 0;
-			script = "xcrun metallib -cikernel \"${INPUT_FILE_PATH}\" -o \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-		};
-/* End PBXBuildRule section */
-
 /* Begin PBXContainerItemProxy section */
-		1133D4A729531E83009C8DBC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 11D1139925D9A7B50063F332 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1133D4A229531E83009C8DBC;
-			remoteInfo = Delaunay;
-		};
 		11A850A12A13899100574368 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 11D1139925D9A7B50063F332 /* Project object */;
@@ -304,14 +217,10 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		112EFB472791BDB400494CA0 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				11955284295F44A2000C7A95 /* Voronoi.framework in Embed Frameworks */,
-				11955285295F44A2000C7A95 /* SwiftClipper.framework in Embed Frameworks */,
-				11955286295F44A2000C7A95 /* PoissonDisk.framework in Embed Frameworks */,
-				1133D4AA29531E83009C8DBC /* Delaunay.framework in Embed Frameworks */,
 				11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */,
 				11A850A42A13899100574368 /* Levels.framework in Embed Frameworks */,
 			);
@@ -351,64 +260,7 @@
 		1126C22F277A205600C26BEC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		1126C23A277A2B3900C26BEC /* CGFloat+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Utils.swift"; sourceTree = "<group>"; };
 		1126C23C277A2B4600C26BEC /* CGPoint+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
-		112EFB3F2791BDB400494CA0 /* Voronoi.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Voronoi.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		112EFB412791BDB400494CA0 /* Voronoi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Voronoi.h; sourceTree = "<group>"; };
-		112EFB502791BDCA00494CA0 /* SwiftClipper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftClipper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		112EFB522791BDCA00494CA0 /* SwiftClipper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftClipper.h; sourceTree = "<group>"; };
-		112EFB5B2791BE0000494CA0 /* TEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TEdge.swift; sourceTree = "<group>"; };
-		112EFB5C2791BE0000494CA0 /* Rect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rect.swift; sourceTree = "<group>"; };
-		112EFB5D2791BE0000494CA0 /* SwiftClipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftClipper.swift; sourceTree = "<group>"; };
-		112EFB5E2791BE0000494CA0 /* Defines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Defines.swift; sourceTree = "<group>"; };
-		112EFB5F2791BE0000494CA0 /* PolyNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolyNode.swift; sourceTree = "<group>"; };
-		112EFB602791BE0000494CA0 /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
-		112EFB612791BE0000494CA0 /* Path+Offsetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Offsetter.swift"; sourceTree = "<group>"; };
-		112EFB622791BE0000494CA0 /* Offsetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Offsetter.swift; sourceTree = "<group>"; };
-		112EFB632791BE0100494CA0 /* OutRec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutRec.swift; sourceTree = "<group>"; };
-		112EFB642791BE0100494CA0 /* Path+Clipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Clipper.swift"; sourceTree = "<group>"; };
-		112EFB652791BE0100494CA0 /* Path+Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Geometry.swift"; sourceTree = "<group>"; };
-		112EFB662791BE0100494CA0 /* Clipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clipper.swift; sourceTree = "<group>"; };
-		112EFB672791BE0100494CA0 /* ClipperBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipperBase.swift; sourceTree = "<group>"; };
-		112EFB772791BE1D00494CA0 /* FortuneSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneSite.swift; sourceTree = "<group>"; };
-		112EFB782791BE1D00494CA0 /* VEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VEdge.swift; sourceTree = "<group>"; };
-		112EFB792791BE1D00494CA0 /* HashSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashSet.swift; sourceTree = "<group>"; };
-		112EFB7A2791BE1D00494CA0 /* VPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPoint.swift; sourceTree = "<group>"; };
-		112EFB7B2791BE1D00494CA0 /* BorderInfoAggregator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderInfoAggregator.swift; sourceTree = "<group>"; };
-		112EFB7C2791BE1D00494CA0 /* MinHeap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MinHeap.swift; sourceTree = "<group>"; };
-		112EFB7D2791BE1D00494CA0 /* FortuneCircleEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneCircleEvent.swift; sourceTree = "<group>"; };
-		112EFB7E2791BE1D00494CA0 /* FortuneEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneEvent.swift; sourceTree = "<group>"; };
-		112EFB7F2791BE1D00494CA0 /* FortuneSiteEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortuneSiteEvent.swift; sourceTree = "<group>"; };
-		112EFB802791BE1D00494CA0 /* RBTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBTree.swift; sourceTree = "<group>"; };
-		112EFB812791BE1D00494CA0 /* BeachLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeachLine.swift; sourceTree = "<group>"; };
-		112EFB832791BE1D00494CA0 /* PolygonCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolygonCalculation.swift; sourceTree = "<group>"; };
-		112EFB842791BE1D00494CA0 /* ParabolaMath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParabolaMath.swift; sourceTree = "<group>"; };
-		112EFB852791BE1D00494CA0 /* Approx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Approx.swift; sourceTree = "<group>"; };
-		112EFB862791BE1D00494CA0 /* ClipRectInternal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipRectInternal.swift; sourceTree = "<group>"; };
-		112EFB872791BE1D00494CA0 /* ClipBorderEdgeCalculation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipBorderEdgeCalculation.swift; sourceTree = "<group>"; };
-		112EFB882791BE1D00494CA0 /* FortunesAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FortunesAlgorithm.swift; sourceTree = "<group>"; };
-		112EFB892791BE1D00494CA0 /* LineSegmentIntersection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineSegmentIntersection.swift; sourceTree = "<group>"; };
-		112EFB8B2791BE1D00494CA0 /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
-		112EFB8C2791BE1D00494CA0 /* Voronoi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Voronoi.swift; sourceTree = "<group>"; };
-		112EFB8D2791BE1D00494CA0 /* SitePoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SitePoint.swift; sourceTree = "<group>"; };
-		112EFB8E2791BE1D00494CA0 /* Site.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
-		112EFB8F2791BE1D00494CA0 /* ClipRect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipRect.swift; sourceTree = "<group>"; };
-		112EFBB02794274400494CA0 /* PoissonDisk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PoissonDisk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		112EFBB22794274400494CA0 /* PoissonDisk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PoissonDisk.h; sourceTree = "<group>"; };
-		112EFBBD27944D7400494CA0 /* Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
-		112EFBBE27944D7400494CA0 /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
-		112EFBBF27944D7400494CA0 /* PoissonDiskSampling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoissonDiskSampling.swift; sourceTree = "<group>"; };
-		112EFBC027944D7400494CA0 /* GridPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridPoint.swift; sourceTree = "<group>"; };
 		1130A4A6292FB2FE004898D9 /* ZobbleBobble.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZobbleBobble.entitlements; sourceTree = "<group>"; };
-		1133D48C29531039009C8DBC /* Circumcircle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Circumcircle.swift; sourceTree = "<group>"; };
-		1133D48D29531039009C8DBC /* Edge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Edge.swift; sourceTree = "<group>"; };
-		1133D48E29531039009C8DBC /* Point.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
-		1133D48F29531039009C8DBC /* CDT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CDT.swift; sourceTree = "<group>"; };
-		1133D49029531039009C8DBC /* TPolygon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPolygon.swift; sourceTree = "<group>"; };
-		1133D49129531039009C8DBC /* ConformingDelaunay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConformingDelaunay.swift; sourceTree = "<group>"; };
-		1133D49229531039009C8DBC /* PointNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointNode.swift; sourceTree = "<group>"; };
-		1133D49329531039009C8DBC /* Triangle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Triangle.swift; sourceTree = "<group>"; };
-		1133D49429531039009C8DBC /* Delaunay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Delaunay.swift; sourceTree = "<group>"; };
-		1133D4A329531E83009C8DBC /* Delaunay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Delaunay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1133D4A529531E83009C8DBC /* Delaunay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delaunay.h; sourceTree = "<group>"; };
 		1160EF582928E83900AFD08C /* ZPBody.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPBody.mm; sourceTree = "<group>"; };
 		1160EF5A2928E84100AFD08C /* ZPBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPBody.h; sourceTree = "<group>"; };
 		1160EF77292B8A5600AFD08C /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -591,37 +443,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1133D4A929531E83009C8DBC /* Delaunay.framework in Frameworks */,
 				11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */,
 				11A850A32A13899100574368 /* Levels.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB3C2791BDB400494CA0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB4D2791BDCA00494CA0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFBAD2794274400494CA0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		1133D4A029531E83009C8DBC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -705,127 +528,6 @@
 				11B8210229856908005300DC /* Render */,
 			);
 			path = Game;
-			sourceTree = "<group>";
-		};
-		112EFB402791BDB400494CA0 /* Voronoi */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB412791BDB400494CA0 /* Voronoi.h */,
-				112EFB752791BE1D00494CA0 /* Internal */,
-				112EFB8A2791BE1D00494CA0 /* Public */,
-			);
-			path = Voronoi;
-			sourceTree = "<group>";
-		};
-		112EFB512791BDCA00494CA0 /* SwiftClipper */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB662791BE0100494CA0 /* Clipper.swift */,
-				112EFB672791BE0100494CA0 /* ClipperBase.swift */,
-				112EFB5E2791BE0000494CA0 /* Defines.swift */,
-				112EFB622791BE0000494CA0 /* Offsetter.swift */,
-				112EFB632791BE0100494CA0 /* OutRec.swift */,
-				112EFB642791BE0100494CA0 /* Path+Clipper.swift */,
-				112EFB652791BE0100494CA0 /* Path+Geometry.swift */,
-				112EFB612791BE0000494CA0 /* Path+Offsetter.swift */,
-				112EFB602791BE0000494CA0 /* Point.swift */,
-				112EFB5F2791BE0000494CA0 /* PolyNode.swift */,
-				112EFB5C2791BE0000494CA0 /* Rect.swift */,
-				112EFB5D2791BE0000494CA0 /* SwiftClipper.swift */,
-				112EFB5B2791BE0000494CA0 /* TEdge.swift */,
-				112EFB522791BDCA00494CA0 /* SwiftClipper.h */,
-			);
-			path = SwiftClipper;
-			sourceTree = "<group>";
-		};
-		112EFB752791BE1D00494CA0 /* Internal */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB762791BE1D00494CA0 /* Structures */,
-				112EFB822791BE1D00494CA0 /* Static */,
-			);
-			path = Internal;
-			sourceTree = "<group>";
-		};
-		112EFB762791BE1D00494CA0 /* Structures */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB772791BE1D00494CA0 /* FortuneSite.swift */,
-				112EFB782791BE1D00494CA0 /* VEdge.swift */,
-				112EFB792791BE1D00494CA0 /* HashSet.swift */,
-				112EFB7A2791BE1D00494CA0 /* VPoint.swift */,
-				112EFB7B2791BE1D00494CA0 /* BorderInfoAggregator.swift */,
-				112EFB7C2791BE1D00494CA0 /* MinHeap.swift */,
-				112EFB7D2791BE1D00494CA0 /* FortuneCircleEvent.swift */,
-				112EFB7E2791BE1D00494CA0 /* FortuneEvent.swift */,
-				112EFB7F2791BE1D00494CA0 /* FortuneSiteEvent.swift */,
-				112EFB802791BE1D00494CA0 /* RBTree.swift */,
-				112EFB812791BE1D00494CA0 /* BeachLine.swift */,
-			);
-			path = Structures;
-			sourceTree = "<group>";
-		};
-		112EFB822791BE1D00494CA0 /* Static */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB832791BE1D00494CA0 /* PolygonCalculation.swift */,
-				112EFB842791BE1D00494CA0 /* ParabolaMath.swift */,
-				112EFB852791BE1D00494CA0 /* Approx.swift */,
-				112EFB862791BE1D00494CA0 /* ClipRectInternal.swift */,
-				112EFB872791BE1D00494CA0 /* ClipBorderEdgeCalculation.swift */,
-				112EFB882791BE1D00494CA0 /* FortunesAlgorithm.swift */,
-				112EFB892791BE1D00494CA0 /* LineSegmentIntersection.swift */,
-			);
-			path = Static;
-			sourceTree = "<group>";
-		};
-		112EFB8A2791BE1D00494CA0 /* Public */ = {
-			isa = PBXGroup;
-			children = (
-				112EFB8B2791BE1D00494CA0 /* Edge.swift */,
-				112EFB8C2791BE1D00494CA0 /* Voronoi.swift */,
-				112EFB8D2791BE1D00494CA0 /* SitePoint.swift */,
-				112EFB8E2791BE1D00494CA0 /* Site.swift */,
-				112EFB8F2791BE1D00494CA0 /* ClipRect.swift */,
-			);
-			path = Public;
-			sourceTree = "<group>";
-		};
-		112EFBB12794274400494CA0 /* PoissonDisk */ = {
-			isa = PBXGroup;
-			children = (
-				112EFBB22794274400494CA0 /* PoissonDisk.h */,
-				112EFBBD27944D7400494CA0 /* Grid.swift */,
-				112EFBC027944D7400494CA0 /* GridPoint.swift */,
-				112EFBBE27944D7400494CA0 /* Point.swift */,
-				112EFBBF27944D7400494CA0 /* PoissonDiskSampling.swift */,
-			);
-			path = PoissonDisk;
-			sourceTree = "<group>";
-		};
-		1133D48B29531039009C8DBC /* Delaunay */ = {
-			isa = PBXGroup;
-			children = (
-				1133D48C29531039009C8DBC /* Circumcircle.swift */,
-				1133D48D29531039009C8DBC /* Edge.swift */,
-				1133D48E29531039009C8DBC /* Point.swift */,
-				1133D48F29531039009C8DBC /* CDT.swift */,
-				1133D49029531039009C8DBC /* TPolygon.swift */,
-				1133D49129531039009C8DBC /* ConformingDelaunay.swift */,
-				1133D49229531039009C8DBC /* PointNode.swift */,
-				1133D49329531039009C8DBC /* Triangle.swift */,
-				1133D49429531039009C8DBC /* Delaunay.swift */,
-			);
-			path = Delaunay;
-			sourceTree = "<group>";
-		};
-		1133D4A429531E83009C8DBC /* Delaunay */ = {
-			isa = PBXGroup;
-			children = (
-				1133D4A529531E83009C8DBC /* Delaunay.h */,
-				1133D48B29531039009C8DBC /* Delaunay */,
-			);
-			path = Delaunay;
 			sourceTree = "<group>";
 		};
 		115DFA8B279868AA00B09FF2 /* Components */ = {
@@ -949,10 +651,6 @@
 			children = (
 				11E0CBD728AE266D00D24C5C /* Project.md */,
 				1126C1A32773AFAF00C26BEC /* ZobbleBobble */,
-				112EFB402791BDB400494CA0 /* Voronoi */,
-				112EFB512791BDCA00494CA0 /* SwiftClipper */,
-				112EFBB12794274400494CA0 /* PoissonDisk */,
-				1133D4A429531E83009C8DBC /* Delaunay */,
 				11DFF32F2927BB3B001EA051 /* ZobblePhysics */,
 				11A850862A13880900574368 /* LevelConverter */,
 				11A8509E2A13899100574368 /* Levels */,
@@ -965,11 +663,7 @@
 			isa = PBXGroup;
 			children = (
 				1126C1A22773AFAF00C26BEC /* ZobbleBobble.app */,
-				112EFB3F2791BDB400494CA0 /* Voronoi.framework */,
-				112EFB502791BDCA00494CA0 /* SwiftClipper.framework */,
-				112EFBB02794274400494CA0 /* PoissonDisk.framework */,
 				11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */,
-				1133D4A329531E83009C8DBC /* Delaunay.framework */,
 				11A850852A13880900574368 /* LevelConverter */,
 				11A8509D2A13899100574368 /* Levels.framework */,
 			);
@@ -1180,38 +874,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		112EFB3A2791BDB400494CA0 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				112EFB422791BDB400494CA0 /* Voronoi.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB4B2791BDCA00494CA0 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				112EFB532791BDCA00494CA0 /* SwiftClipper.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFBAB2794274400494CA0 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				11C0A724292253C400CA7954 /* PoissonDisk.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		1133D49E29531E83009C8DBC /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1133D4A629531E83009C8DBC /* Delaunay.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		11A850982A13899100574368 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1303,90 +965,15 @@
 				112EFB472791BDB400494CA0 /* Embed Frameworks */,
 			);
 			buildRules = (
-				1160EF76292B809800AFD08C /* PBXBuildRule */,
-				1160EF75292B804100AFD08C /* PBXBuildRule */,
 			);
 			dependencies = (
 				11DFF3332927BB3B001EA051 /* PBXTargetDependency */,
-				1133D4A829531E83009C8DBC /* PBXTargetDependency */,
 				11A850A22A13899100574368 /* PBXTargetDependency */,
 			);
 			name = ZobbleBobble;
 			productName = ZobbleBobble;
 			productReference = 1126C1A22773AFAF00C26BEC /* ZobbleBobble.app */;
 			productType = "com.apple.product-type.application";
-		};
-		112EFB3E2791BDB400494CA0 /* Voronoi */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 112EFB4A2791BDB400494CA0 /* Build configuration list for PBXNativeTarget "Voronoi" */;
-			buildPhases = (
-				112EFB3A2791BDB400494CA0 /* Headers */,
-				112EFB3B2791BDB400494CA0 /* Sources */,
-				112EFB3C2791BDB400494CA0 /* Frameworks */,
-				112EFB3D2791BDB400494CA0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Voronoi;
-			productName = Voronoi;
-			productReference = 112EFB3F2791BDB400494CA0 /* Voronoi.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		112EFB4F2791BDCA00494CA0 /* SwiftClipper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 112EFB582791BDCA00494CA0 /* Build configuration list for PBXNativeTarget "SwiftClipper" */;
-			buildPhases = (
-				112EFB4B2791BDCA00494CA0 /* Headers */,
-				112EFB4C2791BDCA00494CA0 /* Sources */,
-				112EFB4D2791BDCA00494CA0 /* Frameworks */,
-				112EFB4E2791BDCA00494CA0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SwiftClipper;
-			productName = SwiftClipper;
-			productReference = 112EFB502791BDCA00494CA0 /* SwiftClipper.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		112EFBAF2794274400494CA0 /* PoissonDisk */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 112EFBB82794274400494CA0 /* Build configuration list for PBXNativeTarget "PoissonDisk" */;
-			buildPhases = (
-				112EFBAB2794274400494CA0 /* Headers */,
-				112EFBAC2794274400494CA0 /* Sources */,
-				112EFBAD2794274400494CA0 /* Frameworks */,
-				112EFBAE2794274400494CA0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = PoissonDisk;
-			productName = PoissonDisk;
-			productReference = 112EFBB02794274400494CA0 /* PoissonDisk.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		1133D4A229531E83009C8DBC /* Delaunay */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 1133D4AB29531E83009C8DBC /* Build configuration list for PBXNativeTarget "Delaunay" */;
-			buildPhases = (
-				1133D49E29531E83009C8DBC /* Headers */,
-				1133D49F29531E83009C8DBC /* Sources */,
-				1133D4A029531E83009C8DBC /* Frameworks */,
-				1133D4A129531E83009C8DBC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Delaunay;
-			productName = Delaunay;
-			productReference = 1133D4A329531E83009C8DBC /* Delaunay.framework */;
-			productType = "com.apple.product-type.framework";
 		};
 		11A850842A13880900574368 /* LevelConverter */ = {
 			isa = PBXNativeTarget;
@@ -1455,21 +1042,6 @@
 					1126C1A12773AFAF00C26BEC = {
 						CreatedOnToolsVersion = 13.1;
 					};
-					112EFB3E2791BDB400494CA0 = {
-						CreatedOnToolsVersion = 13.1;
-					};
-					112EFB4F2791BDCA00494CA0 = {
-						CreatedOnToolsVersion = 13.1;
-						LastSwiftMigration = 1310;
-					};
-					112EFBAF2794274400494CA0 = {
-						CreatedOnToolsVersion = 13.1;
-						LastSwiftMigration = 1310;
-					};
-					1133D4A229531E83009C8DBC = {
-						CreatedOnToolsVersion = 14.0;
-						LastSwiftMigration = 1400;
-					};
 					11A850842A13880900574368 = {
 						CreatedOnToolsVersion = 14.3;
 					};
@@ -1496,11 +1068,7 @@
 			projectRoot = "";
 			targets = (
 				1126C1A12773AFAF00C26BEC /* ZobbleBobble */,
-				112EFB3E2791BDB400494CA0 /* Voronoi */,
-				112EFB4F2791BDCA00494CA0 /* SwiftClipper */,
-				112EFBAF2794274400494CA0 /* PoissonDisk */,
 				11DFF32D2927BB3B001EA051 /* ZobblePhysics */,
-				1133D4A229531E83009C8DBC /* Delaunay */,
 				11A850842A13880900574368 /* LevelConverter */,
 				11A8509C2A13899100574368 /* Levels */,
 			);
@@ -1514,34 +1082,6 @@
 			files = (
 				1126C1B22773AFB100C26BEC /* Assets.xcassets in Resources */,
 				1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB3D2791BDB400494CA0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB4E2791BDCA00494CA0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFBAE2794274400494CA0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		1133D4A129531E83009C8DBC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1601,74 +1141,6 @@
 				11720C692A0AA5EF00397C0F /* LiquidInstance.swift in Sources */,
 				11CB837129C075DC0042B2F4 /* Star.swift in Sources */,
 				11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB3B2791BDB400494CA0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				112EFBA32791BE1D00494CA0 /* Voronoi.swift in Sources */,
-				112EFBA02791BE1D00494CA0 /* FortunesAlgorithm.swift in Sources */,
-				112EFB9A2791BE1D00494CA0 /* BeachLine.swift in Sources */,
-				112EFB902791BE1D00494CA0 /* FortuneSite.swift in Sources */,
-				112EFB922791BE1D00494CA0 /* HashSet.swift in Sources */,
-				112EFB982791BE1D00494CA0 /* FortuneSiteEvent.swift in Sources */,
-				112EFB9F2791BE1D00494CA0 /* ClipBorderEdgeCalculation.swift in Sources */,
-				112EFB972791BE1D00494CA0 /* FortuneEvent.swift in Sources */,
-				112EFB952791BE1D00494CA0 /* MinHeap.swift in Sources */,
-				112EFBA62791BE1D00494CA0 /* ClipRect.swift in Sources */,
-				112EFB9B2791BE1D00494CA0 /* PolygonCalculation.swift in Sources */,
-				112EFB992791BE1D00494CA0 /* RBTree.swift in Sources */,
-				112EFBA42791BE1D00494CA0 /* SitePoint.swift in Sources */,
-				112EFBA22791BE1D00494CA0 /* Edge.swift in Sources */,
-				112EFB912791BE1D00494CA0 /* VEdge.swift in Sources */,
-				112EFB9C2791BE1D00494CA0 /* ParabolaMath.swift in Sources */,
-				112EFB962791BE1D00494CA0 /* FortuneCircleEvent.swift in Sources */,
-				112EFB932791BE1D00494CA0 /* VPoint.swift in Sources */,
-				112EFBA12791BE1D00494CA0 /* LineSegmentIntersection.swift in Sources */,
-				112EFB942791BE1D00494CA0 /* BorderInfoAggregator.swift in Sources */,
-				112EFB9D2791BE1D00494CA0 /* Approx.swift in Sources */,
-				112EFBA52791BE1D00494CA0 /* Site.swift in Sources */,
-				112EFB9E2791BE1D00494CA0 /* ClipRectInternal.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFB4C2791BDCA00494CA0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				112EFB6E2791BE0100494CA0 /* Path+Offsetter.swift in Sources */,
-				112EFB682791BE0100494CA0 /* TEdge.swift in Sources */,
-				112EFB6A2791BE0100494CA0 /* SwiftClipper.swift in Sources */,
-				112EFB6D2791BE0100494CA0 /* Point.swift in Sources */,
-				112EFB742791BE0100494CA0 /* ClipperBase.swift in Sources */,
-				112EFB722791BE0100494CA0 /* Path+Geometry.swift in Sources */,
-				112EFB712791BE0100494CA0 /* Path+Clipper.swift in Sources */,
-				112EFB6F2791BE0100494CA0 /* Offsetter.swift in Sources */,
-				112EFB6B2791BE0100494CA0 /* Defines.swift in Sources */,
-				112EFB692791BE0100494CA0 /* Rect.swift in Sources */,
-				112EFB6C2791BE0100494CA0 /* PolyNode.swift in Sources */,
-				112EFB702791BE0100494CA0 /* OutRec.swift in Sources */,
-				112EFB732791BE0100494CA0 /* Clipper.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		112EFBAC2794274400494CA0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				112EFBC327944D7400494CA0 /* PoissonDiskSampling.swift in Sources */,
-				112EFBC227944D7400494CA0 /* Point.swift in Sources */,
-				112EFBC427944D7400494CA0 /* GridPoint.swift in Sources */,
-				112EFBC127944D7400494CA0 /* Grid.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		1133D49F29531E83009C8DBC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1768,11 +1240,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		1133D4A829531E83009C8DBC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1133D4A229531E83009C8DBC /* Delaunay */;
-			targetProxy = 1133D4A729531E83009C8DBC /* PBXContainerItemProxy */;
-		};
 		11A850A22A13899100574368 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 11A8509C2A13899100574368 /* Levels */;
@@ -1878,303 +1345,10 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		112EFB482791BDB400494CA0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.Voronoi";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		112EFB492791BDB400494CA0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.Voronoi";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		112EFB592791BDCA00494CA0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.SwiftClipper";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		112EFB5A2791BDCA00494CA0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.SwiftClipper";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		112EFBB92794274400494CA0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.PoissonDisk";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		112EFBBA2794274400494CA0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/**";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "-.PoissonDisk";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		1133D4AC29531E83009C8DBC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4DZU58EZPK;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.Delaunay;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		1133D4AD29531E83009C8DBC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4DZU58EZPK;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.Delaunay;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -2482,42 +1656,6 @@
 			buildConfigurations = (
 				1126C1B62773AFB100C26BEC /* Debug */,
 				1126C1B72773AFB100C26BEC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		112EFB4A2791BDB400494CA0 /* Build configuration list for PBXNativeTarget "Voronoi" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				112EFB482791BDB400494CA0 /* Debug */,
-				112EFB492791BDB400494CA0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		112EFB582791BDCA00494CA0 /* Build configuration list for PBXNativeTarget "SwiftClipper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				112EFB592791BDCA00494CA0 /* Debug */,
-				112EFB5A2791BDCA00494CA0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		112EFBB82794274400494CA0 /* Build configuration list for PBXNativeTarget "PoissonDisk" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				112EFBB92794274400494CA0 /* Debug */,
-				112EFBBA2794274400494CA0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		1133D4AB29531E83009C8DBC /* Build configuration list for PBXNativeTarget "Delaunay" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1133D4AC29531E83009C8DBC /* Debug */,
-				1133D4AD29531E83009C8DBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
