@@ -9,10 +9,8 @@ import UIKit
 
 final class GameViewController: UIViewController {
     var screenSize: CGSize { UIScreen.main.bounds.size }
-    var renderSize: CGSize { CGSize(width: UIScreen.main.nativeBounds.size.width / Settings.resolutionDownscale,
-                                    height: UIScreen.main.nativeBounds.size.height / Settings.resolutionDownscale) }
-//    var physicsSize: CGSize { CGSize(width: Settings.worldWidth,
-//                                     height: Settings.worldWidth / UIScreen.main.bounds.width * UIScreen.main.bounds.height) }
+    var renderSize: CGSize { CGSize(width: UIScreen.main.nativeBounds.size.width / Settings.Graphics.resolutionDownscale,
+                                    height: UIScreen.main.nativeBounds.size.height / Settings.Graphics.resolutionDownscale) }
     
     private var game: Game?
     

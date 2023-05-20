@@ -25,7 +25,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     
     var particleRadius: Float { Float(level.particleRadius) }
     
-    var liquidFadeModifier: Float = Settings.liquidFadeMultiplier
+    var liquidFadeModifier: Float = Settings.Graphics.fadeMultiplier
     var liquidCount: Int?
     var liquidPositions: UnsafeMutableRawPointer?
     var liquidVelocities: UnsafeMutableRawPointer?
@@ -76,9 +76,9 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         self.starCenterPoint = CGPoint(x: 0, y: game.screenSize.height * 0.6)
         
         let def = ZPWorldDef()
-        def.gravityScale = float32(Settings.physicsGravityModifier);
+        def.gravityScale = float32(Settings.Physics.gravityModifier);
         def.rotationStep = level.rotationPerSecond.radians / 60.0;
-        def.maxCount = int32(Settings.maxParticleCount)
+        def.maxCount = int32(Settings.Physics.maxParticleCount)
         def.center = .zero
         def.gravityRadius = level.gravityRadius
         def.radius = Float(level.particleRadius)
@@ -96,7 +96,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         star.radius = Float(pack.radius)
         star.position = SIMD2<Float>(Float(starCenterPoint.x), Float(starCenterPoint.y))
         let missleRange = star.getWorldVisibleMissles(levelIndex: game.state.levelIndex, misslesFired: 0)
-        star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+        star.updateStarAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
                                   levelIndex: CGFloat(game.state.levelIndex),
                                   visibleMissleRange: missleRange)
         
@@ -110,9 +110,9 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
     func update(_ time: CFTimeInterval) {
         autoreleasepool {
             self.world.worldStep(time,
-                                 velocityIterations: Int32(Settings.physicsVelocityIterations),
-                                 positionIterations: Int32(Settings.physicsPositionIterations),
-                                 particleIterations: Int32(Settings.physicsParticleIterations))
+                                 velocityIterations: Int32(Settings.Physics.velocityIterations),
+                                 positionIterations: Int32(Settings.Physics.positionIterations),
+                                 particleIterations: Int32(Settings.Physics.particleIterations))
             
             self.liquidPositions = world.liquidPositions
             self.liquidVelocities = world.liquidVelocities
@@ -151,7 +151,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             let flags = material.physicsFlags
             let isStatic = true
             let gravityScale = material.gravityScale
-            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
+            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.speedThresholdModifier
             let staticContactBehavior = material.becomesLiquidOnContact
             
             world.addParticle(withPosition: center,
@@ -185,7 +185,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
             
             let missleRange = self.star.getWorldVisibleMissles(levelIndex: Int(currentLevel), misslesFired: misslesFired)
-            self.star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+            self.star.updateStarAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
                                            levelIndex: currentLevel,
                                            visibleMissleRange: missleRange)
             self.lastQueryStarHadChanges = true
@@ -195,7 +195,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         
         let completion = {
             let missleRange = self.star.getWorldVisibleMissles(levelIndex: Int(currentLevel), misslesFired: endMissleCount)
-            self.star.updateStarAppearance(levelToPackProgress: Settings.levelCameraScale,
+            self.star.updateStarAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
                                            levelIndex: currentLevel,
                                            visibleMissleRange: missleRange)
             self.star.state.currentMissleIndex += 1
@@ -206,7 +206,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
         }
         
         if animated {
-            Animator.animate(duraion: Settings.shotAnimationDuration, easing: Settings.shotAnimationEasing, step: animation, completion: completion)
+            Animator.animate(duraion: Settings.Camera.shotAnimationDuration, easing: Settings.Camera.shotAnimationEasing, step: animation, completion: completion)
         } else {
             completion()
         }
@@ -223,7 +223,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
             let flags = material.physicsFlags
             let isStatic = false
             let gravityScale = material.gravityScale
-            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.physicsSpeedThresholdModifier
+            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.speedThresholdModifier
             let staticContactBehavior = material.becomesLiquidOnContact
             
             var pos = CGPoint(x: CGFloat(center.x), y: CGFloat(center.y))
@@ -242,7 +242,7 @@ final class World: ObjectRenderDataSource, CameraRenderDataSource {
                                     freezeVelocityThreshold: freezeVelocityThreshold,
                                     becomesLiquidOnContact: staticContactBehavior,
                                     explosionRadius: material.explosionRadius,
-                                    shootImpulse: missle.missleModel.startImpulse * Settings.physicsMissleShotImpulseModifier)
+                                    shootImpulse: missle.missleModel.startImpulse * Settings.Physics.missleShotImpulseModifier)
         }
     }
 }
@@ -305,6 +305,6 @@ extension World: StarsRenderDataSource {
     }
     
     var starTransitionProgress: Float {
-        Float(Settings.levelsMenuCameraScale)
+        Float(Settings.Camera.levelsMenuCameraScale)
     }
 }

@@ -93,7 +93,7 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         return Array(allStars[visibleLevelPackIndices])
     }
     
-    init(game: Game?, from: CGFloat = Settings.levelsMenuCameraScale, to: CGFloat = Settings.levelsMenuCameraScale) {
+    init(game: Game?, from: CGFloat = Settings.Camera.levelsMenuCameraScale, to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
         self.game = game
         self.state = MenuState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
         
@@ -103,11 +103,11 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             return
         }
         switch to {
-        case Settings.levelCameraScale:
+        case Settings.Camera.levelCameraScale:
             transitionToLevel()
-        case Settings.levelsMenuCameraScale:
+        case Settings.Camera.levelsMenuCameraScale:
             transitionToLevelSelection()
-        case Settings.packsMenuCameraScale:
+        case Settings.Camera.packsMenuCameraScale:
             transitionToPackSelection()
         default:
             break
@@ -181,9 +181,9 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         let currentStar = stars[game!.state.packIndex]
         
         let startProgress = state.levelToPackProgress
-        let targetProgress = Settings.levelCameraScale
+        let targetProgress = Settings.Camera.levelCameraScale
         
-        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
+        Animator.animate(duraion: Settings.Camera.menuAnimationDuration, easing: Settings.Camera.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             self.updateRenderData()
@@ -199,14 +199,14 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
         let currentStar = stars[game!.state.packIndex]
         
         let startProgress = state.levelToPackProgress
-        let targetProgress = Settings.levelsMenuCameraScale
+        let targetProgress = Settings.Camera.levelsMenuCameraScale
         
         let startMissle = currentStar.state.currentMissleIndex
         let targetMissle = CGFloat(0)
         
         state.currentLevelPagePosition = CGFloat(game!.state.levelIndex)
         
-        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
+        Animator.animate(duraion: Settings.Camera.menuAnimationDuration, easing: Settings.Camera.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             currentStar.state.currentMissleIndex = startMissle + (targetMissle - startMissle) * percentage
@@ -222,11 +222,11 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
     
     private func transitionToPackSelection() {
         let startProgress = state.levelToPackProgress
-        let targetProgress = Settings.packsMenuCameraScale
+        let targetProgress = Settings.Camera.packsMenuCameraScale
         
         state.currentPackPagePosition = CGFloat(game!.state.packIndex)
         
-        Animator.animate(duraion: Settings.menuAnimationDuration, easing: Settings.menuAnimationEasing) { [weak self] percentage in
+        Animator.animate(duraion: Settings.Camera.menuAnimationDuration, easing: Settings.Camera.menuAnimationEasing) { [weak self] percentage in
             guard let self = self else { return }
             self.state.levelToPackProgress = startProgress + (targetProgress - startProgress) * percentage
             self.updateRenderData()
@@ -297,25 +297,25 @@ final class Menu: ObjectRenderDataSource, StarsRenderDataSource {
             if state.levelToPackProgress <= 2 {
                 // level selection
                 let p = state.levelToPackProgress - 1
-                starRadiusScale = Settings.starLevelScale + p * (Settings.starLevelMenuScale - Settings.starLevelScale)
-                planetRadiusScale = Settings.planetLevelScale + p * (Settings.planetLevelMenuScale - Settings.planetLevelScale)
+                starRadiusScale = Settings.Camera.starLevelScale + p * (Settings.Camera.starLevelMenuScale - Settings.Camera.starLevelScale)
+                planetRadiusScale = Settings.Camera.planetLevelScale + p * (Settings.Camera.planetLevelMenuScale - Settings.Camera.planetLevelScale)
                 starCenterPoint = CGPoint(x: starCenterLevelMode.x + p * (starCenterMenuLevelMode.x - starCenterLevelMode.x),
                                           y: starCenterLevelMode.y + p * (starCenterMenuLevelMode.y - starCenterLevelMode.y))
                 planetCenterPoint = CGPoint(x: planetCenterLevelMode.x + p * (planetCenterMenuLevelMode.x - planetCenterLevelMode.x),
                                             y: planetCenterLevelMode.y + p * (planetCenterMenuLevelMode.y - planetCenterLevelMode.y))
-                starAngleBetweenPositions = Settings.starLevelAngle + p * (Settings.starLevelMenuAngle - Settings.starLevelAngle)
-                planetAngleBetweenPositions = Settings.planetLevelAngle + p * (Settings.planetLevelMenuAngle - Settings.planetLevelAngle)
+                starAngleBetweenPositions = Settings.Camera.starLevelAngle + p * (Settings.Camera.starLevelMenuAngle - Settings.Camera.starLevelAngle)
+                planetAngleBetweenPositions = Settings.Camera.planetLevelAngle + p * (Settings.Camera.planetLevelMenuAngle - Settings.Camera.planetLevelAngle)
             } else {
                 // pack selection
                 let p = state.levelToPackProgress - 2
-                starRadiusScale = Settings.starLevelMenuScale + p * (Settings.starPackMenuScale - Settings.starLevelMenuScale)
-                planetRadiusScale = Settings.planetLevelMenuScale + p * (Settings.planetPackMenuScale - Settings.planetLevelMenuScale)
+                starRadiusScale = Settings.Camera.starLevelMenuScale + p * (Settings.Camera.starPackMenuScale - Settings.Camera.starLevelMenuScale)
+                planetRadiusScale = Settings.Camera.planetLevelMenuScale + p * (Settings.Camera.planetPackMenuScale - Settings.Camera.planetLevelMenuScale)
                 starCenterPoint = CGPoint(x: starCenterMenuLevelMode.x + p * (starCenterMenuPackMode.x - starCenterMenuLevelMode.x),
                                           y: starCenterMenuLevelMode.y + p * (starCenterMenuPackMode.y - starCenterMenuLevelMode.y))
                 planetCenterPoint = CGPoint(x: planetCenterMenuLevelMode.x + p * (planetCenterMenuPackMode.x - planetCenterMenuLevelMode.x),
                                             y: planetCenterMenuLevelMode.y + p * (planetCenterMenuPackMode.y - planetCenterMenuLevelMode.y))
-                starAngleBetweenPositions = Settings.starLevelMenuAngle + p * (Settings.starPackMenuAngle - Settings.starLevelMenuAngle)
-                planetAngleBetweenPositions = Settings.planetLevelMenuAngle + p * (Settings.planetPackMenuAngle - Settings.planetLevelMenuAngle)
+                starAngleBetweenPositions = Settings.Camera.starLevelMenuAngle + p * (Settings.Camera.starPackMenuAngle - Settings.Camera.starLevelMenuAngle)
+                planetAngleBetweenPositions = Settings.Camera.planetLevelMenuAngle + p * (Settings.Camera.planetPackMenuAngle - Settings.Camera.planetLevelMenuAngle)
             }
             
             starAnchor = CGPoint(x: starCenterPoint.x, y: starCenterPoint.y - starRadius)

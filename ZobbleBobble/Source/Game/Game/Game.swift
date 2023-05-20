@@ -31,7 +31,7 @@ struct GameState {
 }
 
 final class Game {
-    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.levelCenterOffset)
+    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
     
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
@@ -104,7 +104,7 @@ final class Game {
     }
     
     func runMenu(isFromLevel: Bool = false) {
-        let from = isFromLevel ? Settings.levelCameraScale : Settings.levelsMenuCameraScale
+        let from = isFromLevel ? Settings.Camera.levelCameraScale : Settings.Camera.levelsMenuCameraScale
         let menu = Menu(game: self, from: from)
         self.menu = menu
         self.state.state = .menu

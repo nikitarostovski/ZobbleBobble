@@ -120,35 +120,35 @@ class LiquidMesh: BaseMesh {
     
     init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.positionBufferProvider = BufferProvider(device: device,
-                                                     inflightBuffersCount: Settings.inflightBufferCount,
-                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.maxParticleCount)
+                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.Physics.maxParticleCount)
         self.velocityBufferProvider = BufferProvider(device: device,
-                                                     inflightBuffersCount: Settings.inflightBufferCount,
-                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.maxParticleCount)
+                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.Physics.maxParticleCount)
         self.colorBufferProvider = BufferProvider(device: device,
-                                                  inflightBuffersCount: Settings.inflightBufferCount,
-                                                  bufferSize: MemoryLayout<SIMD4<UInt8>>.stride * Settings.maxParticleCount)
+                                                  inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                  bufferSize: MemoryLayout<SIMD4<UInt8>>.stride * Settings.Physics.maxParticleCount)
         self.uniformsBufferProvider = BufferProvider(device: device,
-                                                     inflightBuffersCount: Settings.inflightBufferCount,
+                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
         self.fadeMultiplierBufferProvider = BufferProvider(device: device,
-                                                           inflightBuffersCount: Settings.inflightBufferCount,
+                                                           inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                            bufferSize: MemoryLayout<Float32>.stride)
         self.pointCountBufferProvider = BufferProvider(device: device,
-                                                       inflightBuffersCount: Settings.inflightBufferCount,
+                                                       inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<Int>.stride)
         self.surfaceThicknessBufferProvider = BufferProvider(device: device,
-                                                             inflightBuffersCount: Settings.inflightBufferCount,
+                                                             inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                              bufferSize: MemoryLayout<Int>.stride)
         self.textureCountBufferProvider = BufferProvider(device: device,
-                                                             inflightBuffersCount: Settings.inflightBufferCount,
+                                                             inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                              bufferSize: MemoryLayout<Int>.stride)
         self.screenSize = screenSize
         self.renderSize = renderSize
         
         
-        let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
-        let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
+        let width = Int(renderSize.width * CGFloat(Settings.Graphics.metaballsDownscale))
+        let height = Int(renderSize.height * CGFloat(Settings.Graphics.metaballsDownscale))
         guard width > 0, height > 0 else { return nil }
         
         super.init()
@@ -213,7 +213,7 @@ class LiquidMesh: BaseMesh {
         
         let defaultScale = Float(renderSize.width / screenSize.width)
         var uniforms = Uniforms(particleRadius: particleRadius * planetActualScale,
-                                downScale: Settings.liquidMetaballsDownscale,
+                                downScale: Settings.Graphics.metaballsDownscale,
                                 cameraScale: cameraScale * defaultScale,
                                 camera: camera)
         
@@ -319,7 +319,7 @@ class LiquidMesh: BaseMesh {
         
         
         
-        var thickness = Int(Float(Settings.planetSurfaceThickness) * planetActualScale)
+        var thickness = Int(Float(Settings.Graphics.planetSurfaceThickness) * planetActualScale)
         _ = surfaceThicknessBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let surfaceThicknessBuffer = surfaceThicknessBufferProvider.nextUniformsBuffer(data: &thickness,
                                                                                    length: MemoryLayout<Int>.stride)

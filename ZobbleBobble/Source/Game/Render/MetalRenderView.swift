@@ -86,7 +86,7 @@ class Renderer: NSObject, MTKViewDelegate {
         self.commandQueue = device.makeCommandQueue()!
         self.view = view
         self.textureCountBufferProvider = BufferProvider(device: device,
-                                                         inflightBuffersCount: Settings.inflightBufferCount,
+                                                         inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                          bufferSize: MemoryLayout<Int>.stride)
         super.init()
         view.device = device

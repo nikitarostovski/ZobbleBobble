@@ -42,14 +42,14 @@ class LiquidInstance: BaseMesh {
         var mainColor = material.color
         self.mainColorBuffer = device.makeBuffer(bytes: &mainColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
         
-        let blurRadius = Int(CGFloat(Settings.liquidMetaballsBlurKernelSize) * material.blurModifier)
+        let blurRadius = Int(CGFloat(Settings.Graphics.metaballsBlurKernelSize) * material.blurModifier)
         self.blurRadius = blurRadius
         if blurRadius > 0 {
             self.blurRadiusBuffer = device.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
         }
         
-        let width = Int(renderSize.width * CGFloat(Settings.liquidMetaballsDownscale))
-        let height = Int(renderSize.height * CGFloat(Settings.liquidMetaballsDownscale))
+        let width = Int(renderSize.width * CGFloat(Settings.Graphics.metaballsDownscale))
+        let height = Int(renderSize.height * CGFloat(Settings.Graphics.metaballsDownscale))
         guard width > 0, height > 0 else { return nil }
         
         var size: SIMD2<Float> = SIMD2<Float>(Float(width), Float(height))

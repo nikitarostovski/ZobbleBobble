@@ -39,28 +39,28 @@ class StarsMesh: BaseMesh {
     
     init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
         self.uniformsBufferProvider = BufferProvider(device: device,
-                                                     inflightBuffersCount: Settings.inflightBufferCount,
+                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
         self.starCenterBufferProvider = BufferProvider(device: device,
-                                                       inflightBuffersCount: Settings.inflightBufferCount,
+                                                       inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<SIMD2<Float32>>.stride)
         self.renderCenterBufferProvider = BufferProvider(device: device,
-                                                         inflightBuffersCount: Settings.inflightBufferCount,
+                                                         inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                          bufferSize: MemoryLayout<SIMD2<Float32>>.stride)
         self.missleCenterBufferProvider = BufferProvider(device: device,
-                                                         inflightBuffersCount: Settings.inflightBufferCount,
+                                                         inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                          bufferSize: MemoryLayout<SIMD2<Float32>>.stride)
         self.starRadiusBufferProvider = BufferProvider(device: device,
-                                                       inflightBuffersCount: Settings.inflightBufferCount,
+                                                       inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<Float32>.stride)
         self.notchRadiusBufferProvider = BufferProvider(device: device,
-                                                        inflightBuffersCount: Settings.inflightBufferCount,
+                                                        inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                         bufferSize: MemoryLayout<Float32>.stride)
         self.materialsBufferProvider = BufferProvider(device: device,
-                                                      inflightBuffersCount: Settings.inflightBufferCount,
-                                                      bufferSize: MemoryLayout<StarMaterialData>.stride * Settings.maxMaterialCount)
+                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                      bufferSize: MemoryLayout<StarMaterialData>.stride * Settings.Physics.maxMaterialCount)
         self.materialCountsBufferProvider = BufferProvider(device: device,
-                                                           inflightBuffersCount: Settings.inflightBufferCount,
+                                                           inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                            bufferSize: MemoryLayout<Int32>.stride)
         self.screenSize = screenSize
         self.renderSize = renderSize

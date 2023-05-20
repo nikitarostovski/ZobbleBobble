@@ -87,14 +87,14 @@ final class Star {
         
         var lo: CGFloat = 0
         var hi: CGFloat = 0
-        if Settings.levelCameraScale...Settings.levelsMenuCameraScale ~= levelToPackProgress {
+        if Settings.Camera.levelCameraScale...Settings.Camera.levelsMenuCameraScale ~= levelToPackProgress {
             // level to levels menu
-            let p = levelToPackProgress - Settings.levelCameraScale
+            let p = levelToPackProgress - Settings.Camera.levelCameraScale
             lo = levelLo + (levelsLo - levelLo) * p
             hi = levelHi + (levelsHi - levelHi) * p
-        } else if Settings.levelsMenuCameraScale...Settings.packsMenuCameraScale ~= levelToPackProgress {
+        } else if Settings.Camera.levelsMenuCameraScale...Settings.Camera.packsMenuCameraScale ~= levelToPackProgress {
             // levels to packs menu
-            let p = levelToPackProgress - Settings.levelsMenuCameraScale
+            let p = levelToPackProgress - Settings.Camera.levelsMenuCameraScale
             lo = levelsLo + (packsLo - levelsLo) * p
             hi = levelsHi + (packsHi - levelsHi) * p
         }
@@ -132,24 +132,24 @@ final class Star {
             nextRadius = nextMissle.boundingRadius
         }
         
-        let scaleProgress = levelToPackProgress - Settings.levelCameraScale
+        let scaleProgress = levelToPackProgress - Settings.Camera.levelCameraScale
         let mp = missleIndexFloating - CGFloat(missleIndex)
         
         let levelsMissleRadius: CGFloat = 0
-        let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.starMissleDeadZone
+        let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.Camera.starMissleDeadZone
         let missleRadius = levelMissleRadius + (levelsMissleRadius - levelMissleRadius) * scaleProgress
         
         return Float(max(0, missleRadius))
     }
     
     func getRenderCenter(levelToPackProgress: CGFloat) -> SIMD2<Float> {
-        let missleScale = 1 - max(0, min(1, levelToPackProgress - Settings.levelCameraScale))
-        let renderCenterVerticalOffset = missleScale * (CGFloat(radius) + Settings.starMissleCenterOffset)
+        let missleScale = 1 - max(0, min(1, levelToPackProgress - Settings.Camera.levelCameraScale))
+        let renderCenterVerticalOffset = missleScale * (CGFloat(radius) + Settings.Camera.starMissleCenterOffset)
         return SIMD2<Float32>(position.x, position.y - Float(renderCenterVerticalOffset))
     }
     
     func getMissleCenter() -> SIMD2<Float> {
-        SIMD2<Float32>(position.x, position.y - radius - Float(Settings.starMissleCenterOffset))
+        SIMD2<Float32>(position.x, position.y - radius - Float(Settings.Camera.starMissleCenterOffset))
     }
     
     func updateStarAppearance(levelToPackProgress: CGFloat, levelIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
@@ -165,12 +165,12 @@ final class Star {
         self.renderCenter = getRenderCenter(levelToPackProgress: levelToPackProgress)
         self.missleCenter = getMissleCenter()
         
-        let p = max(0, min(1, levelToPackProgress - Settings.levelsMenuCameraScale))
+        let p = max(0, min(1, levelToPackProgress - Settings.Camera.levelsMenuCameraScale))
         let addScale = 1 + (visibleMissleRange.upperBound - visibleMissleRange.lowerBound - 1) * p // for packs menu
-        let materialScale = min(max(1, Settings.packsMenuCameraScale - levelToPackProgress), Settings.planetMaterialsUpscaleInGame)
+        let materialScale = min(max(1, Settings.Camera.packsMenuCameraScale - levelToPackProgress), Settings.Camera.planetMaterialsUpscaleInGame)
         
         let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
-        let colorMixStrength: CGFloat = 1 - max(0, min(1, levelToPackProgress - Settings.levelCameraScale))
+        let colorMixStrength: CGFloat = 1 - max(0, min(1, levelToPackProgress - Settings.Camera.levelCameraScale))
         
         var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { _, m in
             let start = CGFloat(m.position.x)
@@ -188,7 +188,7 @@ final class Star {
             return nil
         }
         var rootColor = visibleCorrectedMaterials.first?.color ?? self.mainColor
-        if levelToPackProgress == Settings.levelCameraScale {
+        if levelToPackProgress == Settings.Camera.levelCameraScale {
             rootColor = mainColor
         }
         let rootPosition = SIMD2<Float>(Float(visibilityRange.lowerBound), Float(visibilityRange.upperBound))
