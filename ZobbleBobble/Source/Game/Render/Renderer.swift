@@ -84,10 +84,7 @@ class Renderer: NSObject, MTKViewDelegate {
             options: .storageModeShared)!
         vertexCount = vertices.count
         
-        let s = MTLSamplerDescriptor()
-        s.magFilter = .nearest
-        s.minFilter = .nearest
-        self.upscaleSamplerState = device.makeSamplerState(descriptor: s)
+        self.upscaleSamplerState = device.nearestSampler
     }
     
     private func updateNodesIfNeeded() {

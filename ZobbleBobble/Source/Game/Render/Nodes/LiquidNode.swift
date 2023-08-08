@@ -166,15 +166,8 @@ class LiquidNode: BaseNode<LiquidBody> {
         self.body = body
         self.device = device
         
-        let nearestSamplerDescriptor = MTLSamplerDescriptor()
-        nearestSamplerDescriptor.magFilter = .nearest
-        nearestSamplerDescriptor.minFilter = .nearest
-        self.nearestSamplerState = device.makeSamplerState(descriptor: nearestSamplerDescriptor)
-        
-        let linearSamplerDescriptor = MTLSamplerDescriptor()
-        linearSamplerDescriptor.magFilter = .linear
-        linearSamplerDescriptor.minFilter = .linear
-        self.linearSamplerState = device.makeSamplerState(descriptor: linearSamplerDescriptor)
+        self.nearestSamplerState = device.nearestSampler
+        self.linearSamplerState = device.linearSampler
 
         self.lowResAlphaTexture = device.makeTexture(width: width, height: height, pixelFormat: .r8Unorm)
         self.finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))

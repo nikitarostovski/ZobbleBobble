@@ -83,8 +83,7 @@ class StarNode: BaseNode<StarBody> {
         
         self.finalTexture = device?.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
         
-        let s = MTLSamplerDescriptor()
-        self.samplerState = device?.makeSamplerState(descriptor: s)
+        self.samplerState = device?.nearestSampler
     }
     
     override func render(commandBuffer: MTLCommandBuffer, cameraScale: Float, camera: SIMD2<Float>) -> MTLTexture? {
