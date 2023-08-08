@@ -1,8 +1,8 @@
 //
-//  Star.swift
+//  StarBody.swift
 //  ZobbleBobble
 //
-//  Created by Rost on 29.01.2023.
+//  Created by Rost on 31.07.2023.
 //
 
 import Foundation
@@ -13,46 +13,37 @@ struct StarMaterialData {
     let position: SIMD2<Float>
 }
 
-struct StarState {
-    var visibleMaterials = [StarMaterialData]()
-    var currentLevelIndex: CGFloat = 0
-    var currentMissleIndex: CGFloat = 0
-    var visibleMissleRange: ClosedRange<CGFloat> = 0...0
-}
-
-final class Star {
+class StarBody: Body {
+    struct State {
+        var visibleMaterials = [StarMaterialData]()
+        var currentLevelIndex: CGFloat = 0
+        var currentMissleIndex: CGFloat = 0
+        var visibleMissleRange: ClosedRange<CGFloat> = 0...0
+    }
+    
+    var renderData: StarRenderData?
+    
     weak var game: Game?
     
-    var pack: PackModel
-    var state: StarState
-    var number: Int
+    let pack: PackModel
+    var state = State()
     
     private let initialMaterials: [StarMaterialData]
     
-    var position: SIMD2<Float>
-    var renderCenter: SIMD2<Float>
-    var missleCenter: SIMD2<Float>
-    
+    var position = SIMD2<Float>(0, 0)
     var radius: Float
     var missleRadius: Float
     var mainColor: SIMD4<UInt8>
     
-    var positionPointer: UnsafeMutableRawPointer!
-    var renderCenterPointer: UnsafeMutableRawPointer!
-    var missleCenterPointer: UnsafeMutableRawPointer!
-    var radiusPointer: UnsafeMutableRawPointer!
-    var missleRadiusPointer: UnsafeMutableRawPointer!
-    var materialsPointer: UnsafeMutableRawPointer!
+    private(set) var renderCenter = SIMD2<Float>(0, 0)
+    private(set) var missleCenter = SIMD2<Float>(0, 0)
     
-    init(game: Game, number: Int) {
-        let pack = game.levelManager.allLevelPacks[game.state.packIndex]
+    var uniqueMaterials: [MaterialType] { [] }
+    
+    init(game: Game, pack: PackModel) {
         self.pack = pack
         self.game = game
-        self.number = number
-        self.state = StarState()
-        self.position = SIMD2<Float>(0, 0)
-        self.renderCenter = SIMD2<Float>(0, 0)
-        self.missleCenter = SIMD2<Float>(0, 0)
+        
         self.radius = Float(pack.radius)
         self.mainColor = Colors.Stars.mainColor
         self.missleRadius = 0
@@ -69,6 +60,7 @@ final class Star {
             }
         }
         self.initialMaterials = materials
+        createRenderData()
         updateRenderData()
     }
     
@@ -124,7 +116,7 @@ final class Star {
         
         if 0..<level.missleChunks.count ~= missleIndex {
             let currentMissle = level.missleChunks[missleIndex]
-            currentRadius = currentMissle.boundingRadius//.shape.boundingRadius
+            currentRadius = currentMissle.boundingRadius
         }
         
         if 0..<(level.missleChunks.count - 1) ~= missleIndex {
@@ -199,29 +191,51 @@ final class Star {
         updateRenderData()
     }
     
+    private func createRenderData() {
+        let positionPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
+                                                               alignment: MemoryLayout<SIMD2<Float32>>.alignment)
+        let renderCenterPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
+                                                                   alignment: MemoryLayout<SIMD2<Float32>>.alignment)
+        let missleCenterPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
+                                                                   alignment: MemoryLayout<SIMD2<Float32>>.alignment)
+        let radiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
+                                                             alignment: MemoryLayout<Float32>.alignment)
+        let missleRadiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
+                                                                   alignment: MemoryLayout<Float32>.alignment)
+        self.renderData = .init(positionPointer: positionPointer,
+                                renderCenterPointer: renderCenterPointer,
+                                missleCenterPointer: missleCenterPointer,
+                                radiusPointer: radiusPointer,
+                                missleRadiusPointer: missleRadiusPointer,
+                                materialsPointer: materialsPointer,
+                                materialCount: materialCount)
+    }
+    
     private func updateRenderData() {
-        self.positionPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
-                                                                alignment: MemoryLayout<SIMD2<Float32>>.alignment)
-        self.positionPointer.copyMemory(from: &self.position, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
+        guard let renderData = renderData else { return }
         
-        self.renderCenterPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
-                                                                    alignment: MemoryLayout<SIMD2<Float32>>.alignment)
-        self.renderCenterPointer.copyMemory(from: &self.renderCenter, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
+        renderData.positionPointer.copyMemory(from: &self.position, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
         
-        self.missleCenterPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<SIMD2<Float32>>.stride,
-                                                                    alignment: MemoryLayout<SIMD2<Float32>>.alignment)
-        self.missleCenterPointer.copyMemory(from: &self.missleCenter, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
+        renderData.renderCenterPointer.copyMemory(from: &self.renderCenter, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
         
-        self.radiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
-                                                                alignment: MemoryLayout<Float32>.alignment)
-        self.radiusPointer.copyMemory(from: &self.radius, byteCount: MemoryLayout<Float32>.stride)
+        renderData.missleCenterPointer.copyMemory(from: &self.missleCenter, byteCount: MemoryLayout<SIMD2<Float32>>.stride)
         
-        self.missleRadiusPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float32>.stride,
-                                                                alignment: MemoryLayout<Float32>.alignment)
-        self.missleRadiusPointer.copyMemory(from: &self.missleRadius, byteCount: MemoryLayout<Float32>.stride)
+        renderData.radiusPointer.copyMemory(from: &self.radius, byteCount: MemoryLayout<Float32>.stride)
         
-        self.materialsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<StarMaterialData>.stride * state.visibleMaterials.count,
-                                                                alignment: MemoryLayout<StarMaterialData>.alignment)
-        self.materialsPointer.copyMemory(from: self.state.visibleMaterials, byteCount: MemoryLayout<StarMaterialData>.stride * state.visibleMaterials.count)
+        renderData.missleRadiusPointer.copyMemory(from: &self.missleRadius, byteCount: MemoryLayout<Float32>.stride)
+        
+        self.renderData?.materialsPointer = materialsPointer
+        self.renderData?.materialCount = materialCount
+    }
+    
+    private var materialCount: Int {
+        state.visibleMaterials.count
+    }
+    
+    private var materialsPointer: UnsafeMutableRawPointer {
+        let pointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<StarMaterialData>.stride * materialCount,
+                                                       alignment: MemoryLayout<StarMaterialData>.alignment)
+        pointer.copyMemory(from: self.state.visibleMaterials, byteCount: MemoryLayout<StarMaterialData>.stride * materialCount)
+        return pointer
     }
 }

@@ -1,13 +1,24 @@
 //
-//  StarsMesh.swift
+//  StarNode.swift
 //  ZobbleBobble
 //
-//  Created by Rost on 30.01.2023.
+//  Created by Rost on 31.07.2023.
 //
 
+import Foundation
 import MetalKit
 
-class StarsMesh: BaseMesh {
+struct StarRenderData {
+    let positionPointer: UnsafeMutableRawPointer
+    let renderCenterPointer: UnsafeMutableRawPointer
+    let missleCenterPointer: UnsafeMutableRawPointer
+    let radiusPointer: UnsafeMutableRawPointer
+    let missleRadiusPointer: UnsafeMutableRawPointer
+    var materialsPointer: UnsafeMutableRawPointer
+    var materialCount: Int
+}
+
+class StarNode: BaseNode<StarBody> {
     struct Uniforms {
         let cameraScale: Float32
         let camera: SIMD2<Float32>
@@ -37,7 +48,7 @@ class StarsMesh: BaseMesh {
     private let screenSize: CGSize
     private let renderSize: CGSize
     
-    init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize) {
+    init(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize, body: StarBody?) {
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
@@ -64,55 +75,39 @@ class StarsMesh: BaseMesh {
                                                            bufferSize: MemoryLayout<Int32>.stride)
         self.screenSize = screenSize
         self.renderSize = renderSize
+        
         super.init()
+        
+        self.body = body
         self.device = device
         
-        let finalDesc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: .bgra8Unorm,
-            width: Int(renderSize.width),
-            height: Int(renderSize.height),
-            mipmapped: false)
-        finalDesc.usage = [.shaderRead, .shaderWrite, .renderTarget]
-        self.finalTexture = device?.makeTexture(descriptor: finalDesc)
+        self.finalTexture = device?.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
         
         let s = MTLSamplerDescriptor()
-//        s.magFilter = .linear
-//        s.minFilter = .linear
         self.samplerState = device?.makeSamplerState(descriptor: s)
     }
     
-    func render(commandBuffer: MTLCommandBuffer,
-                position: UnsafeMutableRawPointer?,
-                renderCenter: UnsafeMutableRawPointer?,
-                missleCenter: UnsafeMutableRawPointer?,
-                radius: UnsafeMutableRawPointer?,
-                missleRadius: UnsafeMutableRawPointer?,
-                materials: UnsafeMutableRawPointer?,
-                materialCount: Int,
-                hasChanges: Bool,
-                cameraScale: Float,
-                camera: SIMD2<Float>) -> MTLTexture? {
-        
-        guard let position = position,
-              let renderCenter = renderCenter,
-              let missleCenter = missleCenter,
-              let radius = radius,
-              let missleRadius = missleRadius,
-              let materials = materials,
-              materialCount > 0,
-              let clearPipelineState = clearPipelineState,
+    override func render(commandBuffer: MTLCommandBuffer, cameraScale: Float, camera: SIMD2<Float>) -> MTLTexture? {
+        guard let renderData = body?.renderData,
+              renderData.materialCount > 0,
               let computeDrawStarPipelineState = computeDrawStarPipelineState,
               let finalTexture = finalTexture,
               let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
         else {
-            return getClearTexture(commandBuffer: commandBuffer)
+            return super.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera)
         }
         
+        let position = renderData.positionPointer
+        let renderCenter = renderData.renderCenterPointer
+        let missleCenter = renderData.missleCenterPointer
+        let radius = renderData.radiusPointer
+        let missleRadius = renderData.missleRadiusPointer
+        let materials = renderData.materialsPointer
         
         let defaultScale = Float(renderSize.width / screenSize.width)
         var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, camera: camera)
         
-        var materialCount = materialCount
+        var materialCount = renderData.materialCount
         
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
@@ -149,9 +144,7 @@ class StarsMesh: BaseMesh {
             self.materialCountsBufferProvider.avaliableResourcesSemaphore.signal()
         }
         
-        computeEncoder.setComputePipelineState(clearPipelineState)
-        computeEncoder.setTexture(finalTexture, index: 0)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
+        clearTexture(texture: finalTexture, computeEncoder: computeEncoder)
         
         computeEncoder.setComputePipelineState(computeDrawStarPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
@@ -163,7 +156,7 @@ class StarsMesh: BaseMesh {
         computeEncoder.setBuffer(notchRadiusBuffer, offset: 0, index: 5)
         computeEncoder.setBuffer(materialsBuffer, offset: 0, index: 6)
         computeEncoder.setBuffer(materialCountBuffer, offset: 0, index: 7)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: clearPipelineState, width: finalTexture.width, height: finalTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeDrawStarPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.endEncoding()
         

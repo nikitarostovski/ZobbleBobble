@@ -13,7 +13,8 @@ enum Settings {
         static let levelsMenuCameraScale: CGFloat = 2
         static let packsMenuCameraScale: CGFloat = 3
         
-        static let levelCenterOffset: CGFloat = 50
+        static let levelCenterOffset: CGFloat = -150
+        static let starCenterOffset: CGFloat = 600
         
         static let starMissleCenterOffset: CGFloat = 25
         static let starMissleDeadZone: CGFloat = 40
@@ -44,28 +45,29 @@ enum Settings {
     }
     
     enum Physics {
-        static let maxParticleCount = 10000
+        static let scale: CGFloat = 100_000
+        
+        static let maxParticleCount = 10_000
         static let maxMaterialCount = 50
         
         static let velocityIterations = 8
         static let positionIterations = 3
-        static let particleIterations = 2
+        static let particleIterations = 3
         
-        static let gravityModifier: CGFloat = 5
-        static let missleShotImpulseModifier: CGFloat = 100_000
+        static let gravityModifier: CGFloat = 2_000 * scale
+        static let missleShotImpulseModifier: CGFloat = 4_000 * scale
         
-        static let speedThresholdModifier: CGFloat = 35
+        static let freezeThresholdModifier: CGFloat = 30 * scale
     }
     
     enum Graphics {
-        static let resolutionDownscale: CGFloat = 1
+        static let resolutionDownscale: CGFloat = 2
         
-        static let metaballsDownscale: Float = 0.25
-        static let metaballsBlurKernelSize: Int = 2
+        static let metaballsDownscale: Float = 0.5
+        static let metaballsBlurKernelSize: Int = 1
         
-        static let fadeMultiplier: Float = 0.2//0.3
+        static let fadeMultiplier: Float = 0.3
         
-        static let planetSurfaceThickness: Int = 12
         static let inflightBufferCount = 3
     }
 }

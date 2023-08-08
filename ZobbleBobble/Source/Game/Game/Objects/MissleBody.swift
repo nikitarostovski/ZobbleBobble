@@ -1,22 +1,19 @@
 //
-//  Missle.swift
+//  MissleBody.swift
 //  ZobbleBobble
 //
-//  Created by Rost on 13.02.2023.
+//  Created by Rost on 02.08.2023.
 //
 
 import Foundation
 import Levels
 
-final class Missle {
+class MissleBody: LiquidBody {
+    private let liquidFadeMultiplier: Float = 0
+    
     var missleModel: ChunkModel
     weak var game: Game?
-    weak var star: Star?
-    
-    var staticLiquidCount: Int?
-    var staticLiquidPositions: UnsafeMutableRawPointer?
-    var staticLiquidVelocities: UnsafeMutableRawPointer?
-    var staticLiquidColors: UnsafeMutableRawPointer?
+    weak var star: StarBody?
     
     var positions: [SIMD2<Float32>] = []
     var colors: [SIMD4<UInt8>] = []
@@ -25,10 +22,14 @@ final class Missle {
     private var idlePositions: [SIMD2<Float32>] = []
     private var readyPositions: [SIMD2<Float32>] = []
     
-    init(missleModel: ChunkModel, star: Star, game: Game?) {
+    init(missleModel: ChunkModel, star: StarBody, game: Game?) {
         self.missleModel = missleModel
         self.game = game
         self.star = star
+        
+        super.init()
+        
+        uniqueMaterials = Array(Set(missleModel.particles.map { $0.material }))
         
         updateTargetPositions()
         updateMisslePosition(0)
@@ -36,8 +37,10 @@ final class Missle {
     
     private func updateTargetPositions() {
         guard let star = star else { return }
+
+        let starEdgeY = CGFloat(star.position.y - star.radius)
         let missleSpawnCenter = CGPoint(x: CGFloat(star.position.x),
-                                        y: CGFloat(star.position.y) - CGFloat(star.radius) - Settings.Camera.starMissleCenterOffset)
+                                        y: (starEdgeY - Settings.Camera.starMissleCenterOffset))
         
         let missleRadius = CGFloat(star.missleRadius)
         let idleAngleStart = CGFloat.pi
@@ -89,27 +92,26 @@ final class Missle {
             let ready = readyPositions[i]
             let current = SIMD2<Float32>(idle.x + (ready.x - idle.x) * Float(p),
                                          idle.y + (ready.y - idle.y) * Float(p))
-            
+            if i == 0 {
+//                print("\(idle) \(ready)")
+            }
             newVelocities.append(SIMD2<Float32>(0, 0))
             newColors.append(color)
             newPositions.append(current)
         }
-        self.positions = newPositions
-        self.colors = newColors
-        self.velocities = newVelocities
-        self.staticLiquidCount = newPositions.count
+        positions = newPositions
+        colors = newColors
+        velocities = newVelocities
+        
         updateRenderData()
     }
     
     private func invalidateRenderData() {
-        self.staticLiquidPositions = nil
-        self.staticLiquidColors = nil
-        self.staticLiquidVelocities = nil
-        self.staticLiquidCount = nil
+        renderData = nil
     }
     
     private func updateRenderData() {
-        guard let staticLiquidCount = staticLiquidCount, staticLiquidCount > 0 else {
+        guard let star = star, positions.count > 0 else {
             invalidateRenderData()
             return
         }
@@ -129,9 +131,12 @@ final class Missle {
         colors.copyMemory(from: &self.colors,
                           byteCount: MemoryLayout<SIMD4<UInt8>>.stride * self.colors.count)
         
-        self.staticLiquidPositions = positions
-        self.staticLiquidColors = colors
-        self.staticLiquidVelocities = velocities
-        self.staticLiquidCount = self.positions.count
+        self.renderData = .init(particleRadius: Float(star.pack.particleRadius),
+                                liquidFadeModifier: liquidFadeMultiplier,
+                                scale: 1,
+                                liquidCount: self.positions.count,
+                                liquidPositions: positions,
+                                liquidVelocities: velocities,
+                                liquidColors: colors)
     }
 }

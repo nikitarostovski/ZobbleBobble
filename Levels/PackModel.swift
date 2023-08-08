@@ -7,25 +7,30 @@
 
 import Foundation
 
-public struct PackModel: Codable {
+public struct PackModel: Codable, Equatable {
+    private let uuid = UUID()
+    
     public var radius: CGFloat
     public var levels: [LevelModel]
     
     public var particleRadius: CGFloat
     public var missleCount: Int
+
+    public static func == (lhs: PackModel, rhs: PackModel) -> Bool {
+        lhs.uuid == rhs.uuid
+    }
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         do {
-            let particleRadius = try container.decode(CGFloat.self, forKey: .particleRadius)
+            let particleRadius = try? container.decode(CGFloat.self, forKey: .particleRadius)
             var levels = try container.decode([LevelModel].self, forKey: .levels)
             self.radius = try container.decode(CGFloat.self, forKey: .radius)
-            self.particleRadius = particleRadius
+            self.particleRadius = particleRadius ?? 0
             
             var misslesTotal = 0
             for i in 0..<levels.count {
                 levels[i].misslesBefore = misslesTotal
-                levels[i].particleRadius = particleRadius
                 misslesTotal += levels[i].missleChunks.count
             }
             

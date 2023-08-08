@@ -1,10 +1,9 @@
 [
     {
         "radius": 230,
-        "particleRadius": 2,
         "levels": [
             {
-                "rotationPerSecond": 120,
+                "rotationPerSecond": 40,
                 "gravityRadius": 180,
                 "initialChunks": [
                     {
@@ -15,122 +14,122 @@
                 "missleChunks": [
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle2",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle2",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle2",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle1",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     },
                     {
                         "source": "Missle3",
-                        "scale": 1,
+                        "scale": 0.25,
                         "startImpulse": 1
                     }
                 ]

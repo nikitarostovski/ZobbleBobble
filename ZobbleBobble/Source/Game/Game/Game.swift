@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ZobblePhysics
 import Levels
 
 protocol GameDelegate: AnyObject {
@@ -30,33 +29,41 @@ struct GameState {
     var levelIndex: Int
 }
 
+struct CameraState {
+    var camera: CGPoint = .zero
+    var cameraScale: CGFloat = 1
+}
+
 final class Game {
     let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
-    
-    weak var delegate: GameDelegate?
-    weak var scrollHolder: ScrollHolder?
-    
-    var state: GameState
     
     let screenSize: CGSize
     let renderSize: CGSize
     
     let levelManager: LevelManager
     
-    var visibleMaterials: [MaterialType] {
-        switch state.state {
-        case .level:
-            let level = levelManager.allLevelPacks[state.packIndex].levels[state.levelIndex]
-            return level.allMaterials
-        case .menu:
-            return MaterialType.allCases
-        }
+    weak var delegate: GameDelegate?
+    weak var scrollHolder: ScrollHolder?
+    
+    var state: GameState
+    var cameraState = CameraState()
+    
+    var currentPack: PackModel? {
+        guard 0..<levelManager.allLevelPacks.count ~= state.packIndex else { return nil }
+        return levelManager.allLevelPacks[state.packIndex]
     }
     
-    private var background: Background?
-    private var world: World?
-    private var menu: Menu?
-    var stars = [Star]()
+    var currentLevel: LevelModel? {
+        guard let pack = currentPack, 0..<pack.levels.count ~= state.levelIndex else { return nil }
+        return pack.levels[state.levelIndex]
+    }
+    
+    var scene: LevelScene?
+    var menu: MenuScene?
+    
+    var stars = [StarBody]()
+    var terrains = [TerrainBody]()
+    var missles = [MissleBody]()
     
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
         let levelManager: LevelManager
@@ -78,45 +85,38 @@ final class Game {
         self.scrollHolder = scrollHolder
         
         self.state = GameState(state: .menu, packIndex: 0, levelIndex: 0)
-        
-        self.stars = levelManager.allLevelPacks.enumerated().map { i, pack in
-            Star(game: self, number: i)
-        }
-        
-        setupBackground()
     }
     
     func update(_ time: CFTimeInterval) {
-        background?.updateRenderData()
-        if let world = world {
-            world.update(time)
+        if let scene = scene {
+            scene.update(time)
         }
     }
     
     func runGame() {
-        let star = stars[state.packIndex]
-        let world = World(game: self, star: star)
-        self.world = world
+        cameraState.camera = .zero
+        cameraState.cameraScale = 1
+        
+        let scene = LevelScene(game: self)
+        self.scene = scene
         self.state.state = .level
         self.menu = nil
-        background?.objectPositionProvider = world
         delegate?.gameDidChangeState(self)
     }
     
     func runMenu(isFromLevel: Bool = false) {
         let from = isFromLevel ? Settings.Camera.levelCameraScale : Settings.Camera.levelsMenuCameraScale
-        let menu = Menu(game: self, from: from)
+        let menu = MenuScene(game: self, from: from)
         self.menu = menu
         self.state.state = .menu
-        self.world = nil
-        background?.objectPositionProvider = menu
+        self.scene = nil
         delegate?.gameDidChangeState(self)
     }
     
     func onTap(at pos: CGPoint) {
         switch state.state {
         case .level:
-            world?.onTap(pos)
+            scene?.onTap(pos)
         case .menu:
             menu?.onTap(position: pos)
         }
@@ -125,7 +125,7 @@ final class Game {
     func onSwipe(_ position: CGPoint) {
         switch state.state {
         case .level:
-            world?.onSwipe(position.x)
+            scene?.onSwipe(position.x)
         case .menu:
             menu?.onSwipe(position.x)
         }
@@ -136,41 +136,15 @@ final class Game {
         runMenu(isFromLevel: true)
     }
     
-    private func setupBackground() {
-        let background = Background(game: self)
-        self.background = background
-    }
-}
-
-extension Game {
-    var starsDataSource: StarsRenderDataSource? {
-        switch state.state {
-        case .level:
-            return world
-        case .menu:
-            return menu
+    func replace(stars: [StarBody]? = nil, terrains: [TerrainBody]? = nil, missles: [MissleBody]? = nil) {
+        if let terrains = terrains {
+            self.terrains = terrains
         }
-    }
-    
-    var backgroundDataSource: BackgroundRenderDataSource? {
-        return background
-    }
-    
-    var objectsDataSource: ObjectRenderDataSource? {
-        switch state.state {
-        case .level:
-            return world
-        case .menu:
-            return menu
+        if let stars = stars {
+            self.stars = stars
         }
-    }
-    
-    var cameraDataSource: CameraRenderDataSource? {
-        switch state.state {
-        case .level:
-            return world
-        case .menu:
-            return menu
+        if let missles = missles {
+            self.missles = missles
         }
     }
 }

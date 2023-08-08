@@ -28,7 +28,7 @@ final class BufferProvider {
         }
     }
     
-    func nextUniformsBuffer(data: UnsafeMutableRawPointer, length: Int, data2: UnsafeMutableRawPointer? = nil, length2: Int = 0) -> MTLBuffer {
+    func nextUniformsBuffer(data: UnsafeMutableRawPointer, length: Int) -> MTLBuffer {
         let buffer = uniformsBuffers[avaliableBufferIndex]
         let bufferPointer = buffer.contents()
 
@@ -37,13 +37,7 @@ final class BufferProvider {
             avaliableBufferIndex = 0
         }
         
-        // TODO: EXC_BAD_ACCESS on high loads
         memcpy(bufferPointer, data, length)
-        
-        if let data2 = data2, length2 > 0 {
-            let start = bufferPointer.advanced(by: length)
-            memcpy(start, data2, length2)
-        }
 
         return buffer
     }

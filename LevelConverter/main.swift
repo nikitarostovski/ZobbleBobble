@@ -38,8 +38,8 @@ levelPacks.forEach { pack in
     }
 }
 
-let radius: CGFloat = 2
-let scale: CGFloat = 1
+let radius: CGFloat = 1.5
+let scale: CGFloat = 0.5
 
 fileNames = fileNames.removeDuplicates()
 
@@ -93,6 +93,7 @@ let particles = fileNames.compactMap { (s: String) -> (String, [ParticleModel])?
 
 levelPacks = levelPacks.map { pack in
     var pack = pack
+    pack.particleRadius = radius
     pack.levels = pack.levels.map { level in
         var level = level
         level.initialChunks = level.initialChunks.map { chunk in

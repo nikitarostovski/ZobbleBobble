@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import "ZPWorldDef.h"
 
+typedef void (^RenderDataPassBlock)(int, void*, void *, void *);
+
 @class ZPBody;
 
 @interface ZPWorld : NSObject
@@ -15,18 +17,19 @@
 @property (nonatomic) void *world;
 @property (nonatomic) void *particleSystem;
 
-@property void *liquidPositions;
-@property void *liquidColors;
-@property void *liquidVelocities;
-@property (nonatomic) int liquidCount;
-
-
 - (id)initWithWorldDef:(ZPWorldDef *)def;
+/// Steps physics simulation
+/// - Parameters:
+///   - timeStep: time since last step
+///   - velocityIterations: liquidFun's `velocityIterations`
+///   - positionIterations: liquidFun's `positionIterations`
+///   - particleIterations: liquidFun's `particleIterations`
 - (void)worldStep:(CFTimeInterval)timeStep
 VelocityIterations:(int)velocityIterations
 PositionIterations:(int)positionIterations
 ParticleIterations:(int)particleIterations;
 
+- (void)requestRenderDataWithCompletionHandler:(RenderDataPassBlock)completion;
 
 /// Adds a particle with given parameters
 /// - Parameters:
@@ -49,6 +52,8 @@ ParticleIterations:(int)particleIterations;
                 ExplosionRadius:(CGFloat)explosionRadius
                    ShootImpulse:(CGFloat)shootImpulse;
 
+/// Removes particle at index `index` from physics simulation
+/// - Parameter index: index of particle to remove
 - (void)removeParticleAt:(int)index;
 
 @end

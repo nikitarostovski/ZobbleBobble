@@ -21,8 +21,7 @@ final class GameViewController: UIViewController {
     }()
     
     lazy var renderView: MetalRenderView = {
-        let view = MetalRenderView(screenSize: screenSize, renderSize: renderSize)
-        view.renderDelegate = self
+        let view = MetalRenderView(screenSize: screenSize, renderSize: renderSize, delegate: self, dataSource: game)
         view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -118,14 +117,9 @@ final class GameViewController: UIViewController {
 }
 
 extension GameViewController: RenderViewDelegate {
-    func updateRenderData() {
+    func updateRenderData(time: TimeInterval) {
         guard let game = game else { return }
-        game.update(1.0 / 60.0)
-        
-        renderView.backgroundDataSource = game.backgroundDataSource
-        renderView.objectsDataSource = game.objectsDataSource
-        renderView.starsDataSource = game.starsDataSource
-        renderView.cameraDataSource = game.cameraDataSource
+        game.update(time)
     }
 }
 
@@ -137,7 +131,6 @@ extension GameViewController: GameDelegate {
         default:
             controlsBar.isHidden = true
         }
-        renderView.renderer?.uniqueMaterials = game.visibleMaterials
     }
 }
 

@@ -46,6 +46,68 @@ fragment float4 fragment_render(TexturePipelineRasterizerData in [[stage_in]],
                                 device int const &textureCount [[buffer(0)]],
                                 sampler s [[sampler(0)]]) {
     
+    // material mix (checkboard)
+//    int visibleCount = 0;
+//    for (int i = 0; i < textureCount; i++) {
+//        float4 rgba = textures[i].sample(s, in.texcoord);
+//        if (rgba.a > 0) {
+//            visibleCount += 1;
+//        }
+//    }
+//    if (visibleCount == 0) {
+//        return float4(0, 0, 0, 1);
+//    }
+//
+//    int x = (int)in.texcoord.x * textures[0].get_width();
+////    int y = (int)in.texcoord.y * textures[0].get_height();
+//
+//    int index = (x) % visibleCount;
+//
+//    int i = 0;
+//    while (visibleCount > index) {
+//        float4 rgba = textures[i].sample(s, in.texcoord);
+//        if (rgba.a > 0) {
+//            visibleCount -= 1;
+//        }
+//        i++;
+//    }
+//
+//    float4 result = textures[i - 1].sample(s, in.texcoord);
+//    result.a = 1.0;
+//    return result;
+    
+    // material mix (hsv)
+//    float3 totalChannels = float3(0, 0, 0);
+//    int visibleCount = 0;
+//    for (int i = 0; i < textureCount; i++) {
+//        float4 rgba = textures[i].sample(s, in.texcoord);
+//        float3 hsv = rgb2hsv(rgba.rgb);
+//        if (rgba.a > 0) {
+//            totalChannels += hsv;
+//            visibleCount += 1;
+//        }
+//    }
+//    totalChannels /= visibleCount;
+//    totalChannels.y *= 1.0 / visibleCount;
+//    totalChannels = hsv2rgb(totalChannels);
+//    return float4(totalChannels, 1);
+    
+    // multiply
+//    float4 totalChannels = float4(0, 0, 0, 1);
+//    int visibleCount = 0;
+//    for (int i = 0; i < textureCount; i++) {
+//        float4 col = textures[i].sample(s, in.texcoord);
+//        if (col.a > 0) {
+//            totalChannels.r += col.r;
+//            totalChannels.g += col.g;
+//            totalChannels.b += col.b;
+//
+//            visibleCount += 1;
+//        }
+//    }
+//    totalChannels.rgb /= visibleCount;
+//    return totalChannels;
+    
     // max-alpha
     float4 maxAlphaColor = float4(-1);
     for (int i = 0; i < textureCount; i++) {

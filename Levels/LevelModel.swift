@@ -15,17 +15,6 @@ public struct LevelModel: Codable {
     public var initialChunks: [ChunkModel]
     public var missleChunks: [ChunkModel]
     
-    private var currentParticleRadius: CGFloat = 0
-    public var particleRadius: CGFloat {
-        set {
-            guard newValue != currentParticleRadius else { return }
-            currentParticleRadius = newValue
-        }
-        get {
-            currentParticleRadius
-        }
-    }
-    
     public var misslesBefore: Int = 0
     public private(set) var allMaterials = [MaterialType]()
     

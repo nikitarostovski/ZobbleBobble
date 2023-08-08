@@ -30,8 +30,25 @@ static float kExplosiveImpulse = 1050000;
     NSMutableArray *_particlesToAdd;
     NSMutableArray *_particleIndicesToDestroy;
     
+    NSLock *_syncLock;
+    
     b2ParticleGroup *_staticGroup;
     b2ParticleGroup *_dynamicGroup;
+}
+
+- (void)requestRenderDataWithCompletionHandler:(RenderDataPassBlock)completion {
+    [_syncLock lock];
+    
+    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
+    
+    int liquidCount = _system->GetParticleCount();
+    void* liquidPositions = _system->GetPositionBuffer();
+    void *liquidVelocities = _system->GetVelocityBuffer();
+    void *liquidColors = _system->GetColorBuffer();
+    
+    [_syncLock unlock];
+    
+    completion(liquidCount, liquidPositions, liquidVelocities, liquidColors);
 }
 
 - (id)initWithWorldDef:(ZPWorldDef *)def {
@@ -44,6 +61,7 @@ static float kExplosiveImpulse = 1050000;
     _gravityCenter = def.center;
     _particleIndicesToDestroy = [NSMutableArray new];
     _particlesToAdd = [NSMutableArray new];
+    _syncLock = [NSLock new];
     
     b2World *_world = new b2World(b2Vec2(0, 0));
     _world->SetAllowSleeping(true);
@@ -93,9 +111,6 @@ VelocityIterations:(int)velocityIterations
 PositionIterations:(int)positionIterations
 ParticleIterations:(int)particleIterations {
     
-    [self rotateCore];
-    [self rotateDynamicParticles];
-    
     b2World *_world = (b2World *)self.world;
     _world->Step(timeStep, velocityIterations, positionIterations, particleIterations);
     
@@ -112,22 +127,26 @@ ParticleIterations:(int)particleIterations {
 //    }
 //    NSLog(@"Total: %d Static: %d(%d) Dynamic: %d(%d) Stuck: %d", _system->GetParticleCount(), staticCount, _staticGroup->GetParticleCount(),  dynamicCount, _dynamicGroup->GetParticleCount(), _system->GetStuckCandidateCount());
     
-    [self updateGravity];
+    // Rotate core and dynamic particles
+    [self rotateParticlesInGroup:_staticGroup ShouldClampRotationToGravityField:NO];
+    [self rotateParticlesInGroup:_dynamicGroup ShouldClampRotationToGravityField:YES];
+    
     [self processContacts];
     [self checkForStaticParticles];
-    [self updateRenderData];
     
     [self createAndRemoveBodies];
+    [self updateGravity];
+    
 }
 
-- (void)rotateCore {
+- (void)rotateParticlesInGroup:(b2ParticleGroup *)group ShouldClampRotationToGravityField:(BOOL)shouldClampRotationToGravityField {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     b2Vec2 *position = _system->GetPositionBuffer();
     
-    int count = _staticGroup->GetParticleCount();
-    int offset = _staticGroup->GetBufferIndex();
+    int count = group->GetParticleCount();
+    int offset = group->GetBufferIndex();
     
-    b2Vec2 center = b2Vec2_zero;
+    b2Vec2 center = b2Vec2(_gravityCenter.x, _gravityCenter.y);
     float angleStep = _rotationStep;
     
     for (int i = 0; i < count; i++) {
@@ -135,29 +154,12 @@ ParticleIterations:(int)particleIterations {
         float length = b2Distance(pos, center);
         float angle = atan2(pos.y - center.y, pos.x - center.x);
         
-        b2Vec2 newPos = b2Vec2(length * cos(angle + angleStep), length * sin(angle + angleStep));
-        position[i + offset] = newPos;
-    }
-}
-
-- (void)rotateDynamicParticles {
-    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    b2Vec2 *position = _system->GetPositionBuffer();
-    
-    int count = _dynamicGroup->GetParticleCount();
-    int offset = _dynamicGroup->GetBufferIndex();
-    
-    b2Vec2 center = b2Vec2_zero;
-    float angleStep = _rotationStep;
-    
-    for (int i = 0; i < count; i++) {
-        b2Vec2 pos = position[i + offset];
-        float length = b2Distance(pos, center);
-        float angle = atan2(pos.y - center.y, pos.x - center.x);
+        float lengthModifier = length > _maxCenterToStaticParticle ? 0 : 0.2;
         
-        float targetAngle = angle + angleStep * (length > _maxCenterToStaticParticle ? 0 : 1);
+        float currentAngleStep = angleStep * (shouldClampRotationToGravityField ? lengthModifier : 1);
+        float targetAngle = angle + currentAngleStep;
         
-        b2Vec2 newPos = b2Vec2(length * cos(targetAngle), length * sin(targetAngle));
+        b2Vec2 newPos = b2Vec2(center.x + length * cos(targetAngle), center.y + length * sin(targetAngle));
         position[i + offset] = newPos;
     }
 }
@@ -169,18 +171,18 @@ ParticleIterations:(int)particleIterations {
     b2Vec2 *positionBuffer = _system->GetPositionBuffer();
     void **ud = _system->GetUserDataBuffer();
     
+    b2Vec2 center = b2Vec2(_gravityCenter.x, _gravityCenter.y);
+    
     // Liquids
     for (int i = 0; i < particleCount; i++) {
         ZPParticle *userData = (ZPParticle *)ud[i];
-        userData->hasContactWithCore = NO;
-        if (userData->gravityScale <= 0) { continue; }
+        if (userData == NULL || userData->gravityScale <= 0) { continue; }
         
-        b2Vec2 v = positionBuffer[i];
-        b2Vec2 d = b2Vec2(_gravityCenter.x, _gravityCenter.y) - v;
-        
+        b2Vec2 d = positionBuffer[i] - center;
         d.Normalize();
+        
         float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius() * _system->GetGravityScale();
-        float force = GRAVITY_FORCE * mass * 2 / d.LengthSquared() * userData->gravityScale;
+        float force = -GRAVITY_FORCE * mass * 2 / d.LengthSquared() * userData->gravityScale;
         _system->ParticleApplyForce(i, d * force);
     }
 }
@@ -194,6 +196,12 @@ ParticleIterations:(int)particleIterations {
     b2Vec2 *positionBuffer = _system->GetPositionBuffer();
     const b2ParticleContact *particleContactBuffer = _system->GetContacts();
     void** ud = _system->GetUserDataBuffer();
+    
+    // Reset hasContactWithCore to false
+    for (int i = 0; i < particleCount; i++) {
+        ZPParticle *userData = (ZPParticle *)ud[i];
+        userData->hasContactWithCore = NO;
+    }
     
     // Check for particle - particle contact
     for (int i = 0; i < particleContactCount; i++) {
@@ -318,15 +326,6 @@ ParticleIterations:(int)particleIterations {
     [_particlesToAdd removeAllObjects];
 }
 
-- (void)updateRenderData {
-    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    
-    self.liquidPositions = _system->GetPositionBuffer();
-    self.liquidVelocities = _system->GetVelocityBuffer();
-    self.liquidColors = _system->GetColorBuffer();
-    self.liquidCount = _system->GetParticleCount();
-}
-
 - (void)addParticleWithPosition:(CGPoint)position
                           Color:(CGRect)color
                           Flags:(unsigned int)flags
@@ -345,8 +344,8 @@ ParticleIterations:(int)particleIterations {
 
     
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius() * _system->GetGravityScale();
-    b2Vec2 force = pos * mass * 2 * shootImpulse * _shotImpulseModifier;
+    float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
+    b2Vec2 force = pos * mass * shootImpulse * _shotImpulseModifier;
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic
                                        BecomesLiquidOnContact:becomesLiquidOnContact

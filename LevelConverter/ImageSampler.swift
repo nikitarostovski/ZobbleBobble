@@ -111,31 +111,8 @@ final class ImageSampler {
                                               UInt8(color.z * 255.0),
                                               UInt8(color.w * 255.0))
             let material = MaterialType.parseColor(colorConverted)
-//            print("\(colorConverted) \(material)")
             result.append(material)
         }
         return result
-        
-        
-        
-//        var result = [MaterialType?]()
-//        for y in 0..<height {
-//            for x in 0..<width {
-//                let offset = (y * height + x)
-////                let floatColor = resultBuffer.contents().advanced(by: offset).load(as: SIMD4<Float>.self)
-//                let floatColor = resultBuffer.contents().load(as: SIMD4<Float>.self)
-//
-//                
-//
-//                let color = SIMD4<UInt8>(UInt8(floatColor.x / 255.0),
-//                                         UInt8(floatColor.y / 255.0),
-//                                         UInt8(floatColor.z / 255.0),
-//                                         255)
-//                let material = MaterialType.parseColor(color)
-//                result.append(material)
-//            }
-//        }
-//
-//        return result
     }
 }

@@ -50,9 +50,9 @@ public enum MaterialType: String, Codable, CaseIterable {
     public var freezeVelocityThreshold: CGFloat {
         switch self {
         case .soil:
-            return 5
-        case .sand:
             return 2
+        case .sand:
+            return 1
         case .rock:
             return 10
         default:
@@ -138,7 +138,7 @@ extension MaterialType {
     public var cropThreshold: Float {
         switch self {
         case .soil: return 0.5
-        case .sand: return 0.7
+        case .sand: return 0.4
         case .rock: return 0.5
         case .water: return 0.5
         case .oil: return 0.5
