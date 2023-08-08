@@ -17,7 +17,8 @@ final class SwipeView: UIView, UIScrollViewDelegate {
     lazy var scrollView: UIScrollView = {
         let s = UIScrollView()
         s.delegate = self
-//        s.backgroundColor = UIColor.red.withAlphaComponent(0.3)
+        s.showsHorizontalScrollIndicator = false
+        s.showsVerticalScrollIndicator = false
         s.isPagingEnabled = true
         s.translatesAutoresizingMaskIntoConstraints = false
         return s
