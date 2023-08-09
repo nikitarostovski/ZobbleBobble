@@ -135,7 +135,8 @@ final class LevelScene {
         let endMissleCount = star.state.currentMissleIndex + 1
         
         let animation = { (percentage: CGFloat) in
-            let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * percentage
+            let starPercentage = min(1, percentage * Settings.Camera.missleParticleMaxSpeedModifier)
+            let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * starPercentage
             
             let missleRange = self.star.getWorldVisibleMissles(levelIndex: Int(currentLevel), misslesFired: misslesFired)
             self.star.updateStarAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,

@@ -19,6 +19,10 @@ enum Settings {
         static let starMissleCenterOffset: CGFloat = 25
         static let starMissleDeadZone: CGFloat = 40
         
+        static let missleRadiusShiftInsideStar: CGFloat = 3
+        static let missleAngleShiftInsideStar = CGFloat(5).radians
+        static let missleParticleMaxSpeedModifier: CGFloat = 2
+        
         static let starLevelScale: CGFloat = 1
         static let starLevelMenuScale: CGFloat = 0.25
         static let starPackMenuScale: CGFloat = 0.5
@@ -40,7 +44,7 @@ enum Settings {
         static let menuAnimationDuration: Double = 0.3
         static let menuAnimationEasing: Curve = .sine
         
-        static let shotAnimationDuration: Double = 0.25
+        static let shotAnimationDuration: Double = 0.4
         static let shotAnimationEasing: Curve = .sine
     }
     

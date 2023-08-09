@@ -19,8 +19,12 @@ class MissleBody: LiquidBody {
     var colors: [SIMD4<UInt8>] = []
     var velocities: [SIMD2<Float32>] = []
     
+    /// per-particle positions when missle starts to appear
     private var idlePositions: [SIMD2<Float32>] = []
+    /// per-particle positions when missle is ready to fire
     private var readyPositions: [SIMD2<Float32>] = []
+    
+    private var speedModifiers: [CGFloat] = []
     
     init(missleModel: ChunkModel, star: StarBody, game: Game?) {
         self.missleModel = missleModel
@@ -37,37 +41,48 @@ class MissleBody: LiquidBody {
     
     private func updateTargetPositions() {
         guard let star = star else { return }
-
-        let starEdgeY = CGFloat(star.position.y - star.radius)
-        let missleSpawnCenter = CGPoint(x: CGFloat(star.position.x),
-                                        y: (starEdgeY - Settings.Camera.starMissleCenterOffset))
         
-        let missleRadius = CGFloat(star.missleRadius)
-        let idleAngleStart = CGFloat.pi
-        let idleAngleEnd: CGFloat = 0
+        let starRadius = CGFloat(star.radius)
+        let missleRadius = CGFloat(star.missleRadius) + Settings.Camera.missleRadiusShiftInsideStar
         
-        var newIdle = [SIMD2<Float32>]()
-        var newReady = [SIMD2<Float32>]()
+        let starCenter = CGPoint(x: CGFloat(star.position.x),
+                                 y: CGFloat(star.position.y))
+        let missleCenter = CGPoint(x: starCenter.x,
+                                   y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
         
-        for i in 0 ..< missleModel.particles.count {
-            let center = missleModel.particles[i].position
+        let d = missleCenter.distance(to: starCenter)
+        
+        // angle from missle center to star edge (intersection point)
+        let intersectionAngle = CGFloat.circleIntersectionAngle(r1: missleRadius, r2: starRadius, d: d)
+        let angleShift = missleCenter.angle(to: starCenter).radians
+        
+        // fill idle
+        let idleAngleStart = intersectionAngle - Settings.Camera.missleAngleShiftInsideStar
+        let idleAngleEnd = -intersectionAngle + Settings.Camera.missleAngleShiftInsideStar
+        
+        let angleStep = (idleAngleEnd - idleAngleStart) / CGFloat(missleModel.particles.count - 1)
+        
+        idlePositions = missleModel.particles.indices.map { i in
+            let angle = angleShift + idleAngleStart + CGFloat(i) * angleStep
             
-            let idleAngle = idleAngleStart + (idleAngleEnd - idleAngleStart) * CGFloat(i) / CGFloat(missleModel.particles.count - 1)
-            let idleRadius = missleRadius
+            let idleX = missleCenter.x + missleRadius * cos(angle)
+            let idleY = missleCenter.y + missleRadius * sin(angle)
             
-            let idleX = missleSpawnCenter.x + idleRadius * cos(idleAngle)
-            let idleY = missleSpawnCenter.y + idleRadius * sin(idleAngle) + Settings.Camera.starMissleDeadZone
-            
-            let idleCenter = SIMD2<Float32>(x: Float32(idleX),
-                                            y: Float32(idleY))
-            let readyCenter = SIMD2<Float32>(x: Float32(center.x + missleSpawnCenter.x),
-                                             y: Float32(center.y + missleSpawnCenter.y))
-            newIdle.append(idleCenter)
-            newReady.append(readyCenter)
+            return SIMD2<Float32>(x: Float32(idleX),
+                                  y: Float32(idleY))
+        }.shuffled()
+        
+        // fill ready positions
+        readyPositions = missleModel.particles.map { particle in
+            SIMD2<Float32>(x: Float32(particle.position.x + missleCenter.x),
+                           y: Float32(particle.position.y + missleCenter.y))
         }
         
-        readyPositions = newReady
-        idlePositions = newIdle
+        // fill speed
+        speedModifiers = missleModel.particles.map { particle in
+            let verticalPosition = 1 - (particle.position.y / missleModel.boundingRadius + 1) / 2
+            return 1 + verticalPosition * (Settings.Camera.missleParticleMaxSpeedModifier - 1)
+        }
     }
     
     /// Updates particle positions
@@ -82,19 +97,14 @@ class MissleBody: LiquidBody {
         
         for i in 0..<readyPositions.count {
             let color = missleModel.particles[i].material.color
-            var p = missleProgress
-//            let random
-//            if i % 3 == 0 {
-//
-//            }
-            
+            let speedModifier = speedModifiers[i]
             let idle = idlePositions[i]
             let ready = readyPositions[i]
+            
+            let p = max(0, min(1, missleProgress * speedModifier))
             let current = SIMD2<Float32>(idle.x + (ready.x - idle.x) * Float(p),
                                          idle.y + (ready.y - idle.y) * Float(p))
-            if i == 0 {
-//                print("\(idle) \(ready)")
-            }
+            
             newVelocities.append(SIMD2<Float32>(0, 0))
             newColors.append(color)
             newPositions.append(current)

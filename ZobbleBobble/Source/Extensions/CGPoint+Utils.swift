@@ -66,16 +66,6 @@ public extension CGPoint {
     }
 }
 
-
-//
-//  Lerp.swift
-//  Lerp
-//
-//  Created by Daniel Clelland on 6/12/15.
-//  Copyright © 2015 Daniel Clelland. All rights reserved.
-//
-import Foundation
-
 // MARK: Lerpable protocol
 public protocol Lerpable {
     func lerp(min: Self, max: Self) -> Self
