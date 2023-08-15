@@ -36,6 +36,15 @@ public enum MaterialType: String, Codable, CaseIterable {
         }
     }
     
+    public var auxColor: SIMD4<UInt8> {
+        let mainColor = color
+        let modifier: Float = 0.8
+        return SIMD4<UInt8>(UInt8(Float(mainColor.x) * modifier),
+                            UInt8(Float(mainColor.y) * modifier),
+                            UInt8(Float(mainColor.z) * modifier),
+                            UInt8(Float(mainColor.w) * modifier))
+    }
+    
     /// 0 is zero gravity, 1 is planet gravity radius, and so on
     public var gravityScale: CGFloat {
         switch self {
@@ -128,20 +137,54 @@ extension MaterialType {
     public var blurModifier: CGFloat {
         switch self {
         case .soil: return 1
-        case .sand: return 0
+        case .sand: return 0.5
+        case .rock: return 0.7
+        case .water: return 1
+        case .oil: return 1.2
+        }
+    }
+    
+    /// Threshold for metaballs alpha texture cropping
+    public var cropThreshold: Float {
+        switch self {
+        case .soil: return 0.5
+        case .sand: return 0.5
+        case .rock: return 0.6
+        case .water: return 0.5
+        case .oil: return 0.35
+        }
+    }
+    
+    /// scale for alpha radius (when drawing metaballs)
+    public var alphaTextureRadiusModifier: Float {
+        switch self {
+        case .soil: return 1
+        case .sand: return 1.3
+        case .rock: return 1
+        case .water: return 1.2
+        case .oil: return 1.2
+        }
+    }
+    
+    /// scale for movement texture radius (when drawing metaballs) for smoother/sharper movement pattern
+    public var movmentTextureRadiusModifier: Float {
+        switch self {
+        case .soil: return 1
+        case .sand: return 1
         case .rock: return 1
         case .water: return 1
         case .oil: return 1
         }
     }
     
-    public var cropThreshold: Float {
+    /// Threshold for movement channels color distribution [0...0.5]
+    public var movementTextureThresold: Float {
         switch self {
-        case .soil: return 0.5
-        case .sand: return 0.4
-        case .rock: return 0.5
-        case .water: return 0.5
-        case .oil: return 0.5
+        case .soil: return 0.25
+        case .sand: return 0.25
+        case .rock: return 0.25
+        case .water: return 0.25
+        case .oil: return 0.25
         }
     }
 }

@@ -38,7 +38,6 @@ final class Game {
     let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
     
     let screenSize: CGSize
-    let renderSize: CGSize
     
     let levelManager: LevelManager
     
@@ -65,7 +64,7 @@ final class Game {
     var terrains = [TerrainBody]()
     var missles = [MissleBody]()
     
-    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, renderSize: CGSize) {
+    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize) {
         let levelManager: LevelManager
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
@@ -79,7 +78,6 @@ final class Game {
         }
         self.levelManager = levelManager
         self.screenSize = screenSize
-        self.renderSize = renderSize
         
         self.delegate = delegate
         self.scrollHolder = scrollHolder

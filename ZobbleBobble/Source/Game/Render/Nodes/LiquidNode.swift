@@ -6,6 +6,7 @@
 //
 
 import MetalKit
+import MetalPerformanceShaders
 import Levels
 
 struct LiquidRenderData {
@@ -23,6 +24,8 @@ class LiquidNode: BaseNode<LiquidBody> {
     struct Uniforms {
         let particleRadius: Float32
         let downScale: Float32
+        let alphaTextureRadiusModifier: Float
+        let movementTextureRadiusModifier: Float
         let cameraScale: Float32
         let camera: SIMD2<Float32>
     }
@@ -41,7 +44,7 @@ class LiquidNode: BaseNode<LiquidBody> {
         let renderPipelineDescriptor = MTLRenderPipelineDescriptor()
         renderPipelineDescriptor.vertexFunction = library.makeFunction(name: "metaballs_vertex")!
         renderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "metaballs_fragment")!
-        renderPipelineDescriptor.colorAttachments[0].pixelFormat = .r8Unorm
+        renderPipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
         renderPipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
         renderPipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
         renderPipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
@@ -52,13 +55,6 @@ class LiquidNode: BaseNode<LiquidBody> {
         renderPipelineDescriptor.sampleCount = 1;
         
         return try? device.makeRenderPipelineState(descriptor: renderPipelineDescriptor)
-    }()
-    
-    private lazy var computeBlurPipelineState: MTLComputePipelineState? = {
-        guard let device = device, let library = device.makeDefaultLibrary() else {
-            fatalError("Unable to create default Metal library")
-        }
-        return try? device.makeComputePipelineState(function: library.makeFunction(name: "blur")!)
     }()
     
     private lazy var computeUpscalePipelineState: MTLComputePipelineState? = {
@@ -88,9 +84,10 @@ class LiquidNode: BaseNode<LiquidBody> {
     let textureCountBufferProvider: BufferProvider
     
     var mainColorBuffer: MTLBuffer?
+    var auxColorBuffer: MTLBuffer?
     var lowResSizeBuffer: MTLBuffer?
-    var blurRadiusBuffer: MTLBuffer?
     var thresholdBuffer: MTLBuffer?
+    var moveThresholdBuffer: MTLBuffer?
     
     var nearestSamplerState: MTLSamplerState?
     var linearSamplerState: MTLSamplerState?
@@ -108,8 +105,8 @@ class LiquidNode: BaseNode<LiquidBody> {
     
     var material: MaterialType
     var threshold: Float
-    
-    var blurRadius: Int?
+    var moveThreshold: Float
+    var blurSigma: Float
     
     init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize, material: MaterialType, body: LiquidBody?) {
         self.positionBufferProvider = BufferProvider(device: device,
@@ -148,18 +145,19 @@ class LiquidNode: BaseNode<LiquidBody> {
         var size: SIMD2<Float> = SIMD2<Float>(Float(width), Float(height))
         self.lowResSizeBuffer = device.makeBuffer(bytes: &size, length: MemoryLayout<SIMD2<Float>>.stride)
         
-        let blurRadius = Int(CGFloat(Settings.Graphics.metaballsBlurKernelSize) * material.blurModifier)
-        self.blurRadius = blurRadius
-        if blurRadius > 0 {
-            self.blurRadiusBuffer = device.makeBuffer(bytes: &self.blurRadius, length: MemoryLayout<Int>.stride)
-        }
+        self.blurSigma = Float(Settings.Graphics.metaballsBlurSigma) * Float(material.blurModifier)
         
         self.threshold = material.cropThreshold
         self.thresholdBuffer = device.makeBuffer(bytes: &self.threshold, length: MemoryLayout<Float>.stride)
         
+        self.moveThreshold = material.movementTextureThresold
+        self.moveThresholdBuffer = device.makeBuffer(bytes: &self.moveThreshold, length: MemoryLayout<Float>.stride)
+        
         var mainColor = material.color
         self.mainColorBuffer = device.makeBuffer(bytes: &mainColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
         
+        var auxColor = material.auxColor
+        self.auxColorBuffer = device.makeBuffer(bytes: &auxColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
         
         super.init()
         
@@ -169,7 +167,7 @@ class LiquidNode: BaseNode<LiquidBody> {
         self.nearestSamplerState = device.nearestSampler
         self.linearSamplerState = device.linearSampler
 
-        self.lowResAlphaTexture = device.makeTexture(width: width, height: height, pixelFormat: .r8Unorm)
+        self.lowResAlphaTexture = device.makeTexture(width: width, height: height, usage: [.shaderRead, .shaderWrite, .renderTarget])
         self.finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
         self.finalAlphaCorrectedTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
         
@@ -203,6 +201,8 @@ class LiquidNode: BaseNode<LiquidBody> {
         let defaultScale = Float(renderSize.width / screenSize.width)
         var uniforms = Uniforms(particleRadius: renderData.particleRadius,
                                 downScale: Settings.Graphics.metaballsDownscale,
+                                alphaTextureRadiusModifier: material.alphaTextureRadiusModifier,
+                                movementTextureRadiusModifier: material.movmentTextureRadiusModifier,
                                 cameraScale: cameraScale * defaultScale / renderData.scale,
                                 camera: camera)
         
@@ -237,8 +237,7 @@ class LiquidNode: BaseNode<LiquidBody> {
         guard let initPipelineState = initPipelineState,
               let metaballsPipelineState = metaballsPipelineState,
               let computeThresholdPipelineState = computeThresholdPipelineState,
-              let computeUpscalePipelineState = computeUpscalePipelineState,
-              let computeBlurPipelineState = computeBlurPipelineState
+              let computeUpscalePipelineState = computeUpscalePipelineState
         else {
             return getClearTexture(commandBuffer: commandBuffer)
         }
@@ -250,7 +249,6 @@ class LiquidNode: BaseNode<LiquidBody> {
                                    colorBuffer: colorBuffer,
                                    metaballsPipelineState: metaballsPipelineState,
                                    computeUpscalePipelineState: computeUpscalePipelineState,
-                                   computeBlurPipelineState: computeBlurPipelineState,
                                    linearSampler: linearSamplerState,
                                    pointCount: pointCount)
         
@@ -270,15 +268,14 @@ class LiquidNode: BaseNode<LiquidBody> {
                                     colorBuffer: MTLBuffer,
                                     metaballsPipelineState: MTLRenderPipelineState,
                                     computeUpscalePipelineState: MTLComputePipelineState,
-                                    computeBlurPipelineState: MTLComputePipelineState,
                                     linearSampler: MTLSamplerState,
                                     pointCount: Int) -> MTLTexture? {
-        guard let lowResAlphaTexture = lowResAlphaTexture,
+        guard var lowResAlphaTexture = lowResAlphaTexture,
               let finalAlphaCorrectedTexture = finalAlphaCorrectedTexture
         else {
             return nil
         }
-        
+        // TODO: render material aux color texture in full size
         let metaballsEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: metaballsRenderPassDescriptor)!
         metaballsEncoder.setRenderPipelineState(metaballsPipelineState)
         metaballsEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 0)
@@ -287,18 +284,16 @@ class LiquidNode: BaseNode<LiquidBody> {
         metaballsEncoder.setVertexBuffer(colorBuffer, offset: 0, index: 3)
         metaballsEncoder.setVertexBuffer(lowResSizeBuffer, offset: 0, index: 4)
         metaballsEncoder.setVertexBuffer(mainColorBuffer, offset: 0, index: 5)
+        metaballsEncoder.setFragmentBuffer(uniformsBuffer, offset: 0, index: 0)
         metaballsEncoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: pointCount)
         metaballsEncoder.endEncoding()
         
-        let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
-        
-        if let blurRadiusBuffer = blurRadiusBuffer {
-            computeEncoder.setComputePipelineState(computeBlurPipelineState)
-            computeEncoder.setTexture(lowResAlphaTexture, index: 0)
-            computeEncoder.setTexture(lowResAlphaTexture, index: 1)
-            computeEncoder.setBuffer(blurRadiusBuffer, offset: 0, index: 0)
-            ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeBlurPipelineState, width: lowResAlphaTexture.width, height: lowResAlphaTexture.height)
+        if let device = device, blurSigma > 0 {
+            let gauss = MPSImageGaussianBlur(device: device, sigma: blurSigma)
+            gauss.encode(commandBuffer: commandBuffer, inPlaceTexture: &lowResAlphaTexture, fallbackCopyAllocator: nil)
         }
+        
+        let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
         computeEncoder.setTexture(lowResAlphaTexture, index: 0)
@@ -330,7 +325,9 @@ class LiquidNode: BaseNode<LiquidBody> {
         computeEncoder.setTexture(finalAlphaCorrectedTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setBuffer(mainColorBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(thresholdBuffer, offset: 0, index: 1)
+        computeEncoder.setBuffer(auxColorBuffer, offset: 0, index: 1)
+        computeEncoder.setBuffer(thresholdBuffer, offset: 0, index: 2)
+        computeEncoder.setBuffer(moveThresholdBuffer, offset: 0, index: 3)
         computeEncoder.setSamplerState(nearestSampler, index: 0)
         computeEncoder.setSamplerState(linearSampler, index: 1)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: computeThresholdPipelineState, width: finalTexture.width, height: finalTexture.height)

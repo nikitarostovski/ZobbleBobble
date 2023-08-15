@@ -65,13 +65,14 @@ enum Settings {
     }
     
     enum Graphics {
-        static let resolutionDownscale: CGFloat = 2
+        static let resolutionDownscale: CGFloat = 1
         
-        static let metaballsDownscale: Float = 0.5
-        static let metaballsBlurKernelSize: Int = 1
+        static let metaballsDownscale: Float = 1
+        static let metaballsBlurSigma: Float = 1.2
         
         static let fadeMultiplier: Float = 0.3
         
         static let inflightBufferCount = 3
+        static let dotMaskType: DotMask.MaskType = .trisectedShifted
     }
 }

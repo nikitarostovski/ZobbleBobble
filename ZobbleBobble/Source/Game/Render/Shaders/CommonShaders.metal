@@ -15,6 +15,7 @@ void drawMetaball(texture2d<float, access::read> input, texture2d<float, access:
             uint2 coords = uint2(x, y);
             float dist = distance(float2(x, y), center);
             
+            // TODO: wtf?
 //            float alpha = smoothstep(0, 1, 1 - dist / radius);
             float alpha = 1 - dist / radius / 2;
             
@@ -26,19 +27,6 @@ void drawMetaball(texture2d<float, access::read> input, texture2d<float, access:
             
             output.write(alphaColor, coords);
             colorOutput.write(float4(color.r, color.g, color.b, 1), coords);
-        }
-    }
-}
-
-void drawCircle(texture2d<float, access::write> output, float2 center, float radius, float4 color) {
-    for (int y = floor(center.y - radius); y < ceil(center.y + radius); y++) {
-        for (int x = floor(center.x - radius); x < ceil(center.x + radius); x++) {
-            uint2 coords = uint2(x, y);
-            float dist = distance(float2(x, y), center);
-            
-            if (dist <= radius) {
-                output.write(color, coords);
-            }
         }
     }
 }
@@ -61,22 +49,18 @@ kernel void upscale_texture(texture2d<float, access::sample> input [[texture(0)]
     return;
 }
 
-kernel void blur(texture2d<float, access::read> inTexture [[ texture(0) ]],
-                 texture2d<float, access::write> outTexture [[ texture(1) ]],
-                 constant int *blurRadius [[buffer(0)]],
-                 uint2 gid [[ thread_position_in_grid ]]) {
-    
-    int range = *blurRadius;//floor(blurSize/2.0);
-    
-    float4 colors = float4(0);
-    for (int x = -range; x <= range; x++) {
-        for (int y = -range; y <= range; y++) {
-            float4 color = inTexture.read(uint2(gid.x+x,
-                                                gid.y+y));
-            colors += color;
-        }
-    }
-    
-    float4 finalColor = colors/float(range*range*4);
-    outTexture.write(finalColor, gid);
+float3 rgb2hsv(float3 c) {
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = mix(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));
+    float4 q = mix(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float3 hsv2rgb(float3 c) {
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    float3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }

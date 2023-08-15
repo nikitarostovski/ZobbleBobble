@@ -106,9 +106,10 @@ final class LevelScene {
             let gravityScale = material.gravityScale
             let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.freezeThresholdModifier
             let staticContactBehavior = material.becomesLiquidOnContact
+            let color = chunk.particles[i].movementColor
             
             physicsWorld.addParticle(withPosition: center,
-                                     color: material.color,
+                                     color: color,
                                      flags: flags,
                                      isStatic: isStatic,
                                      gravityScale: gravityScale,
@@ -189,8 +190,10 @@ final class LevelScene {
             pos.x = dist * cos(angle)
             pos.y = dist * sin(angle)
             
+            let color = missle.missleModel.particles[i].movementColor
+            
             self?.physicsWorld.addParticle(withPosition: pos,
-                                           color: material.color,
+                                           color: color,
                                            flags: flags,
                                            isStatic: isStatic,
                                            gravityScale: gravityScale,

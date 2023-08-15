@@ -14,7 +14,7 @@ extension MTLDevice {
                      storageMode: MTLStorageMode = .shared,
                      textureType: MTLTextureType = .type2D,
                      sampleCount: Int = 1,
-                     usage: MTLTextureUsage = [.shaderRead, .shaderWrite, .renderTarget]) -> MTLTexture? {
+                     usage: MTLTextureUsage = [.shaderRead, .shaderWrite]) -> MTLTexture? {
         
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: pixelFormat,

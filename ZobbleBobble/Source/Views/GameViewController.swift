@@ -9,8 +9,6 @@ import UIKit
 
 final class GameViewController: UIViewController {
     var screenSize: CGSize { UIScreen.main.bounds.size }
-    var renderSize: CGSize { CGSize(width: UIScreen.main.nativeBounds.size.width / Settings.Graphics.resolutionDownscale,
-                                    height: UIScreen.main.nativeBounds.size.height / Settings.Graphics.resolutionDownscale) }
     
     private var game: Game?
     
@@ -21,7 +19,7 @@ final class GameViewController: UIViewController {
     }()
     
     lazy var renderView: MetalRenderView = {
-        let view = MetalRenderView(screenSize: screenSize, renderSize: renderSize, delegate: self, dataSource: game)
+        let view = MetalRenderView(screenSize: screenSize, delegate: self, dataSource: game)
         view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -66,7 +64,7 @@ final class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self, scrollHolder: self, screenSize: screenSize, renderSize: renderSize)
+        self.game = Game(delegate: self, scrollHolder: self, screenSize: screenSize)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([

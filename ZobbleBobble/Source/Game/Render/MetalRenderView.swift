@@ -23,11 +23,11 @@ protocol RenderViewDelegate: AnyObject {
 final class MetalRenderView: MTKView {
     var renderer: Renderer?
     
-    init(screenSize: CGSize, renderSize: CGSize, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
+    init(screenSize: CGSize, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
         let device = MTLCreateSystemDefaultDevice()!
         super.init(frame: .zero, device: device)
         
-        self.renderer = Renderer(device: device, view: self, renderSize: renderSize, screenSize: screenSize, delegate: delegate, dataSource: dataSource)
+        self.renderer = Renderer(device: device, view: self, screenSize: screenSize, delegate: delegate, dataSource: dataSource)
     }
     
     required init(coder: NSCoder) {
