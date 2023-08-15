@@ -9,28 +9,6 @@
 #include "CommonShaders.h"
 using namespace metal;
 
-void drawMetaball(texture2d<float, access::read> input, texture2d<float, access::write> output, texture2d<float, access::write> colorOutput, float2 center, float radius, float3 color) {
-    for (int y = floor(center.y - 2 * radius); y < ceil(center.y + 2 * radius); y++) {
-        for (int x = floor(center.x - 2 * radius); x < ceil(center.x + 2 * radius); x++) {
-            uint2 coords = uint2(x, y);
-            float dist = distance(float2(x, y), center);
-            
-            // TODO: wtf?
-//            float alpha = smoothstep(0, 1, 1 - dist / radius);
-            float alpha = 1 - dist / radius / 2;
-            
-            float4 oldColor = input.read(coords);
-            float4 alphaColor = float4(alpha + oldColor.r,
-                                       alpha + oldColor.g,
-                                       alpha + oldColor.b,
-                                       0);
-            
-            output.write(alphaColor, coords);
-            colorOutput.write(float4(color.r, color.g, color.b, 1), coords);
-        }
-    }
-}
-
 kernel void fill_clear(texture2d<float, access::write> output [[texture(0)]],
                        uint2 gid [[thread_position_in_grid]]) {
     output.write(float4(0), gid);

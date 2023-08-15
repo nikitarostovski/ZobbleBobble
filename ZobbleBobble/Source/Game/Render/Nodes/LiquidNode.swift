@@ -275,7 +275,7 @@ class LiquidNode: BaseNode<LiquidBody> {
         else {
             return nil
         }
-        // TODO: render material aux color texture in full size
+        
         let metaballsEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: metaballsRenderPassDescriptor)!
         metaballsEncoder.setRenderPipelineState(metaballsPipelineState)
         metaballsEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 0)

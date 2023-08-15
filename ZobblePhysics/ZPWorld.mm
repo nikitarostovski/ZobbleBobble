@@ -222,50 +222,6 @@ ParticleIterations:(int)particleIterations {
         } else if (userDataB->state == ZPParticleStateDynamic && userDataA->state == ZPParticleStateStatic) {
             userDataB->hasContactWithCore = YES;
         }
-        continue;
-        if (userDataA->state == ZPParticleStateDynamic &&
-            userDataA->becomesLiquidOnContact &&
-            userDataB->state == ZPParticleStateStatic) {
-            
-            [self makeLiquidAt:indexA Force:CGPointMake(0, 0)];
-        } else if (userDataB->state == ZPParticleStateDynamic &&
-                   userDataB->becomesLiquidOnContact &&
-                   userDataA->state == ZPParticleStateStatic) {
-            
-            [self makeLiquidAt:indexB Force:CGPointMake(0, 0)];
-        }
-        
-        b2Vec2 explosionCenter;
-        CGFloat explosionRadius;
-        if (userDataA->state == ZPParticleStateDynamic &&
-            userDataA->explosionRadius > 0 &&
-            userDataB->explosionRadius <= 0) {
-
-            explosionCenter = positionBuffer[indexB];
-            explosionRadius = userDataA->explosionRadius;
-            [self removeParticleAt:indexA];
-        } else if (userDataB->state == ZPParticleStateDynamic &&
-                   userDataB->explosionRadius > 0 &&
-                   userDataA->explosionRadius <= 0) {
-
-            explosionCenter = positionBuffer[indexA];
-            explosionRadius = userDataB->explosionRadius;
-            [self removeParticleAt:indexB];
-        } else {
-            continue;
-        }
-
-        for (int i = 0; i < particleCount; i++) {
-            b2Vec2 pos = positionBuffer[i];
-            float dist = (pos - explosionCenter).Length();
-            if (dist < explosionRadius) {
-                pos.Normalize();
-                b2Vec2 force = pos * kExplosiveImpulse;
-                
-                [self makeLiquidAt:i Force:CGPointMake(force.x, force.y)];
-//                _system->GetColorBuffer()[i] = b2ParticleColor(0, 255, 0, 255);
-            }
-        }
     }
 }
 
@@ -286,7 +242,7 @@ ParticleIterations:(int)particleIterations {
             userData->hasContactWithCore &&
             velocity < userData->freezeVelocityThreshold) {
             
-            [self makeCoreAt:i Force:CGPointMake(0, 0)];
+            [self makeCoreAt:i];
         }
     }
 }
@@ -414,7 +370,7 @@ ParticleIterations:(int)particleIterations {
 }
 
 // TODO: try to avoid deleting and adding particles. try to change their params
-- (void)makeCoreAt:(int)index Force:(CGPoint)force {
+- (void)makeCoreAt:(int)index {
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     ZPParticle *userData = (ZPParticle *)_system->GetUserDataBuffer()[index];
 
@@ -425,7 +381,7 @@ ParticleIterations:(int)particleIterations {
                                                         Flags:userData->currentFlags
                                               ExplosionRadius:userData->explosionRadius
                                                  ShootImpulse:userData->shootImpulse];
-    def.initialForce = force;
+    def.initialForce = CGPointMake(0, 0);
 
     b2Vec2 pos = _system->GetPositionBuffer()[index];
     b2ParticleColor col = _system->GetColorBuffer()[index];

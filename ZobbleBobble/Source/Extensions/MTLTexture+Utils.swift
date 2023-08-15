@@ -7,7 +7,6 @@
 
 import MetalKit
 
-// TODO: use this methods in ThreadHelper
 extension MTLTexture {
     func threadGroupCount(pipeline: MTLComputePipelineState) -> MTLSize {
         return MTLSizeMake(pipeline.threadExecutionWidth,

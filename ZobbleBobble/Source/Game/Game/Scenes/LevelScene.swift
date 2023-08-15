@@ -83,7 +83,6 @@ final class LevelScene {
         guard userInteractionEnabled else { return }
         
         guard star.state.currentMissleIndex <= CGFloat(level.missleChunks.count) else {
-            // TODO: level finished
 //            game?.runMenu(isFromLevel: true)
             return
         }

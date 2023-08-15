@@ -37,7 +37,6 @@ final class BufferProvider {
             avaliableBufferIndex = 0
         }
         
-        // TODO: EXC_BAD_ACCESS on high loads
         memcpy(bufferPointer, data, length)
         
         if let data2 = data2, length2 > 0 {

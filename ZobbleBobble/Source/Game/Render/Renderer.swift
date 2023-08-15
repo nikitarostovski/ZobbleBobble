@@ -82,7 +82,6 @@ class Renderer: NSObject, MTKViewDelegate {
         starNodes + liquidNodes
     }
     
-    // TODO: move to settings
     private var shaderOptions = ShaderOptions(bloom: 1, // 1
                                               bloomRadiusR: 4.0, // 1.0
                                               bloomRadiusG: 4.0, // 1.0

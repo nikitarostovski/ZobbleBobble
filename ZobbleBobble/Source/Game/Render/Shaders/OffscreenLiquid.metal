@@ -56,7 +56,6 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
                      device float const &fadeMultiplier [[buffer(0)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
-    // TODO: check if only red channel needs to be faded
     float4 oldColor = input.read(gid);
     oldColor.r = oldColor.r * fadeMultiplier;
     oldColor.g = 0;

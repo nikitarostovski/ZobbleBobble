@@ -1,4 +1,3 @@
 TODO:
 
-- make prebaking for level textures in menu
-- threadgroups tuning
+https://trello.com/b/cjJw2tRX/zobblebobble
