@@ -9,7 +9,7 @@ import Foundation
 
 extension Game: RenderViewDataSource {
     var visibleBodies: [any Body] {
-        stars + terrains + missles
+        return visibleScenes.flatMap { $0.visibleBodies }
     }
     
     var cameraX: Float {

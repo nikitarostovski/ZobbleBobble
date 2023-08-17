@@ -10,6 +10,13 @@
 
 using namespace metal;
 
+float4 blendOver(float4 a, float4 b) {
+    float newAlpha = mix(b.w, 1.0, a.w);
+    float3 newColor = mix(b.w * b.xyz, a.xyz, a.w);
+    float divideFactor = (newAlpha > 0.001 ? (1.0 / newAlpha) : 1.0);
+    return float4(divideFactor * newColor, newAlpha);
+}
+
 kernel void merge(texture2d<float, access::write> output [[texture(0)]],
                   array<texture2d<float, access::read>, 96> textures [[texture(1)]],
                   device int const &textureCount [[buffer(0)]],
@@ -46,20 +53,29 @@ kernel void merge(texture2d<float, access::write> output [[texture(0)]],
 //    return result;
     
     // material mix (hsv)
-    float3 totalChannels = float3(0, 0, 0);
-    int visibleCount = 0;
+//    float3 totalChannels = float3(0, 0, 0);
+//    int visibleCount = 0;
+//    for (int i = 0; i < textureCount; i++) {
+//        float4 rgba = textures[i].read(gid);
+//        float3 hsv = rgb2hsv(rgba.rgb);
+//        if (rgba.a > 0) {
+//            totalChannels += hsv;
+//            visibleCount += 1;
+//        }
+//    }
+//    totalChannels /= visibleCount;
+//    totalChannels.y *= 1.0 / visibleCount;
+//    totalChannels = hsv2rgb(totalChannels);
+//    output.write(float4(totalChannels, 1), gid);
+//    return;
+    
+    // blend over
+    float4 currentColor = float4(1, 1, 1, 0);
     for (int i = 0; i < textureCount; i++) {
-        float4 rgba = textures[i].read(gid);
-        float3 hsv = rgb2hsv(rgba.rgb);
-        if (rgba.a > 0) {
-            totalChannels += hsv;
-            visibleCount += 1;
-        }
+        float4 col = textures[i].read(gid);
+        currentColor = blendOver(currentColor, col);
     }
-    totalChannels /= visibleCount;
-    totalChannels.y *= 1.0 / visibleCount;
-    totalChannels = hsv2rgb(totalChannels);
-    output.write(float4(totalChannels, 1), gid);
+    output.write(float4(currentColor.rgb, 1), gid);
     return;
     
     // multiply
@@ -76,7 +92,8 @@ kernel void merge(texture2d<float, access::write> output [[texture(0)]],
 //        }
 //    }
 //    totalChannels.rgb /= visibleCount;
-//    return totalChannels;
+//    output.write(float4(totalChannels.rgb, 1), gid);
+//    return;
     
     // max-alpha
 //    float4 maxAlphaColor = float4(0, 0, 0, -1);

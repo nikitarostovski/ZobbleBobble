@@ -11,7 +11,19 @@ import Levels
 protocol Body: AnyObject {
     associatedtype RenderData
     
-    var renderData: RenderData? { get set }
+    var renderData: RenderData? { get }
     
     var uniqueMaterials: [MaterialType] { get }
+    
+    var userInteractive: Bool { get }
+    
+    func onTouchDown()
+    func onTouchUp()
+}
+
+extension Body {
+    var uniqueMaterials: [MaterialType] { [] }
+    
+    func onTouchDown() { }
+    func onTouchUp() { }
 }

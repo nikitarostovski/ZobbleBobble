@@ -41,8 +41,8 @@ enum Settings {
         static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
         static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
         
-        static let menuAnimationDuration: Double = 0.3
-        static let menuAnimationEasing: Curve = .sine
+        static let sceneTransitionDuration: Double = 0.3
+        static let sceneTransitionEasing: Curve = .sine
         
         static let shotAnimationDuration: Double = 0.4
         static let shotAnimationEasing: Curve = .sine

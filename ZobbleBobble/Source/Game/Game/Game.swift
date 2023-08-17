@@ -17,12 +17,6 @@ protocol ScrollHolder: AnyObject {
 }
 
 struct GameState {
-    enum State {
-        case level
-        case menu
-    }
-    
-    var state: State = .menu
     /// index of selected pack for level selection mode
     var packIndex: Int
     /// index of level for level mode
@@ -36,17 +30,19 @@ struct CameraState {
 
 final class Game {
     let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
-    
-    let screenSize: CGSize
-    
-    let levelManager: LevelManager
-    
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
+    
+    let screenSize: CGSize
+    let levelManager: LevelManager
     
     var state: GameState
     var cameraState = CameraState()
     
+    // Game objects
+    private(set) var visibleScenes: [TransitionableScene]
+    
+    // Computable properties
     var currentPack: PackModel? {
         guard 0..<levelManager.allLevelPacks.count ~= state.packIndex else { return nil }
         return levelManager.allLevelPacks[state.packIndex]
@@ -57,13 +53,7 @@ final class Game {
         return pack.levels[state.levelIndex]
     }
     
-    var scene: LevelScene?
-    var menu: MenuScene?
-    
-    var stars = [StarBody]()
-    var terrains = [TerrainBody]()
-    var missles = [MissleBody]()
-    
+    // MARK: - Methods
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize) {
         let levelManager: LevelManager
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
@@ -82,12 +72,17 @@ final class Game {
         self.delegate = delegate
         self.scrollHolder = scrollHolder
         
-        self.state = GameState(state: .menu, packIndex: 0, levelIndex: 0)
+        self.state = GameState(/*scene: .controlCenter, */packIndex: 0, levelIndex: 0)
+        
+        let rootScene = ControlCenterScene()
+        self.visibleScenes = [rootScene]
+        
+        rootScene.delegate = self
     }
     
     func update(_ time: CFTimeInterval) {
-        if let scene = scene {
-            scene.update(time)
+        visibleScenes.forEach {
+            $0.update(time)
         }
     }
     
@@ -95,54 +90,86 @@ final class Game {
         cameraState.camera = .zero
         cameraState.cameraScale = 1
         
-        let scene = LevelScene(game: self)
-        self.scene = scene
-        self.state.state = .level
-        self.menu = nil
+//        let scene = LevelScene(game: self)
+//        self.scene = scene
+//        self.state.scene = .planet
+//        self.menu = nil
         delegate?.gameDidChangeState(self)
     }
     
     func runMenu(isFromLevel: Bool = false) {
-        let from = isFromLevel ? Settings.Camera.levelCameraScale : Settings.Camera.levelsMenuCameraScale
-        let menu = MenuScene(game: self, from: from)
-        self.menu = menu
-        self.state.state = .menu
-        self.scene = nil
+//        let from = isFromLevel ? Settings.Camera.levelCameraScale : Settings.Camera.levelsMenuCameraScale
+//        let menu = MenuScene(game: self, from: from)
+//        self.menu = menu
+//        self.state.scene = .controlCenter
+//        self.scene = nil
         delegate?.gameDidChangeState(self)
     }
     
-    func onTap(at pos: CGPoint) {
-        switch state.state {
-        case .level:
-            scene?.onTap(pos)
-        case .menu:
-            menu?.onTap(position: pos)
+    func onTouchDown(pos: CGPoint) {
+        let posNorm = CGPoint(x: pos.x / screenSize.width, y: pos.y / screenSize.height)
+        visibleScenes.forEach {
+            if $0.hitTest(pos: posNorm) {
+                $0.onTouchDown(pos: posNorm)
+            }
+        }
+    }
+    
+    func onTouchMove(pos: CGPoint) {
+        let posNorm = CGPoint(x: pos.x / screenSize.width, y: pos.y / screenSize.height)
+        visibleScenes.forEach {
+            if $0.hitTest(pos: posNorm) {
+                $0.onTouchMove(pos: posNorm)
+            }
+        }
+    }
+    
+    func onTouchUp(pos: CGPoint) {
+        let posNorm = CGPoint(x: pos.x / screenSize.width, y: pos.y / screenSize.height)
+        visibleScenes.forEach {
+            if $0.hitTest(pos: posNorm) {
+                $0.onTouchUp(pos: posNorm)
+            }
         }
     }
     
     func onSwipe(_ position: CGPoint) {
-        switch state.state {
-        case .level:
-            scene?.onSwipe(position.x)
-        case .menu:
-            menu?.onSwipe(position.x)
-        }
+//        switch state.state {
+//        case .level:
+//            scene?.onSwipe(position.x)
+//        case .menu:
+//            menu?.onSwipe(position.x)
+//        }
     }
     
     func onExitTap() {
-        guard state.state == .level else { return }
-        runMenu(isFromLevel: true)
+//        guard state.state == .level else { return }
+//        runMenu(isFromLevel: true)
     }
     
-    func replace(stars: [StarBody]? = nil, terrains: [TerrainBody]? = nil, missles: [MissleBody]? = nil) {
-        if let terrains = terrains {
-            self.terrains = terrains
+//    func replace(stars: [StarBody]? = nil, terrains: [TerrainBody]? = nil, missles: [MissleBody]? = nil) {
+//        if let terrains = terrains {
+//            self.terrains = terrains
+//        }
+//        if let stars = stars {
+//            self.stars = stars
+//        }
+//        if let missles = missles {
+//            self.missles = missles
+//        }
+//    }
+}
+
+extension Game: TransitionableSceneDelegate {
+    func onTransitionableSceneAppendRequest(sender: TransitionableScene, becomesActive: Bool) {
+        if becomesActive || visibleScenes.isEmpty {
+            visibleScenes.append(sender)
+        } else {
+            visibleScenes.insert(sender, at: 0)
         }
-        if let stars = stars {
-            self.stars = stars
-        }
-        if let missles = missles {
-            self.missles = missles
-        }
+    }
+    
+    func onTransitionableSceneRemovalRequest(sender: TransitionableScene) {
+        visibleScenes.removeAll(where: { $0 === sender })
     }
 }

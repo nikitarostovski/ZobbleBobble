@@ -28,7 +28,7 @@ final class BufferProvider {
         }
     }
     
-    func nextUniformsBuffer(data: UnsafeMutableRawPointer, length: Int) -> MTLBuffer {
+    func nextUniformsBuffer(data: UnsafeMutableRawPointer?, length: Int) -> MTLBuffer {
         let buffer = uniformsBuffers[avaliableBufferIndex]
         let bufferPointer = buffer.contents()
 

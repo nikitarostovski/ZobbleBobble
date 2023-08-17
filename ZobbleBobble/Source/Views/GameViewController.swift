@@ -12,12 +12,6 @@ final class GameViewController: UIViewController {
     
     private var game: Game?
     
-    lazy var tapGesture: UIGestureRecognizer = {
-        let g = UITapGestureRecognizer(target: self, action: #selector(onTap(gr:)))
-        g.delegate = self
-        return g
-    }()
-    
     lazy var renderView: MetalRenderView = {
         let view = MetalRenderView(screenSize: screenSize, delegate: self, dataSource: game)
         view.colorPixelFormat = .bgra8Unorm
@@ -30,25 +24,6 @@ final class GameViewController: UIViewController {
 //        view.backgroundColor = .red.withAlphaComponent(0.4)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
-    }()
-    
-    lazy var controlsBar: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [exitButton])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .horizontal
-        stack.spacing = 16
-        stack.alignment = .leading
-        stack.distribution = .equalSpacing
-        return stack
-    }()
-    
-    lazy var exitButton: UIButton = {
-        let b = UIButton()
-        b.translatesAutoresizingMaskIntoConstraints = false
-        b.backgroundColor = .red
-        b.setTitle("EXIT", for: .normal)
-        b.addTarget(self, action: #selector(onExitTap), for: .touchUpInside)
-        return b
     }()
     
     private var isConfigured = false
@@ -74,22 +49,13 @@ final class GameViewController: UIViewController {
             NSLayoutConstraint(item: renderView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
         ])
         
-        view.addSubview(swipeControl)
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: swipeControl, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: swipeControl, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: swipeControl, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: swipeControl, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
-        ])
-        swipeControl.addGestureRecognizer(tapGesture)
-        
-        view.addSubview(controlsBar)
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: controlsBar, attribute: .leading, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: controlsBar, attribute: .top, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .top, multiplier: 1, constant: 20),
-//            NSLayoutConstraint(item: controlsBar, attribute: .trailing, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: controlsBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 100)
-        ])
+//        view.addSubview(swipeControl)
+//        NSLayoutConstraint.activate([
+//            NSLayoutConstraint(item: swipeControl, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
+//            NSLayoutConstraint(item: swipeControl, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
+//            NSLayoutConstraint(item: swipeControl, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
+//            NSLayoutConstraint(item: swipeControl, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
+//        ])
     }
     
     override func viewDidLayoutSubviews() {
@@ -99,18 +65,31 @@ final class GameViewController: UIViewController {
         game?.runMenu()
     }
     
-    @objc
-    private func onExitTap() {
-        game?.onExitTap()
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        guard let touch = touches.first else { return }
+        let pos = touch.location(in: touch.view)
+        game?.onTouchDown(pos: pos)
     }
     
-    @objc
-    private func onTap(gr: UIGestureRecognizer) {
-        var position = gr.location(in: renderView)
-        
-        position.x = position.x - renderView.frame.width / 2
-        position.y = position.y - renderView.frame.height / 2
-        game?.onTap(at: position)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        guard let touch = touches.first else { return }
+        let pos = touch.location(in: touch.view)
+        game?.onTouchMove(pos: pos)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        guard let touch = touches.first else { return }
+        let pos = touch.location(in: touch.view)
+        game?.onTouchUp(pos: pos)
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        let pos = CGPoint(x: CGFloat.greatestFiniteMagnitude, y: CGFloat.greatestFiniteMagnitude)
+        game?.onTouchUp(pos: pos)
     }
 }
 
@@ -122,14 +101,7 @@ extension GameViewController: RenderViewDelegate {
 }
 
 extension GameViewController: GameDelegate {
-    func gameDidChangeState(_ game: Game) {
-        switch game.state.state {
-        case .level:
-            controlsBar.isHidden = false
-        default:
-            controlsBar.isHidden = true
-        }
-    }
+    func gameDidChangeState(_ game: Game) { }
 }
 
 extension GameViewController: ScrollHolder {

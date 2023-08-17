@@ -21,6 +21,7 @@ class StarBody: Body {
         var visibleMissleRange: ClosedRange<CGFloat> = 0...0
     }
     
+    var userInteractive: Bool = false
     var renderData: StarRenderData?
     
     weak var game: Game?

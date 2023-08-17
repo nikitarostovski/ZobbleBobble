@@ -77,9 +77,10 @@ class Renderer: NSObject, MTKViewDelegate {
     
     private var starNodes = [StarNode]()
     private var liquidNodes = [LiquidNode]()
+    private var guiNodes = [GUINode]()
     
     private var allNodes: [Node] {
-        starNodes + liquidNodes
+        starNodes + liquidNodes + guiNodes
     }
     
     private var shaderOptions = ShaderOptions(bloom: 1, // 1
@@ -181,6 +182,7 @@ class Renderer: NSObject, MTKViewDelegate {
     
     private func updateNodesIfNeeded() {
         guard let bodies = renderDataSource?.visibleBodies else { return }
+        
         let nodes = allNodes
         
         for body in bodies {
@@ -207,6 +209,7 @@ class Renderer: NSObject, MTKViewDelegate {
             if !found {
                 starNodes.removeAll(where: { $0 === node })
                 liquidNodes.removeAll(where: { $0 === node })
+                guiNodes.removeAll(where: { $0 === node })
             }
         }
     }
@@ -222,6 +225,9 @@ class Renderer: NSObject, MTKViewDelegate {
                     liquidNodes.append(node)
                 }
             }
+        case is GUIBody:
+            let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
+            guiNodes.append(node)
         default:
             break
         }

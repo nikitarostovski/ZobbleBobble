@@ -24,7 +24,6 @@ class DotMask {
         let G = UInt32(r: base, g: max, b: base)
         let B = UInt32(r: base, g: base, b: max)
         let M = UInt32(r: max, g: base, b: max)
-        let W = UInt32(r: max, g: max, b: max)
         let N = UInt32(r: none, g: none, b: none)
         
         let maskData: [UInt32]

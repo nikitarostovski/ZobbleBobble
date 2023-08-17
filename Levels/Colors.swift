@@ -8,6 +8,28 @@
 import Foundation
 
 public enum Colors {
+    public enum GUI {
+        public enum Background {
+            public static let dark: SIMD4<UInt8> = .init(rgb: 0x141414)
+            public static let light: SIMD4<UInt8> = .init(rgb: 0x222222)
+        }
+        
+        public enum Label {
+            public static let textHeader: SIMD4<UInt8> = .init(rgb: 0xDDDDDD)
+        }
+        
+        public enum Button {
+            public static let backgroundPrimaryNormal: SIMD4<UInt8> = .init(rgb: 0x3388BB)
+            public static let backgroundPrimaryHighlighted: SIMD4<UInt8> = .init(rgb: 0x4499DD)
+            
+            public static let backgroundSecondaryNormal: SIMD4<UInt8> = .init(rgb: 0x116699)
+            public static let backgroundSecondaryHighlighted: SIMD4<UInt8> = .init(rgb: 0x2277AA)
+            
+            public static let titleNormal: SIMD4<UInt8> = .init(rgb: 0xBBBBBB)
+            public static let titleHighlighted: SIMD4<UInt8> = .init(rgb: 0xFFFFFF)
+        }
+    }
+    
     public enum Stars {
         public static let mainColor: SIMD4<UInt8> = .init(rgb: 0xCCCCAA)
     }
