@@ -15,10 +15,10 @@ enum TransitionError: Error {
 class SceneTransition {
     let duration: TimeInterval
     let curve: Curve
-    let from: TransitionableScene
-    let to: TransitionableScene
+    let from: Scene
+    let to: Scene
     
-    init(from: TransitionableScene, to: TransitionableScene, duration: TimeInterval, curve: Curve) {
+    init(from: Scene, to: Scene, duration: TimeInterval, curve: Curve) {
         self.from = from
         self.to = to
         self.duration = duration

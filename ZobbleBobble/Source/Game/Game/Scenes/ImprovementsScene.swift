@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class ImprovementsScene: TransitionableScene {
+final class ImprovementsScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .improvements }
     
     private lazy var gui: GUIBody = {

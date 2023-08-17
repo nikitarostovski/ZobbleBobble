@@ -1,5 +1,5 @@
 //
-//  TransitionableScene.swift
+//  Scene.swift
 //  ZobbleBobble
 //
 //  Created by Rost on 16.08.2023.
@@ -8,11 +8,11 @@
 import Foundation
 
 protocol TransitionableSceneDelegate: AnyObject {
-    func onTransitionableSceneAppendRequest(sender: TransitionableScene, becomesActive: Bool)
-    func onTransitionableSceneRemovalRequest(sender: TransitionableScene)
+    func onTransitionableSceneAppendRequest(sender: Scene, becomesActive: Bool)
+    func onTransitionableSceneRemovalRequest(sender: Scene)
 }
 
-class TransitionableScene: Scene {
+class Scene {
     enum TransitionType {
         case toMe
         case fromMe
@@ -39,7 +39,7 @@ class TransitionableScene: Scene {
     private var activeTransitionType: TransitionType? {
         activeTransition.map { $0.from === self ? .fromMe : .toMe }
     }
-    private var activeTransitionScene: TransitionableScene? {
+    private var activeTransitionScene: Scene? {
         activeTransition.map { $0.from === self ? $0.to : $0.from }
     }
     
@@ -65,7 +65,6 @@ class TransitionableScene: Scene {
     func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
         currentVisibility = visibility
         userInteractionEnabled = visibility + .leastNonzeroMagnitude >= 1
-//        print("\(transitionTargetCategory) alpha: \(visibility) with: \(transitionTarget)")
     }
     
     func onTransitionFinished() {
@@ -75,13 +74,12 @@ class TransitionableScene: Scene {
         self.activeTransition = nil
     }
     
-    func transition(to scene: TransitionableScene, becomesActive: Bool = true) throws {
+    func transition(to scene: Scene, becomesActive: Bool = true) throws {
         guard scene !== self else { throw TransitionError.unavailable }
         guard activeTransition == nil, scene.activeTransition == nil else { throw TransitionError.anotherTransitionInProgress }
         
         scene.delegate = delegate
         
-        print("start transition from \(transitionTargetCategory) to \(scene.transitionTargetCategory)")
         delegate?.onTransitionableSceneAppendRequest(sender: scene, becomesActive: becomesActive)
         
         let transition = SceneTransition(from: self,

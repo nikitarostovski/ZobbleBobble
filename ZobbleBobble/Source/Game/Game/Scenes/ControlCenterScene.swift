@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class ControlCenterScene: TransitionableScene {
+final class ControlCenterScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .controlCenter }
     
     private lazy var gui: GUIBody = {

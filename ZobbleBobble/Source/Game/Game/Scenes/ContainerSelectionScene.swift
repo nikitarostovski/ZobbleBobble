@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class ContainerSelectionScene: TransitionableScene {
+final class ContainerSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .containerSelection }
     
     private lazy var gui: GUIBody = {

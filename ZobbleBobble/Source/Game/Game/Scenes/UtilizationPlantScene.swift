@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class UtilizationPlantScene: TransitionableScene {
+final class UtilizationPlantScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .utilizationPlant }
     
     private lazy var gui: GUIBody = {

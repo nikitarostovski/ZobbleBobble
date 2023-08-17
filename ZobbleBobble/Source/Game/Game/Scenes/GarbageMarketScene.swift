@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class GarbageMarketScene: TransitionableScene {
+final class GarbageMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .garbageMarket }
     
     private lazy var gui: GUIBody = {

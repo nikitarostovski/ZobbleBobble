@@ -40,7 +40,7 @@ final class Game {
     var cameraState = CameraState()
     
     // Game objects
-    private(set) var visibleScenes: [TransitionableScene]
+    private(set) var visibleScenes: [Scene]
     
     // Computable properties
     var currentPack: PackModel? {
@@ -161,7 +161,7 @@ final class Game {
 }
 
 extension Game: TransitionableSceneDelegate {
-    func onTransitionableSceneAppendRequest(sender: TransitionableScene, becomesActive: Bool) {
+    func onTransitionableSceneAppendRequest(sender: Scene, becomesActive: Bool) {
         if becomesActive || visibleScenes.isEmpty {
             visibleScenes.append(sender)
         } else {
@@ -169,7 +169,7 @@ extension Game: TransitionableSceneDelegate {
         }
     }
     
-    func onTransitionableSceneRemovalRequest(sender: TransitionableScene) {
+    func onTransitionableSceneRemovalRequest(sender: Scene) {
         visibleScenes.removeAll(where: { $0 === sender })
     }
 }

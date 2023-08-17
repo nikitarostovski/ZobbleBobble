@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class BlackMarketScene: TransitionableScene {
+final class BlackMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .blackMarket }
     
     private lazy var gui: GUIBody = {

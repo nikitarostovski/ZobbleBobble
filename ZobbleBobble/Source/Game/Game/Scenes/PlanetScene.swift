@@ -8,7 +8,7 @@
 import Foundation
 import Levels
 
-final class PlanetScene: TransitionableScene {
+final class PlanetScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planet }
     
     private lazy var gui: GUIBody = {
