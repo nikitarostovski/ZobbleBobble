@@ -11,70 +11,45 @@ import Levels
 final class PlanetSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planetSelection }
     
-    private lazy var gui: GUIBody = {
-        let body = GUIBody(buttons: [backButton, blackMarketButton, planetButton], labels: [titleLabel])
-        body.backgroundColor = Colors.GUI.Background.dark
-        return body
-    }()
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet selection")
+    private lazy var blackMarketButton: GUIButton = GUIButton(style: .secondary, title: "Black market", tapAction: { [weak self] in self?.goTo(.blackMarket) })
+    private lazy var planetButton: GUIButton = GUIButton(title: "To Planet", tapAction: { [weak self] in self?.goTo(.planet) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.containerSelection) })
     
-    private lazy var titleLabel: GUILabel = {
-        let label = GUILabel(frame: CGRect(x: 0, y: 0.1, width: 1, height: 0.1))
-        label.text = "Planet selection"
-        return label
-    }()
-    
-    private lazy var blackMarketButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.1))
-        button.tapAction = { [weak self] _ in try? self?.goToBlackMarket() }
-        button.text = "To black market"
-        return button
-    }()
-    
-    private lazy var planetButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.65, width: 0.5, height: 0.1))
-        button.tapAction = { [weak self] _ in try? self?.goToPlanet() }
-        button.text = "Select planet"
-        return button
-    }()
-    
-    private lazy var backButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.8, width: 0.5, height: 0.1), style: .secondary)
-        button.tapAction = { [weak self] _ in try? self?.goToContainerSelection() }
-        button.text = "Back"
-        return button
-    }()
-    
-    override var visibleBodies: [any Body] { [gui] }
-    
-    func goToContainerSelection() throws {
-        let scene = ContainerSelectionScene()
-        try transition(to: scene)
+    override func setupLayout() {
+        gui = GUIBody(buttons: [blackMarketButton, planetButton, backButton],
+                      labels: [titleLabel],
+                      backgroundColor: Colors.GUI.Background.light)
     }
     
-    func goToBlackMarket() throws {
-        let scene = BlackMarketScene()
-        try transition(to: scene)
-    }
-    
-    func goToPlanet() throws {
-        let scene = PlanetScene()
-        try transition(to: scene)
-    }
-    
-    override func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
-        super.updateVisibility(visibility, transitionTarget: transitionTarget)
-        gui.alpha = visibility
-    }
-    
-    override func onTouchDown(pos: CGPoint) {
-        gui.onTouchDown(pos: pos)
-    }
-    
-    override func onTouchMove(pos: CGPoint) {
-        gui.onTouchMove(pos: pos)
-    }
-    
-    override func onTouchUp(pos: CGPoint) {
-        gui.onTouchUp(pos: pos)
+    override func updateLayout() {
+        let vp = Constants.paddingVertical / size.height
+        let hp = Constants.paddingHorizontal / size.width
+        
+        let buttonWidth = safeArea.width - 2 * hp
+        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        let labelHeight = Constants.titleHeight / size.height
+        
+        titleLabel.frame = CGRect(x: safeArea.minX + hp,
+                                  y: safeArea.minY + vp,
+                                  width: safeArea.width - 2 * hp,
+                                  height: labelHeight)
+        
+        blackMarketButton.frame = CGRect(x: buttonX,
+                                         y: safeArea.maxY - 4 * (buttonHeight + vp),
+                                         width: buttonWidth,
+                                         height: buttonHeight)
+        
+        planetButton.frame = CGRect(x: buttonX,
+                                    y: safeArea.maxY - 2 * (buttonHeight + vp),
+                                    width: buttonWidth,
+                                    height: buttonHeight)
+        
+        backButton.frame = CGRect(x: buttonX,
+                                  y: safeArea.maxY - buttonHeight - vp,
+                                  width: buttonWidth,
+                                  height: buttonHeight)
     }
 }

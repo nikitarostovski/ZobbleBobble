@@ -15,7 +15,7 @@ extension MTLDevice {
                      textureType: MTLTextureType = .type2D,
                      sampleCount: Int = 1,
                      usage: MTLTextureUsage = [.shaderRead, .shaderWrite]) -> MTLTexture? {
-        
+        guard width > 0, height > 0 else { return nil }
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: pixelFormat,
             width: width,

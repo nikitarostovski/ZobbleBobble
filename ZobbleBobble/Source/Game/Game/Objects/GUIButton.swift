@@ -14,7 +14,7 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
     private var normalTextColor: SIMD4<UInt8>
     private var highlightedTextColor: SIMD4<UInt8>
     
-    var tapAction: ((GUIButton) -> Void)?
+    var tapAction: (() -> Void)?
     
     var textColor: SIMD4<UInt8> {
         didSet {
@@ -38,7 +38,9 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
         }
     }
     
-    init(frame: CGRect, style: Style = .primary) {
+    init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil) {
+        self.tapAction = tapAction
+        self.text = title
         self.normalTextColor = style.titleColorNormal
         self.highlightedTextColor = style.titleColorHighlighted
         self.textColor = style.titleColorNormal
@@ -90,7 +92,7 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
     func onTouchUp(pos: CGPoint) -> Bool {
         isHighlighted = false
         if frame.contains(pos) {
-            tapAction?(self)
+            tapAction?()
         }
         return frame.contains(pos)
     }
@@ -100,11 +102,13 @@ extension GUIButton {
     enum Style {
         case primary
         case secondary
+        case utility
         
         var backgroundColorNormal: SIMD4<UInt8> {
             switch self {
             case .primary: return Colors.GUI.Button.backgroundPrimaryNormal
             case .secondary: return Colors.GUI.Button.backgroundSecondaryNormal
+            case .utility: return Colors.GUI.Button.backgroundUtilityNormal
             }
         }
         
@@ -112,6 +116,7 @@ extension GUIButton {
             switch self {
             case .primary: return Colors.GUI.Button.backgroundPrimaryHighlighted
             case .secondary: return Colors.GUI.Button.backgroundSecondaryHighlighted
+            case .utility: return Colors.GUI.Button.backgroundUtilityHighlighted
             }
         }
         

@@ -33,7 +33,17 @@ final class Game {
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
     
-    let screenSize: CGSize
+    var safeArea: CGRect {
+        didSet {
+            visibleScenes.forEach { $0.onSizeChanged(screenSize, newSafeArea: safeArea) }
+        }
+    }
+    
+    var screenSize: CGSize {
+        didSet {
+            visibleScenes.forEach { $0.onSizeChanged(screenSize, newSafeArea: safeArea) }
+        }
+    }
     let levelManager: LevelManager
     
     var state: GameState
@@ -54,7 +64,7 @@ final class Game {
     }
     
     // MARK: - Methods
-    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize) {
+    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, safeArea: CGRect) {
         let levelManager: LevelManager
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
@@ -68,13 +78,14 @@ final class Game {
         }
         self.levelManager = levelManager
         self.screenSize = screenSize
+        self.safeArea = safeArea
         
         self.delegate = delegate
         self.scrollHolder = scrollHolder
         
         self.state = GameState(/*scene: .controlCenter, */packIndex: 0, levelIndex: 0)
         
-        let rootScene = ControlCenterScene()
+        let rootScene = ControlCenterScene(size: screenSize, safeArea: safeArea)
         self.visibleScenes = [rootScene]
         
         rootScene.delegate = self

@@ -25,7 +25,8 @@ class GUILabel: GUIView<GUIRenderData.LabelModel> {
         }
     }
 
-    init(frame: CGRect, style: Style = .header) {
+    init(frame: CGRect = .zero, style: Style = .header, text: String? = nil) {
+        self.text = text
         self.textColor = style.textColor
         super.init(backgroundColor: style.backgroundColor, frame: frame)
     }

@@ -16,14 +16,8 @@ protocol Body: AnyObject {
     var uniqueMaterials: [MaterialType] { get }
     
     var userInteractive: Bool { get }
-    
-    func onTouchDown()
-    func onTouchUp()
 }
 
 extension Body {
     var uniqueMaterials: [MaterialType] { [] }
-    
-    func onTouchDown() { }
-    func onTouchUp() { }
 }

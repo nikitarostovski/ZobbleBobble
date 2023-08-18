@@ -14,7 +14,7 @@ struct GUIRenderData {
         var textColor: SIMD4<UInt8>
         var origin: SIMD2<Float>
         var size: SIMD2<Float>
-        var foregroundPadding: SIMD2<Float> = SIMD2(8, 18)
+        var foregroundPadding: SIMD2<Float> = SIMD2(36, 18)
         var textTextureIndex: Int32 = 0
     }
     
@@ -29,7 +29,7 @@ struct GUIRenderData {
     struct TextRenderData: Hashable {
         var text: String
         var fontName: String = "JoystixMonospace-Regular"
-        var fontSize: Int = 24
+        var fontSize: Int = 36
         var textColor: SIMD4<UInt8> = .one
 
         init?(text: String?) {

@@ -8,12 +8,10 @@
 import UIKit
 
 final class GameViewController: UIViewController {
-    var screenSize: CGSize { UIScreen.main.bounds.size }
-    
     private var game: Game?
     
     lazy var renderView: MetalRenderView = {
-        let view = MetalRenderView(screenSize: screenSize, delegate: self, dataSource: game)
+        let view = MetalRenderView(delegate: self, dataSource: game)
         view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -28,6 +26,19 @@ final class GameViewController: UIViewController {
     
     private var isConfigured = false
     
+    private var safeAreaRectangle: CGRect {
+        var newSafeArea = view.safeAreaInsets
+        newSafeArea.top /= view.frame.size.height
+        newSafeArea.bottom /= view.frame.size.height
+        newSafeArea.left /= view.frame.size.width
+        newSafeArea.right /= view.frame.size.width
+        
+        return CGRect(x: newSafeArea.left,
+                      y: newSafeArea.top,
+                      width: 1 - newSafeArea.right - newSafeArea.left,
+                      height: 1 - newSafeArea.bottom - newSafeArea.top)
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -39,7 +50,7 @@ final class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self, scrollHolder: self, screenSize: screenSize)
+        self.game = Game(delegate: self, scrollHolder: self, screenSize: UIScreen.main.nativeBounds.size, safeArea: safeAreaRectangle)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -60,29 +71,37 @@ final class GameViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        guard !isConfigured else { return }
-        isConfigured = true
-        game?.runMenu()
+        
+        let newSafeAreaRect = safeAreaRectangle
+        if let game = game, newSafeAreaRect != game.safeArea {
+            game.safeArea = newSafeAreaRect
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         guard let touch = touches.first else { return }
-        let pos = touch.location(in: touch.view)
+        var pos = touch.location(in: touch.view)
+        pos.x *= UIScreen.main.scale
+        pos.y *= UIScreen.main.scale
         game?.onTouchDown(pos: pos)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
         guard let touch = touches.first else { return }
-        let pos = touch.location(in: touch.view)
+        var pos = touch.location(in: touch.view)
+        pos.x *= UIScreen.main.scale
+        pos.y *= UIScreen.main.scale
         game?.onTouchMove(pos: pos)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         guard let touch = touches.first else { return }
-        let pos = touch.location(in: touch.view)
+        var pos = touch.location(in: touch.view)
+        pos.x *= UIScreen.main.scale
+        pos.y *= UIScreen.main.scale
         game?.onTouchUp(pos: pos)
     }
     
@@ -94,6 +113,10 @@ final class GameViewController: UIViewController {
 }
 
 extension GameViewController: RenderViewDelegate {
+    func rendererSizeDidChange(size: CGSize) {
+        game?.screenSize = size
+    }
+    
     func updateRenderData(time: TimeInterval) {
         guard let game = game else { return }
         game.update(time)

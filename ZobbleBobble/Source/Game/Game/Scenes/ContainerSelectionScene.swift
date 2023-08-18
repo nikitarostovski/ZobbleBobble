@@ -11,82 +11,51 @@ import Levels
 final class ContainerSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .containerSelection }
     
-    private lazy var gui: GUIBody = {
-        let body = GUIBody(buttons: [backButton, utilizationPlantButton, garbageMarketButton, planetSelectionButton], labels: [titleLabel])
-        body.backgroundColor = Colors.GUI.Background.light
-        return body
-    }()
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Container selection")
+    private lazy var utilizationPlantButton: GUIButton = GUIButton(style: .secondary, title: "Utilization plant", tapAction: { [weak self] in self?.goTo(.utilizationPlant) })
+    private lazy var garbageMarketButton: GUIButton = GUIButton(style: .secondary, title: "Garbage market", tapAction: { [weak self] in self?.goTo(.garbageMarket) })
+    private lazy var planetSelectionButton: GUIButton = GUIButton(title: "Planet selection", tapAction: { [weak self] in self?.goTo(.planetSelection) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.controlCenter) })
     
-    private lazy var titleLabel: GUILabel = {
-        let label = GUILabel(frame: CGRect(x: 0, y: 0.1, width: 1, height: 0.1))
-        label.text = "Container selection"
-        return label
-    }()
-    
-    private lazy var utilizationPlantButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.1))
-        button.tapAction = { [weak self] _ in try? self?.goToUtilizationPlant() }
-        button.text = "Utilization plant"
-        return button
-    }()
-    
-    private lazy var garbageMarketButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.4, width: 0.5, height: 0.1))
-        button.tapAction = { [weak self] _ in try? self?.goToGarbageMarket() }
-        button.text = "Garbage market"
-        return button
-    }()
-    
-    private lazy var planetSelectionButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.65, width: 0.5, height: 0.1))
-        button.tapAction = { [weak self] _ in try? self?.goToPlanetSelection() }
-        button.text = "Planet selection"
-        return button
-    }()
-    
-    private lazy var backButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.8, width: 0.5, height: 0.1), style: .secondary)
-        button.tapAction = { [weak self] _ in try? self?.goToControlCenter() }
-        button.text = "Back"
-        return button
-    }()
-    
-    override var visibleBodies: [any Body] { [gui] }
-    
-    func goToControlCenter() throws {
-        let scene = ControlCenterScene()
-        try transition(to: scene)
+    override func setupLayout() {
+        gui = GUIBody(buttons: [backButton, utilizationPlantButton, garbageMarketButton, planetSelectionButton],
+                      labels: [titleLabel],
+                      backgroundColor: Colors.GUI.Background.light)
     }
     
-    func goToUtilizationPlant() throws {
-        let scene = UtilizationPlantScene()
-        try transition(to: scene)
-    }
-    
-    func goToPlanetSelection() throws {
-        let scene = PlanetSelectionScene()
-        try transition(to: scene)
-    }
-    
-    func goToGarbageMarket() throws {
-        let scene = GarbageMarketScene()
-        try transition(to: scene)
-    }
-    
-    override func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
-        super.updateVisibility(visibility, transitionTarget: transitionTarget)
-        gui.alpha = visibility
-    }
-    
-    override func onTouchDown(pos: CGPoint) {
-        gui.onTouchDown(pos: pos)
-    }
-    
-    override func onTouchMove(pos: CGPoint) {
-        gui.onTouchMove(pos: pos)
-    }
-    
-    override func onTouchUp(pos: CGPoint) {
-        gui.onTouchUp(pos: pos)
+    override func updateLayout() {
+        let vp = Constants.paddingVertical / size.height
+        let hp = Constants.paddingHorizontal / size.width
+        
+        let buttonWidth = safeArea.width - 2 * hp
+        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        let labelHeight = Constants.titleHeight / size.height
+        
+        titleLabel.frame = CGRect(x: safeArea.minX + hp,
+                                  y: safeArea.minY + vp,
+                                  width: safeArea.width - 2 * hp,
+                                  height: labelHeight)
+        
+        utilizationPlantButton.frame = CGRect(x: buttonX,
+                                       y: safeArea.maxY - 5 * (buttonHeight + vp),
+                                       width: buttonWidth,
+                                       height: buttonHeight)
+        
+        garbageMarketButton.frame = CGRect(x: buttonX,
+                                       y: safeArea.maxY - 4 * (buttonHeight + vp),
+                                       width: buttonWidth,
+                                       height: buttonHeight)
+        
+        planetSelectionButton.frame = CGRect(x: buttonX,
+                                       y: safeArea.maxY - 2 * (buttonHeight + vp),
+                                       width: buttonWidth,
+                                       height: buttonHeight)
+        
+        backButton.frame = CGRect(x: buttonX,
+                                  y: safeArea.maxY - buttonHeight - vp,
+                                  width: buttonWidth,
+                                  height: buttonHeight)
     }
 }

@@ -33,7 +33,8 @@ class GUIBody: Body {
                              labels: labelsPointer)
     }
     
-    init(buttons: [GUIButton] = [], labels: [GUILabel] = []) {
+    init(buttons: [GUIButton] = [], labels: [GUILabel] = [], backgroundColor: SIMD4<UInt8> = .zero) {
+        self.backgroundColor = backgroundColor
         self.buttons = buttons
         self.labels = labels
         
@@ -63,7 +64,6 @@ class GUIBody: Body {
         labelsPointer?.copyMemory(from: &labelsRenderData, byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * labels.count)
         textTextureData = newTextTextureData
     }
-    
     
     func onTouchDown(pos: CGPoint) {
         let _ = buttons.reversed().first(where: { $0.onTouchDown(pos: pos) })

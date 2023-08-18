@@ -25,6 +25,9 @@ public enum Colors {
             public static let backgroundSecondaryNormal: SIMD4<UInt8> = .init(rgb: 0x116699)
             public static let backgroundSecondaryHighlighted: SIMD4<UInt8> = .init(rgb: 0x2277AA)
             
+            public static let backgroundUtilityNormal: SIMD4<UInt8> = .init(rgb: 0x333333)
+            public static let backgroundUtilityHighlighted: SIMD4<UInt8> = .init(rgb: 0x373737)
+            
             public static let titleNormal: SIMD4<UInt8> = .init(rgb: 0xBBBBBB)
             public static let titleHighlighted: SIMD4<UInt8> = .init(rgb: 0xFFFFFF)
         }

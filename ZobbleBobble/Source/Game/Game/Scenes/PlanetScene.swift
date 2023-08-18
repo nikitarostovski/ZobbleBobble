@@ -11,58 +11,39 @@ import Levels
 final class PlanetScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planet }
     
-    private lazy var gui: GUIBody = {
-        let body = GUIBody(buttons: [controlCenterButton, gameResultsButton], labels: [titleLabel])
-        body.backgroundColor = Colors.GUI.Background.dark
-        return body
-    }()
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet")
+    private lazy var controlCenterButton: GUIButton = GUIButton(style: .secondary, title: "Control center", tapAction: { [weak self] in self?.goTo(.controlCenter) })
+    private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: { [weak self] in self?.goTo(.gameResults) })
     
-    private lazy var titleLabel: GUILabel = {
-        let label = GUILabel(frame: CGRect(x: 0, y: 0.1, width: 1, height: 0.1))
-        label.text = "Planet"
-        return label
-    }()
-    
-    private lazy var controlCenterButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.65, width: 0.5, height: 0.1), style: .secondary)
-        button.tapAction = { [weak self] _ in try? self?.goToControlCenter() }
-        button.text = "To control center"
-        return button
-    }()
-    
-    private lazy var gameResultsButton: GUIButton = {
-        let button = GUIButton(frame: CGRect(x: 0.25, y: 0.8, width: 0.5, height: 0.1), style: .secondary)
-        button.tapAction = { [weak self] _ in try? self?.goToGameResults() }
-        button.text = "To game results"
-        return button
-    }()
-    
-    override var visibleBodies: [any Body] { [gui] }
-    
-    func goToControlCenter() throws {
-        let scene = ControlCenterScene()
-        try transition(to: scene)
+    override func setupLayout() {
+        gui = GUIBody(buttons: [controlCenterButton, resultsButton],
+                      labels: [titleLabel],
+                      backgroundColor: Colors.GUI.Background.dark)
     }
     
-    func goToGameResults() throws {
-        let scene = GameResultsScene()
-        try transition(to: scene)
-    }
-    
-    override func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
-        super.updateVisibility(visibility, transitionTarget: transitionTarget)
-        gui.alpha = visibility
-    }
-    
-    override func onTouchDown(pos: CGPoint) {
-        gui.onTouchDown(pos: pos)
-    }
-    
-    override func onTouchMove(pos: CGPoint) {
-        gui.onTouchMove(pos: pos)
-    }
-    
-    override func onTouchUp(pos: CGPoint) {
-        gui.onTouchUp(pos: pos)
+    override func updateLayout() {
+        let vp = Constants.paddingVertical / size.height
+        let hp = Constants.paddingHorizontal / size.width
+        
+        let buttonWidth = safeArea.width - 2 * hp
+        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        let labelHeight = Constants.titleHeight / size.height
+        
+        titleLabel.frame = CGRect(x: safeArea.minX + hp,
+                                  y: safeArea.minY + vp,
+                                  width: safeArea.width - 2 * hp,
+                                  height: labelHeight)
+        
+        resultsButton.frame = CGRect(x: buttonX,
+                                     y: safeArea.maxY - 2 * (buttonHeight + vp),
+                                     width: buttonWidth,
+                                     height: buttonHeight)
+        
+        controlCenterButton.frame = CGRect(x: buttonX,
+                                           y: safeArea.maxY - 3 * (buttonHeight + vp),
+                                           width: buttonWidth,
+                                           height: buttonHeight)
     }
 }

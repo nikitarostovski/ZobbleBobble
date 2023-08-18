@@ -20,9 +20,14 @@ class Scene {
     
     weak var delegate: TransitionableSceneDelegate?
     
+    var size: CGSize
+    var safeArea: CGRect
+    
+    var gui: GUIBody?
+    
     var userInteractionEnabled = false
     var transitionTargetCategory: TransitionTarget { .none }
-    var visibleBodies: [any Body] { [] }
+    var visibleBodies: [any Body] { [gui].compactMap { $0 } }
     
     private(set) var activeTransition: SceneTransition?
     private(set) var currentVisibility: Float = 0
@@ -43,8 +48,26 @@ class Scene {
         activeTransition.map { $0.from === self ? $0.to : $0.from }
     }
     
-    init(currentVisibility: Float = 1) {
+    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect) {
+        self.size = size
+        self.safeArea = safeArea
+        setupLayout()
+        onSizeChanged(size, newSafeArea: safeArea)
         updateVisibility(currentVisibility)
+    }
+    
+    func setupLayout() { }
+    
+    func updateLayout() { }
+    
+    func onSizeChanged(_ newSize: CGSize, newSafeArea: CGRect) {
+        if size != newSize {
+            size = newSize
+        }
+        if safeArea != newSafeArea {
+            safeArea = newSafeArea
+        }
+        updateLayout()
     }
     
     /// Called when scene visibility should be changed. Do not override for scene updates. Use `updateForTransition`
@@ -65,6 +88,7 @@ class Scene {
     func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
         currentVisibility = visibility
         userInteractionEnabled = visibility + .leastNonzeroMagnitude >= 1
+        gui?.alpha = visibility
     }
     
     func onTransitionFinished() {
@@ -94,8 +118,100 @@ class Scene {
     }
     
     func hitTest(pos: CGPoint) -> Bool { userInteractionEnabled }
-    func onTouchDown(pos: CGPoint) { }
-    func onTouchMove(pos: CGPoint) { }
-    func onTouchUp(pos: CGPoint) { }
+    
+    func onTouchDown(pos: CGPoint) {
+        gui?.onTouchDown(pos: pos)
+    }
+    
+    func onTouchMove(pos: CGPoint) {
+        gui?.onTouchMove(pos: pos)
+    }
+    
+    func onTouchUp(pos: CGPoint) {
+        gui?.onTouchUp(pos: pos)
+    }
+    
     func update(_ time: CFTimeInterval) { }
+}
+
+extension Scene {
+    func goTo(_ target: TransitionTarget) {
+        switch target {
+        case .none:
+            return
+        case .controlCenter:
+            goToControlCenter()
+        case .containerSelection:
+            goToContainerSelection()
+        case .improvements:
+            goToImprovements()
+        case .garbageMarket:
+            goToGarbageMarket()
+        case .blackMarket:
+            goToBlackMarket()
+        case .utilizationPlant:
+            goToUtilizationPlant()
+        case .planetSelection:
+            goToPlanetSelection()
+        case .planet:
+            goToPlanet()
+        case .gameResults:
+            goToGameResults()
+        }
+    }
+    
+    private func goToContainerSelection() {
+        let scene = ContainerSelectionScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToImprovements() {
+        let scene = ImprovementsScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToControlCenter() {
+        let scene = ControlCenterScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToUtilizationPlant() {
+        let scene = UtilizationPlantScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToPlanetSelection() {
+        let scene = PlanetSelectionScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToGarbageMarket() {
+        let scene = GarbageMarketScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToBlackMarket() {
+        let scene = BlackMarketScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToPlanet() {
+        let scene = PlanetScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+    
+    private func goToGameResults() {
+        let scene = GameResultsScene(size: size, safeArea: safeArea)
+        try? transition(to: scene)
+    }
+}
+
+extension Scene {
+    enum Constants {
+        static let buttonHeight: CGFloat = 120
+        static let titleHeight: CGFloat = 80
+        
+        static let paddingHorizontal: CGFloat = 64
+        static let paddingVertical: CGFloat = 32
+    }
 }

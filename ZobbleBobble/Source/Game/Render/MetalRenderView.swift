@@ -17,17 +17,17 @@ protocol RenderViewDataSource: AnyObject {
 }
 
 protocol RenderViewDelegate: AnyObject {
+    func rendererSizeDidChange(size: CGSize)
     func updateRenderData(time: TimeInterval)
 }
 
 final class MetalRenderView: MTKView {
     var renderer: Renderer?
     
-    init(screenSize: CGSize, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
+    init(delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
         let device = MTLCreateSystemDefaultDevice()!
         super.init(frame: .zero, device: device)
-        
-        self.renderer = Renderer(device: device, view: self, screenSize: screenSize, delegate: delegate, dataSource: dataSource)
+        self.renderer = Renderer(device: device, view: self, delegate: delegate, dataSource: dataSource)
     }
     
     required init(coder: NSCoder) {

@@ -30,6 +30,8 @@ struct GUILabel {
     int textureIndex;
 };
 
+// TODO: unify button and label text drawings
+
 float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::read> textTexture) {
     float4 result = float4(0);
     
@@ -49,6 +51,21 @@ float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write>
         float yp = 1 - (y - button.origin.y - paddingV) / (button.size.y - 2 * paddingV);
         texCoords.x = xp * textTexture.get_width();
         texCoords.y = yp * textTexture.get_height();
+        
+        // Aspect fit
+        float scaleX = (button.size.x - 2 * paddingH) * texture.get_width() / textTexture.get_width();
+        float scaleY = (button.size.y - 2 * paddingV) * texture.get_height() / textTexture.get_height();
+
+        if (scaleX < scaleY) {
+            scaleY = scaleX / scaleY;
+            scaleX = 1.0;
+        } else {
+            scaleX = scaleY / scaleX;
+            scaleY = 1.0;
+        }
+        texCoords.x /= scaleX;
+        texCoords.y /= scaleY;
+        //
         
         float4 backgroundColor = float4(button.backgroundColor) / 255;
         float4 textTextureColor = textTexture.read(texCoords);
@@ -79,6 +96,21 @@ float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> te
         float yp = 1 - (y - label.origin.y) / (label.size.y);
         texCoords.x = xp * textTexture.get_width();
         texCoords.y = yp * textTexture.get_height();
+        
+        // Aspect fit
+        float scaleX = label.size.x * texture.get_width() / textTexture.get_width();
+        float scaleY = label.size.y * texture.get_height() / textTexture.get_height();
+
+        if (scaleX < scaleY) {
+            scaleY = scaleX / scaleY;
+            scaleX = 1.0;
+        } else {
+            scaleX = scaleY / scaleX;
+            scaleY = 1.0;
+        }
+        texCoords.x /= scaleX;
+        texCoords.y /= scaleY;
+        //
         
         float4 backgroundColor = float4(label.backgroundColor) / 255;
         float4 textTextureColor = textTexture.read(texCoords);

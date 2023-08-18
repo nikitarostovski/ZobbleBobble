@@ -71,7 +71,6 @@ class Renderer: NSObject, MTKViewDelegate {
     private var vertexCount: Int = 0
     
     private var renderSize: CGSize
-    private let screenSize: CGSize
     
     private var lastDrawDate: Date?
     
@@ -103,8 +102,8 @@ class Renderer: NSObject, MTKViewDelegate {
                                             dotMaskHeight: 0,
                                             scanlineDistance: 6)
     
-    init(device: MTLDevice, view: MTKView, screenSize: CGSize, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
-        self.screenSize = screenSize
+    init(device: MTLDevice, view: MTKView, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
+        let screenSize = view.drawableSize
         self.renderSize = CGSize(width: screenSize.width / Settings.Graphics.resolutionDownscale,
                                  height: screenSize.height / Settings.Graphics.resolutionDownscale)
         self.device = device
@@ -123,9 +122,10 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        self.renderSize = CGSize(width: screenSize.width / Settings.Graphics.resolutionDownscale,
-                                 height: screenSize.height / Settings.Graphics.resolutionDownscale)
+        renderDelegate?.rendererSizeDidChange(size: size)
         
+        self.renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
+                                 height: size.height / Settings.Graphics.resolutionDownscale)
         
         self.mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
         self.finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
@@ -140,6 +140,12 @@ class Renderer: NSObject, MTKViewDelegate {
             uniforms.dotMaskHeight = Int32(dotMaskTexture.height)
         }
         self.fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
+        
+        guiNodes.removeAll()
+        starNodes.removeAll()
+        liquidNodes.removeAll()
+        
+        updateNodesIfNeeded()
     }
     
     private func setupPipeline() {
@@ -216,15 +222,15 @@ class Renderer: NSObject, MTKViewDelegate {
     
     private func addNode(for body: any Body) {
         switch body {
-        case is StarBody:
-            let node = StarNode(device, screenSize: screenSize, renderSize: renderSize, body: body as? StarBody)
-            starNodes.append(node)
-        case is LiquidBody:
-            for material in body.uniqueMaterials {
-                if let node = LiquidNode(device, screenSize: screenSize, renderSize: renderSize, material: material, body: body as? LiquidBody) {
-                    liquidNodes.append(node)
-                }
-            }
+//        case is StarBody:
+//            let node = StarNode(device, screenSize: screenSize, renderSize: renderSize, body: body as? StarBody)
+//            starNodes.append(node)
+//        case is LiquidBody:
+//            for material in body.uniqueMaterials {
+//                if let node = LiquidNode(device, screenSize: screenSize, renderSize: renderSize, material: material, body: body as? LiquidBody) {
+//                    liquidNodes.append(node)
+//                }
+//            }
         case is GUIBody:
             let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
             guiNodes.append(node)
