@@ -7,6 +7,17 @@
 
 import Foundation
 
+protocol GameInteractive: AnyObject {
+    var player: PlayerModel { get }
+    
+//    func addPlanet(_ planet: PlanetModel)
+//    func addContainer(_ container: ContainerModel)
+//    func removeContainer(_ index: Int?)
+//    func loadContainer(_ index: Int)
+    
+    func containerFinished()
+}
+
 protocol TransitionableSceneDelegate: AnyObject {
     func onTransitionableSceneAppendRequest(sender: Scene, becomesActive: Bool)
     func onTransitionableSceneRemovalRequest(sender: Scene)
@@ -18,12 +29,13 @@ class Scene {
         case fromMe
     }
     
-    weak var delegate: TransitionableSceneDelegate?
+    weak var transitionDelegate: TransitionableSceneDelegate?
     
     private(set) var size: CGSize
     private(set) var safeArea: CGRect
     private(set) var screenScale: CGFloat
     
+    weak var game: GameInteractive?
     var gui: GUIBody?
     var background: SIMD4<UInt8> = .zero
     
@@ -51,7 +63,12 @@ class Scene {
         activeTransition.map { $0.from === self ? $0.to : $0.from }
     }
     
-    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
+    convenience init(_ scene: Scene) {
+        self.init(game: scene.game, currentVisibility: scene.currentVisibility, size: scene.size, safeArea: scene.safeArea, screenScale: scene.screenScale)
+    }
+    
+    init(game: GameInteractive?, currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
+        self.game = game
         self.size = size
         self.safeArea = safeArea
         self.screenScale = screenScale
@@ -109,7 +126,7 @@ class Scene {
     
     func onTransitionFinished() {
         if activeTransitionType == .fromMe {
-            delegate?.onTransitionableSceneRemovalRequest(sender: self)
+            transitionDelegate?.onTransitionableSceneRemovalRequest(sender: self)
         }
         self.activeTransition = nil
     }
@@ -118,9 +135,9 @@ class Scene {
         guard scene !== self else { throw TransitionError.unavailable }
         guard activeTransition == nil, scene.activeTransition == nil else { throw TransitionError.anotherTransitionInProgress }
         
-        scene.delegate = delegate
+        scene.transitionDelegate = transitionDelegate
         
-        delegate?.onTransitionableSceneAppendRequest(sender: scene, becomesActive: becomesActive)
+        transitionDelegate?.onTransitionableSceneAppendRequest(sender: scene, becomesActive: becomesActive)
         
         let transition = SceneTransition(from: self,
                                          to: scene,
@@ -152,47 +169,47 @@ class Scene {
 
 extension Scene {
     func goToContainerSelection() {
-        let scene = ContainerSelectionScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = ContainerSelectionScene(self)
         try? transition(to: scene)
     }
     
     func goToImprovements() {
-        let scene = ImprovementsScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = ImprovementsScene(self)
         try? transition(to: scene)
     }
     
     func goToControlCenter() {
-        let scene = ControlCenterScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = ControlCenterScene(self)
         try? transition(to: scene)
     }
     
     func goToUtilizationPlant() {
-        let scene = UtilizationPlantScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = UtilizationPlantScene(self)
         try? transition(to: scene)
     }
     
     func goToPlanetSelection() {
-        guard let scene = PlanetSelectionScene(size: size, safeArea: safeArea, screenScale: screenScale) else { return }
+        let scene = PlanetSelectionScene(self)
         try? transition(to: scene)
     }
     
     func goToGarbageMarket() {
-        let scene = GarbageMarketScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = GarbageMarketScene(self)
         try? transition(to: scene)
     }
     
     func goToBlackMarket() {
-        let scene = BlackMarketScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = BlackMarketScene(self)
         try? transition(to: scene)
     }
     
-    func goToPlanet(_ planet: PlanetModel, player: PlayerModel) {
-        let scene = PlanetScene(size: size, safeArea: safeArea, screenScale: screenScale, planet: planet, player: player)
+    func goToPlanet() {
+        let scene = PlanetScene(self)
         try? transition(to: scene)
     }
     
     func goToGameResults() {
-        let scene = GameResultsScene(size: size, safeArea: safeArea, screenScale: screenScale)
+        let scene = GameResultsScene(self)
         try? transition(to: scene)
     }
 }

@@ -587,12 +587,11 @@
 		1126C1B92773AFC100C26BEC /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				1194330629892CC400AE56CA /* Extensions */,
 				1126C1BB2773AFCF00C26BEC /* Main */,
-				11B8210429856977005300DC /* Utils */,
-				115DFA8B279868AA00B09FF2 /* Components */,
-				1126C22E277A204900C26BEC /* Game */,
 				1126C1BD2773B17C00C26BEC /* Views */,
+				1126C22E277A204900C26BEC /* Game */,
+				11B8210429856977005300DC /* Utils */,
+				1194330629892CC400AE56CA /* Extensions */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -619,6 +618,7 @@
 		1126C1BD2773B17C00C26BEC /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				115DFA8B279868AA00B09FF2 /* Components */,
 				1126C22F277A205600C26BEC /* TouchGameViewController.swift */,
 				119E35522A9111F200A16F00 /* DesktopGameViewController.swift */,
 			);

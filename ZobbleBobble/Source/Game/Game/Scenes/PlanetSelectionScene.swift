@@ -63,31 +63,17 @@ final class PlanetSelectionScene: Scene {
     
     private weak var terrainBody: TerrainBody?
     
-    private let levelManager: LevelManager
+//    private let levelManager: LevelManager
 
 //    private var visibleLevels: [LevelModel] {
 //        Array(currentPack!.levels[visibleLevelIndices])
 //    }
     
-    init?(currentVisibility: Float = 1,
-          size: CGSize,
-          safeArea: CGRect,
-          screenScale: CGFloat,
-          from: CGFloat = Settings.Camera.levelsMenuCameraScale,
-          to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
+    convenience init(_ scene: Scene,
+         from: CGFloat = Settings.Camera.levelsMenuCameraScale,
+         to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
         
-        if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
-                levelManager = try LevelManager(levelData: data)
-            } catch {
-                return nil
-            }
-        } else {
-            return nil
-        }
-        
-        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
+        self.init(scene)
         
 //        self.state = PlanetSelectionState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
 //
@@ -113,35 +99,6 @@ final class PlanetSelectionScene: Scene {
 //        default:
 //            break
 //        }
-    }
-    
-    private func goToPlanet() {
-        guard let pack = levelManager.allLevelPacks.first else { return }
-        
-        let containers: [ContainerModel] = pack.levels.map { .init(missles: $0.missleChunks) }
-        let planets = pack.levels.map {
-            let license = LicenseModel(price: 125,
-                                       radiusLimit: .init(value: $0.gravityRadius * 0.5, fine: 1),
-                                       sectorLimit: .init(value: [CGPoint(x: 0, y: 10)], fine: 2),
-                                       materialWhitelist: .init(value: [.soil, .rock], fine: 4),
-                                       totalParticleAmountLimit: .init(value: 2000, fine: 1),
-                                       outerSpaceLimit: .init(value: (), fine: 1))
-            return PlanetModel(speed: $0.rotationPerSecond,
-                               chunks: $0.initialChunks,
-                               license: license,
-                               gravityRadius: $0.gravityRadius,
-                               gravitySthrength: 1,
-                               particleRadius: pack.particleRadius)
-        }
-        
-        var ship = ShipModel(containers: containers)
-        ship.loadedContainerIndex = 0
-        
-        var player = PlayerModel(availablePlanets: planets, ship: ship, day: 0)
-        
-        if let planet = planets.first {
-            goToPlanet(planet, player: player)
-        }
     }
     
     override func setupLayout() {

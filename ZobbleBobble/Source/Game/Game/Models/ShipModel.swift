@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ShipModel {
-    var containers: [ContainerModel]
+struct ShipModel: Codable {
+    var containers = [ContainerModel]()
     var loadedContainerIndex: Int?
 }

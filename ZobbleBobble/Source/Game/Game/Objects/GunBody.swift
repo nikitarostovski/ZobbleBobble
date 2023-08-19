@@ -62,8 +62,11 @@ class GunBody: Body {
         updateRenderData()
     }
     
-    func getWorldVisibleMissles(containerIndex: Int, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
-        guard 0..<player.ship.containers.count ~= containerIndex else { return 0...0 }
+    func getWorldVisibleMissles(misslesFired: CGFloat) -> ClosedRange<CGFloat> {
+        guard let containerIndex = player.ship.loadedContainerIndex,
+              0..<player.ship.containers.count ~= containerIndex
+        else { return 0...0 }
+        
         let container = player.ship.containers[containerIndex]
         let missleWeight = CGFloat(1) / CGFloat(container.missles.count)
         
@@ -113,7 +116,9 @@ class GunBody: Body {
         SIMD2<Float32>(position.x, position.y - radius - Float(Settings.Camera.gunMissleCenterOffset))
     }
     
-    func updateAppearance(levelToPackProgress: CGFloat, containerIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
+    func updateAppearance(levelToPackProgress: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
+        let containerIndex = CGFloat(player.ship.loadedContainerIndex ?? 0)
+        
         self.state.visibleMissleRange = visibleMissleRange
         self.state.currentContainerIndex = containerIndex
         

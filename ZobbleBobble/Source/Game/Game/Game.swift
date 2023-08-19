@@ -35,33 +35,18 @@ final class Game {
     private(set) var safeArea: CGRect = .zero
     private(set) var screenSize: CGSize = .zero
     private(set) var screenScale: CGFloat = 1
-    
-    let levelManager: LevelManager
-    
-    var state: GameState
-    var cameraState = CameraState()
-    
-    // Game objects
+    private(set) var cameraState = CameraState()
     private(set) var visibleScenes: [Scene]
-    
-    // Computable properties
-    var currentPack: PackModel? {
-        guard 0..<levelManager.allLevelPacks.count ~= state.packIndex else { return nil }
-        return levelManager.allLevelPacks[state.packIndex]
-    }
-    
-    var currentLevel: LevelModel? {
-        guard let pack = currentPack, 0..<pack.levels.count ~= state.levelIndex else { return nil }
-        return pack.levels[state.levelIndex]
-    }
+    private(set) var player: PlayerModel
     
     // MARK: - Methods
     
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?) {
+        let levelManager: LevelManager
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
-                self.levelManager = try LevelManager(levelData: data)
+                levelManager = try LevelManager(levelData: data)
             } catch {
                 return nil
             }
@@ -71,13 +56,24 @@ final class Game {
         
         self.delegate = delegate
         self.scrollHolder = scrollHolder
+        self.player = PlayerModel(credits: 1200)
+        self.visibleScenes = []
         
-        self.state = GameState(/*scene: .controlCenter, */packIndex: 0, levelIndex: 0)
+        //
+        let pack = levelManager.allLevelPacks[0]
+        pack.levels.forEach {
+            let planet = PlanetModel(level: $0, particleRadius: pack.particleRadius)
+            let container = ContainerModel(level: $0)
+            
+            addPlanet(planet)
+            addContainer(container)
+        }
+        loadContainer(0)
+        //
         
-        let rootScene = ControlCenterScene(size: screenSize, safeArea: safeArea, screenScale: screenScale)
-        self.visibleScenes = [rootScene]
-        
-        rootScene.delegate = self
+        let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale)
+        rootScene.transitionDelegate = self
+        visibleScenes = [rootScene]
     }
     
     func updateSceneSize(newScreenSize: CGSize, newSafeArea: CGRect, newScreenScale: CGFloat) {
@@ -98,7 +94,44 @@ final class Game {
             scene.update(time)
         }
     }
+}
+
+// MARK: - Lifecycle
+
+extension Game: GameInteractive {
+    func containerFinished() {
+        removeContainer(nil)
+    }
     
+    private func addPlanet(_ planet: PlanetModel) {
+        player.availablePlanets.append(planet)
+    }
+    
+    private func addContainer(_ container: ContainerModel) {
+        player.ship.containers.append(container)
+    }
+    
+    private func removeContainer(_ index: Int?) {
+        guard let index = index ?? player.ship.loadedContainerIndex else { return }
+        
+        if player.ship.loadedContainerIndex == index {
+            player.ship.loadedContainerIndex = nil
+        }
+        player.ship.containers.remove(at: index)
+        
+        // autoload next
+        loadContainer(0)
+    }
+    
+    private func loadContainer(_ index: Int) {
+        guard 0..<player.ship.containers.count ~= index else { return }
+        player.ship.loadedContainerIndex = index
+    }
+}
+
+// MARK: - Controls
+
+extension Game {
     func onTouchDown(pos: CGPoint) {
         let posNorm = CGPoint(x: pos.x / screenSize.width, y: pos.y / screenSize.height)
         visibleScenes.forEach {

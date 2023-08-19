@@ -10,21 +10,17 @@ import Levels
 
 final class PlanetScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planet }
-    
     override var background: SIMD4<UInt8> { get { Colors.Background.defaultPack } set { } }
+    
+    private let levelCenterPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
+    private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.gunCenterOffset) }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Planet")
     private lazy var controlCenterButton: GUIButton = GUIButton(style: .utility, title: "X", tapAction: goToControlCenter)
     private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults)
     
-    private let levelCenterPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
-    private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.gunCenterOffset) }
-    
     private var planet: PlanetModel
-    private var player: PlayerModel
-    
     private let physicsWorld: PhysicsWorld
-    
     private let terrainBody: TerrainBody?
     private var gun: GunBody
     private var missle: MissleBody?
@@ -45,9 +41,10 @@ final class PlanetScene: Scene {
         return result
     }
     
-    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat, planet: PlanetModel, player: PlayerModel) {
-        self.planet = planet
-        self.player = player
+    override init(game: GameInteractive?, currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
+        guard let player = game?.player else { fatalError() }
+        self.planet = player.selectedPlanet
+        
         let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
                                    rotationStep: planet.speed.radians / 60.0,
                                    gravityRadius: planet.gravityRadius,
@@ -61,28 +58,24 @@ final class PlanetScene: Scene {
         self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
         self.gun = GunBody(player: player)
         
-        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
+        super.init(game: game, currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
         
-        self.gui = GUIBody(buttons: [], labels: [titleLabel])
+        gui = GUIBody(buttons: [], labels: [titleLabel])
+        updateGUI()
         
         planet.chunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
         }
-
-        updateGUI()
         spawnNextMissle(animated: true)
     }
     
     override func setupLayout() {
         updateGUI()
         
-        let containerIndex = player.ship.loadedContainerIndex ?? 0
-        let missleRange = gun.getWorldVisibleMissles(containerIndex: containerIndex, misslesFired: 0)
+        let missleRange = gun.getWorldVisibleMissles(misslesFired: 0)
         
         gun.position = SIMD2<Float>(Float(gunCenterPoint.x), Float(gunCenterPoint.y))
-        gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
-                             containerIndex: CGFloat(containerIndex),
-                             visibleMissleRange: missleRange)
+        gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
     }
     
     override func updateLayout() {
@@ -127,10 +120,7 @@ final class PlanetScene: Scene {
     override func onTouchUp(pos: CGPoint) {
         super.onTouchUp(pos: pos)
         guard userInteractionEnabled else { return }
-        //        guard star.state.currentMissleIndex <= CGFloat(level.missleChunks.count) else {
-        ////            game?.runMenu(isFromLevel: true)
-        //            return
-        //        }
+        
         if gui?.hitTest(pos: pos) != true {
             launchCurrentMissle(to: pos)
             spawnNextMissle()
@@ -165,6 +155,7 @@ final class PlanetScene: Scene {
 
     private func spawnNextMissle(animated: Bool = true) {
         guard let selectedMissle = gun.selectedMissle else {
+            game?.containerFinished()
             isGameOver = true
             userInteractionEnabled = true
             missle = nil
@@ -183,10 +174,8 @@ final class PlanetScene: Scene {
             let starPercentage = min(1, percentage * Settings.Camera.missleParticleMaxSpeedModifier)
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * starPercentage
             
-            let missleRange = gun.getWorldVisibleMissles(containerIndex: Int(self.gun.state.currentContainerIndex), misslesFired: misslesFired)
-            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
-                                      containerIndex: self.gun.state.currentContainerIndex,
-                                      visibleMissleRange: missleRange)
+            let missleRange = gun.getWorldVisibleMissles(misslesFired: misslesFired)
+            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
             
             self.missle?.updateMisslePosition(percentage)
         }
@@ -194,10 +183,8 @@ final class PlanetScene: Scene {
         let completion = { [weak self] in
             guard let self = self else { return }
             
-            let missleRange = gun.getWorldVisibleMissles(containerIndex: Int(self.gun.state.currentContainerIndex), misslesFired: endMissleCount)
-            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale,
-                                      containerIndex: self.gun.state.currentContainerIndex,
-                                      visibleMissleRange: missleRange)
+            let missleRange = gun.getWorldVisibleMissles(misslesFired: endMissleCount)
+            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
             self.gun.state.currentMissleIndex += 1
             self.userInteractionEnabled = true
 
