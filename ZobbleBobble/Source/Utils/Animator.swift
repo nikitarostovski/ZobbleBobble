@@ -9,7 +9,7 @@ import UIKit
 
 final class Animator {
     static func animate(duraion: Double, easing: Curve = .quadratic, step: @escaping (_ percentage: CGFloat) -> Void, completion: (() -> Void)? = nil) {
-        let interval = 1.0/60.0
+        let interval = 1.0 / 60.0
         let startDate = Date()
         Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
             let timePassed = Date().timeIntervalSince(startDate)

@@ -9,13 +9,13 @@ import Foundation
 
 enum Settings {
     enum Camera {
-        static let sceneWidth: CGFloat = 480
+        static let sceneHeight: CGFloat = 960
         
         static let levelCameraScale: CGFloat = 1
         static let levelsMenuCameraScale: CGFloat = 2
         static let packsMenuCameraScale: CGFloat = 3
         
-        static let levelCenterOffset: CGFloat = -70
+        static let levelCenterOffset: CGFloat = -60
         static let starCenterOffset: CGFloat = 300
         
         static let starMissleCenterOffset: CGFloat = 10

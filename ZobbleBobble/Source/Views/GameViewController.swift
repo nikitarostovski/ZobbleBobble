@@ -11,7 +11,7 @@ final class GameViewController: UIViewController {
     private var game: Game?
     
     lazy var renderView: MetalRenderView = {
-        let view = MetalRenderView(delegate: self, dataSource: game)
+        let view = MetalRenderView()
         view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -100,10 +100,17 @@ final class GameViewController: UIViewController {
     }
     
     private func updateGameSizeData(newSize: CGSize? = nil) {
-        let size = newSize ?? renderView.drawableSize
-        guard size != .zero else { return }
+        let scale = UIScreen.main.scale
+        let safeArea = safeAreaRectangle
+        let size = newSize ?? CGSize(width: renderView.frame.width * scale, height: renderView.frame.height * scale)
         
-        game?.updateSceneSize(newScreenSize: size, newSafeArea: safeAreaRectangle, newScreenScale: UIScreen.main.scale)
+        guard let game = game, size != .zero else { return }
+        
+        let needsRebuild = newSize != game.screenSize || scale != game.screenScale
+        if needsRebuild {
+            renderView.resetRenderer(delegate: self, dataSource: game, renderSize: size)
+        }
+        game.updateSceneSize(newScreenSize: size, newSafeArea: safeArea, newScreenScale: scale)
     }
 }
 

@@ -23,15 +23,18 @@ protocol RenderViewDelegate: AnyObject {
 }
 
 final class MetalRenderView: MTKView {
-    var renderer: Renderer?
+    private var renderer: Renderer?
     
-    init(delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
+    init() {
         let device = MTLCreateSystemDefaultDevice()!
         super.init(frame: .zero, device: device)
-        self.renderer = Renderer(device: device, view: self, delegate: delegate, dataSource: dataSource)
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func resetRenderer(delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?, renderSize: CGSize) {
+        renderer = Renderer(view: self, delegate: delegate, dataSource: dataSource, renderSize: renderSize)
     }
 }

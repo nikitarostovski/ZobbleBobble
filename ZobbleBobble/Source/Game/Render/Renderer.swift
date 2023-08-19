@@ -101,8 +101,8 @@ class Renderer: NSObject, MTKViewDelegate {
                                             dotMaskHeight: 0,
                                             scanlineDistance: 6)
     
-    init(device: MTLDevice, view: MTKView, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
-        self.device = device
+    init(view: MTKView, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?, renderSize: CGSize) {
+        self.device = view.device!
         self.renderDelegate = delegate
         self.renderDataSource = dataSource
         self.commandQueue = device.makeCommandQueue()!
@@ -115,146 +115,14 @@ class Renderer: NSObject, MTKViewDelegate {
                                                             inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                             bufferSize: MemoryLayout<SIMD4<UInt8>>.stride)
         super.init()
-        view.device = device
         view.delegate = self
         
-        onSizeUpdate(view.drawableSize)
         setupPipeline()
+        onSizeUpdate(renderSize)
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        guard size != view.drawableSize else { return }
-        onSizeUpdate(size)
-    }
-    
-    private func setupPipeline() {
-        guard let library = device.makeDefaultLibrary() else {
-            return
-        }
-        let drawableRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
-        drawableRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_render")!
-        drawableRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_render")!
-        drawableRenderPipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
-        do {
-            drawableRenderPipelineState = try device.makeRenderPipelineState(descriptor: drawableRenderPipelineDescriptor)
-        } catch {
-            print(error)
-            return
-        }
-        let vertices: [SIMD4<Float>] = [
-            SIMD4<Float>( 1, -1, 1.0, 1.0),
-            SIMD4<Float>(-1, -1, 0.0, 1.0),
-            SIMD4<Float>(-1,  1, 0.0, 0.0),
-            SIMD4<Float>( 1, -1, 1.0, 1.0),
-            SIMD4<Float>(-1,  1, 0.0, 0.0),
-            SIMD4<Float>( 1,  1, 1.0, 0.0)
-        ]
-        
-        vertexBuffer = device.makeBuffer(
-            bytes: vertices,
-            length: MemoryLayout<SIMD4<Float>>.stride * vertices.count,
-            options: .storageModeShared)!
-        vertexCount = vertices.count
-        
-        self.upscaleSamplerState = device.nearestSampler
-        
-        do {
-            self.mergePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
-            self.upscalePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "upscale_texture")!)
-            self.channelSplitPipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
-        } catch {
-            print(error)
-        }
-        
-        self.optionsBuffer = device.makeBuffer(bytes: &shaderOptions, length: MemoryLayout<ShaderOptions>.stride)
-    }
-    
-    private func updateNodesIfNeeded() {
-        guard let bodies = renderDataSource?.visibleBodies else { return }
-        
-        let nodes = allNodes
-        
-        for body in bodies {
-            var found = false
-            for node in nodes {
-                if node.linkedBody === body {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                addNode(for: body)
-            }
-        }
-        
-        for node in nodes {
-            var found = false
-            for body in bodies {
-                if body === node.linkedBody {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                liquidNodes.removeAll(where: { $0 === node })
-                guiNodes.removeAll(where: { $0 === node })
-                gunNodes.removeAll(where: { $0 === node })
-            }
-        }
-    }
-    
-    private func addNode(for body: any Body) {
-        switch body {
-        case is GunBody:
-            let node = GunNode(device, renderSize: gameSceneTextureSize, body: body as? GunBody)
-            gunNodes.append(node)
-        case is LiquidBody:
-            for material in body.uniqueMaterials {
-                if let node = LiquidNode(device, renderSize: gameSceneTextureSize, material: material, body: body as? LiquidBody) {
-                    liquidNodes.append(node)
-                }
-            }
-        case is GUIBody:
-            let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
-            guiNodes.append(node)
-        default:
-            break
-        }
-    }
-    
-    private func onSizeUpdate(_ size: CGSize) {
-        guard size.width > 0, size.height > 0 else { return }
-        
         renderDelegate?.rendererSizeDidChange(size: size)
-        
-        // Recalc sizes
-        gameSceneTextureSize = CGSize(width: Settings.Camera.sceneWidth,
-                                      height: size.height * Settings.Camera.sceneWidth / size.width)
-        renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
-                            height: size.height / Settings.Graphics.resolutionDownscale)
-        
-        
-        // Regenerate textures and buffers
-        mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
-        finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
-        
-        bloomTextureR = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        bloomTextureG = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        bloomTextureB = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        
-        if let dotMaskImage = DotMask.makeDotMask(Settings.Graphics.dotMaskType, brightness: shaderOptions.dotMaskBrightness) {
-            dotMaskTexture = dotMaskImage.toTexture(device: device)
-            uniforms.dotMaskWidth = Int32(dotMaskTexture.width)
-            uniforms.dotMaskHeight = Int32(dotMaskTexture.height)
-        }
-        fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
-        
-        // Reset nodes
-        guiNodes.removeAll()
-        liquidNodes.removeAll()
-        gunNodes.removeAll()
-        
-        updateNodesIfNeeded()
     }
     
     func draw(in view: MTKView) {
@@ -356,5 +224,130 @@ class Renderer: NSObject, MTKViewDelegate {
         
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
+    }
+    
+    private func setupPipeline() {
+        guard let library = device.makeDefaultLibrary() else {
+            return
+        }
+        let drawableRenderPipelineDescriptor = MTLRenderPipelineDescriptor()
+        drawableRenderPipelineDescriptor.vertexFunction = library.makeFunction(name: "vertex_render")!
+        drawableRenderPipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragment_render")!
+        drawableRenderPipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        do {
+            drawableRenderPipelineState = try device.makeRenderPipelineState(descriptor: drawableRenderPipelineDescriptor)
+        } catch {
+            print(error)
+            return
+        }
+        let vertices: [SIMD4<Float>] = [
+            SIMD4<Float>( 1, -1, 1.0, 1.0),
+            SIMD4<Float>(-1, -1, 0.0, 1.0),
+            SIMD4<Float>(-1,  1, 0.0, 0.0),
+            SIMD4<Float>( 1, -1, 1.0, 1.0),
+            SIMD4<Float>(-1,  1, 0.0, 0.0),
+            SIMD4<Float>( 1,  1, 1.0, 0.0)
+        ]
+        
+        vertexBuffer = device.makeBuffer(
+            bytes: vertices,
+            length: MemoryLayout<SIMD4<Float>>.stride * vertices.count,
+            options: .storageModeShared)!
+        vertexCount = vertices.count
+        
+        self.upscaleSamplerState = device.nearestSampler
+        
+        do {
+            self.mergePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
+            self.upscalePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "upscale_texture")!)
+            self.channelSplitPipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
+        } catch {
+            print(error)
+        }
+        self.optionsBuffer = device.makeBuffer(bytes: &shaderOptions, length: MemoryLayout<ShaderOptions>.stride)
+    }
+    
+    private func updateNodesIfNeeded() {
+        guard let bodies = renderDataSource?.visibleBodies else { return }
+        
+        let nodes = allNodes
+        
+        for body in bodies {
+            var found = false
+            for node in nodes {
+                if node.linkedBody === body {
+                    found = true
+                    break
+                }
+            }
+            if !found {
+                addNode(for: body)
+            }
+        }
+        
+        for node in nodes {
+            var found = false
+            for body in bodies {
+                if body === node.linkedBody {
+                    found = true
+                    break
+                }
+            }
+            if !found {
+                liquidNodes.removeAll(where: { $0 === node })
+                guiNodes.removeAll(where: { $0 === node })
+                gunNodes.removeAll(where: { $0 === node })
+            }
+        }
+    }
+    
+    private func addNode(for body: any Body) {
+        switch body {
+        case is GunBody:
+            let node = GunNode(device, renderSize: gameSceneTextureSize, body: body as? GunBody)
+            gunNodes.append(node)
+        case is LiquidBody:
+            for material in body.uniqueMaterials {
+                if let node = LiquidNode(device, renderSize: gameSceneTextureSize, material: material, body: body as? LiquidBody) {
+                    liquidNodes.append(node)
+                }
+            }
+        case is GUIBody:
+            let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
+            guiNodes.append(node)
+        default:
+            break
+        }
+    }
+    
+    private func onSizeUpdate(_ size: CGSize) {
+        guard size.width > 0, size.height > 0 else { return }
+        
+        // Recalc sizes
+        gameSceneTextureSize = CGSize(width: size.width * Settings.Camera.sceneHeight / size.height,
+                                      height: Settings.Camera.sceneHeight)
+        renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
+                            height: size.height / Settings.Graphics.resolutionDownscale)
+        
+        // Regenerate textures and buffers
+        mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
+        finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
+        
+        bloomTextureR = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        bloomTextureG = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        bloomTextureB = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        
+        if let dotMaskImage = DotMask.makeDotMask(Settings.Graphics.dotMaskType, brightness: shaderOptions.dotMaskBrightness) {
+            dotMaskTexture = dotMaskImage.toTexture(device: device)
+            uniforms.dotMaskWidth = Int32(dotMaskTexture.width)
+            uniforms.dotMaskHeight = Int32(dotMaskTexture.height)
+        }
+        fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
+        
+        // Reset nodes
+        guiNodes.removeAll()
+        liquidNodes.removeAll()
+        gunNodes.removeAll()
+        updateNodesIfNeeded()
     }
 }

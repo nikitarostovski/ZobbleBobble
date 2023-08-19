@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,8 +74,8 @@
 		11A850962A1388F600574368 /* ImageSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A850942A1388F600574368 /* ImageSampler.swift */; };
 		11A850972A1388F600574368 /* ImageSampling.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11A850952A1388F600574368 /* ImageSampling.metal */; };
 		11A850A02A13899100574368 /* Levels.h in Headers */ = {isa = PBXBuildFile; fileRef = 11A8509F2A13899100574368 /* Levels.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11A850A32A13899100574368 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; };
-		11A850A42A13899100574368 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		11A850A32A13899100574368 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilter = ios; };
+		11A850A42A13899100574368 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11A850A82A1389A400574368 /* MaterialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198B9FF298D22B800142DFD /* MaterialModel.swift */; };
 		11A850A92A1389A400574368 /* LevelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C0A707292248D100CA7954 /* LevelManager.swift */; };
 		11A850AA2A1389A400574368 /* PackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA05298D22D200142DFD /* PackModel.swift */; };
@@ -99,8 +99,8 @@
 		11C39E962A13B10E007B0371 /* Images in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11C39E932A13AF8D007B0371 /* Images */; };
 		11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB5AD12A8D33F000043A06 /* GUIView.swift */; };
 		11DFF3312927BB3B001EA051 /* ZobblePhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF3302927BB3B001EA051 /* ZobblePhysics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; };
-		11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; platformFilter = ios; };
+		11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11DFF6142927BEE8001EA051 /* b2Body.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5552927BEE7001EA051 /* b2Body.cpp */; };
 		11DFF6152927BEE8001EA051 /* b2World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5562927BEE7001EA051 /* b2World.cpp */; };
 		11DFF6162927BEE8001EA051 /* b2Fixture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5572927BEE7001EA051 /* b2Fixture.cpp */; };
@@ -1430,6 +1430,7 @@
 /* Begin PBXTargetDependency section */
 		11A850A22A13899100574368 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 11A8509C2A13899100574368 /* Levels */;
 			targetProxy = 11A850A12A13899100574368 /* PBXContainerItemProxy */;
 		};
@@ -1440,6 +1441,7 @@
 		};
 		11DFF3332927BB3B001EA051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 11DFF32D2927BB3B001EA051 /* ZobblePhysics */;
 			targetProxy = 11DFF3322927BB3B001EA051 /* PBXContainerItemProxy */;
 		};
@@ -1494,7 +1496,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1537,7 +1539,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
