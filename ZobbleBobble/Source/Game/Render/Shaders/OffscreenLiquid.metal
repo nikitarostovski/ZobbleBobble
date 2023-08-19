@@ -57,9 +57,7 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
     float4 oldColor = input.read(gid);
-    oldColor.r = oldColor.r * fadeMultiplier;
-    oldColor.g = 0;
-    oldColor.b = 0;
+    oldColor = oldColor * fadeMultiplier;
     oldColor.a = 0;
     output.write(oldColor, gid);
 }
