@@ -61,7 +61,6 @@ class LiquidNode: BaseNode<LiquidBody> {
     }()
     
     let metaballsRenderPassDescriptor = MTLRenderPassDescriptor()
-    let computePassDescriptor = MTLComputePassDescriptor()
     
     let positionBufferProvider: BufferProvider
     let velocityBufferProvider: BufferProvider
@@ -279,7 +278,7 @@ class LiquidNode: BaseNode<LiquidBody> {
             gauss.encode(commandBuffer: commandBuffer, inPlaceTexture: &lowResAlphaTexture, fallbackCopyAllocator: nil)
         }
         
-        let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
+        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return nil }
         
         computeEncoder.setComputePipelineState(computeUpscalePipelineState)
         computeEncoder.setTexture(lowResAlphaTexture, index: 0)
@@ -300,12 +299,11 @@ class LiquidNode: BaseNode<LiquidBody> {
         
         guard let finalAlphaCorrectedTexture = finalAlphaCorrectedTexture,
               let lowResAlphaTexture = lowResAlphaTexture,
-              let finalTexture = finalTexture
+              let finalTexture = finalTexture,
+              let computeEncoder = commandBuffer.makeComputeCommandEncoder()
         else {
             return finalTexture
         }
-        
-        let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)!
         
         computeEncoder.setComputePipelineState(computeThresholdPipelineState)
         computeEncoder.setTexture(finalAlphaCorrectedTexture, index: 0)

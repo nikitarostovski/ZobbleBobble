@@ -16,5 +16,6 @@ using namespace metal;
 
 float3 rgb2hsv(float3 c);
 float3 hsv2rgb(float3 c);
+float4 blend(int mode, float4 ca, float4 cb);
 
 #endif /* CommonShaders_h */

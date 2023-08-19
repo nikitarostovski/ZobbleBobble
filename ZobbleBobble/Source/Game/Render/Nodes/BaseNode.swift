@@ -32,8 +32,7 @@ class BaseNode<B: Body>: Node {
             fatalError()
         }
         
-        let computePassDescriptor = MTLComputePassDescriptor()
-        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor) else { return texture }
+        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return texture }
         
         computeEncoder.setComputePipelineState(clearPipelineState)
         computeEncoder.setTexture(texture, index: 0)

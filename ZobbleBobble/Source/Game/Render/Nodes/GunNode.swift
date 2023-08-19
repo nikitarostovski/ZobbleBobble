@@ -21,8 +21,6 @@ class GunNode: BaseNode<GunBody> {
         return try? device.makeComputePipelineState(function: library.makeFunction(name: "draw_gun")!)
     }()
     
-    let computePassDescriptor = MTLComputePassDescriptor()
-    
     let uniformsBufferProvider: BufferProvider
     let gunCenterBufferProvider: BufferProvider
     let renderCenterBufferProvider: BufferProvider
@@ -79,7 +77,7 @@ class GunNode: BaseNode<GunBody> {
               renderData.materialCount > 0,
               let computeDrawGunPipelineState = computeDrawGunPipelineState,
               let finalTexture = finalTexture,
-              let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
+              let computeEncoder = commandBuffer.makeComputeCommandEncoder()
         else {
             return nil
         }

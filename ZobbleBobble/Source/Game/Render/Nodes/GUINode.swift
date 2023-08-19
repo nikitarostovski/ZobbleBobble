@@ -22,7 +22,6 @@ class GUINode: BaseNode<GUIBody> {
     }()
     
     private let ciContext = CIContext()
-    private let computePassDescriptor = MTLComputePassDescriptor()
     
     private let uniformsBufferProvider: BufferProvider
     private let buttonsBufferProvider: BufferProvider
@@ -65,7 +64,7 @@ class GUINode: BaseNode<GUIBody> {
               var labelCount = body.renderData?.labelCount,
               let drawGUIPipelineState = drawGUIPipelineState,
               let finalTexture = finalTexture,
-              let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
+              let computeEncoder = commandBuffer.makeComputeCommandEncoder()
         else {
             return nil
         }

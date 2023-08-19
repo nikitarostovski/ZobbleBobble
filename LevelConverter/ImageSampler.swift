@@ -18,7 +18,6 @@ final class ImageSampler {
     private weak var device: MTLDevice?
     private var texture: MTLTexture
     private let commandQueue: MTLCommandQueue
-    private let computePassDescriptor = MTLComputePassDescriptor()
     private let positionBufferProvider: BufferProvider
     private let resultBufferProvider: BufferProvider
     private let linearSampler: MTLSamplerState?

@@ -45,8 +45,6 @@ class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     
-    private let computePassDescriptor = MTLComputePassDescriptor()
-    
     private var drawableRenderPipelineState: MTLRenderPipelineState!
     private var mergePipelineState: MTLComputePipelineState!
     private var upscalePipelineState: MTLComputePipelineState!
@@ -70,9 +68,8 @@ class Renderer: NSObject, MTKViewDelegate {
     
     private var vertexCount: Int = 0
     
-    private var renderSize: CGSize
-    // TODO: make game render into fixed size texture
-    private let gameSceneTextureSize = CGSize(width: 200, height: 400)
+    private var renderSize: CGSize = .zero
+    private var gameSceneTextureSize: CGSize = .zero
     
     private var lastDrawDate: Date?
     
@@ -105,9 +102,6 @@ class Renderer: NSObject, MTKViewDelegate {
                                             scanlineDistance: 6)
     
     init(device: MTLDevice, view: MTKView, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?) {
-        let screenSize = view.drawableSize
-        self.renderSize = CGSize(width: screenSize.width / Settings.Graphics.resolutionDownscale,
-                                 height: screenSize.height / Settings.Graphics.resolutionDownscale)
         self.device = device
         self.renderDelegate = delegate
         self.renderDataSource = dataSource
@@ -124,34 +118,13 @@ class Renderer: NSObject, MTKViewDelegate {
         view.device = device
         view.delegate = self
         
+        onSizeUpdate(view.drawableSize)
         setupPipeline()
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        renderDelegate?.rendererSizeDidChange(size: size)
-        
-        self.renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
-                                 height: size.height / Settings.Graphics.resolutionDownscale)
-        
-        self.mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
-        self.finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
-        
-        self.bloomTextureR = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        self.bloomTextureG = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        self.bloomTextureB = device.makeTexture(width: Int(size.width), height: Int(size.height))
-        
-        if let dotMaskImage = DotMask.makeDotMask(Settings.Graphics.dotMaskType, brightness: shaderOptions.dotMaskBrightness) {
-            self.dotMaskTexture = dotMaskImage.toTexture(device: device)
-            uniforms.dotMaskWidth = Int32(dotMaskTexture.width)
-            uniforms.dotMaskHeight = Int32(dotMaskTexture.height)
-        }
-        self.fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
-        
-        guiNodes.removeAll()
-        liquidNodes.removeAll()
-        gunNodes.removeAll()
-        
-        updateNodesIfNeeded()
+        guard size != view.drawableSize else { return }
+        onSizeUpdate(size)
     }
     
     private func setupPipeline() {
@@ -233,11 +206,11 @@ class Renderer: NSObject, MTKViewDelegate {
     private func addNode(for body: any Body) {
         switch body {
         case is GunBody:
-            let node = GunNode(device, renderSize: renderSize/*gameSceneTextureSize*/, body: body as? GunBody)
+            let node = GunNode(device, renderSize: gameSceneTextureSize, body: body as? GunBody)
             gunNodes.append(node)
         case is LiquidBody:
             for material in body.uniqueMaterials {
-                if let node = LiquidNode(device, renderSize: renderSize/*gameSceneTextureSize*/, material: material, body: body as? LiquidBody) {
+                if let node = LiquidNode(device, renderSize: gameSceneTextureSize, material: material, body: body as? LiquidBody) {
                     liquidNodes.append(node)
                 }
             }
@@ -247,6 +220,41 @@ class Renderer: NSObject, MTKViewDelegate {
         default:
             break
         }
+    }
+    
+    private func onSizeUpdate(_ size: CGSize) {
+        guard size.width > 0, size.height > 0 else { return }
+        
+        renderDelegate?.rendererSizeDidChange(size: size)
+        
+        // Recalc sizes
+        gameSceneTextureSize = CGSize(width: Settings.Camera.sceneWidth,
+                                      height: size.height * Settings.Camera.sceneWidth / size.width)
+        renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
+                            height: size.height / Settings.Graphics.resolutionDownscale)
+        
+        
+        // Regenerate textures and buffers
+        mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
+        finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
+        
+        bloomTextureR = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        bloomTextureG = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        bloomTextureB = device.makeTexture(width: Int(size.width), height: Int(size.height))
+        
+        if let dotMaskImage = DotMask.makeDotMask(Settings.Graphics.dotMaskType, brightness: shaderOptions.dotMaskBrightness) {
+            dotMaskTexture = dotMaskImage.toTexture(device: device)
+            uniforms.dotMaskWidth = Int32(dotMaskTexture.width)
+            uniforms.dotMaskHeight = Int32(dotMaskTexture.height)
+        }
+        fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
+        
+        // Reset nodes
+        guiNodes.removeAll()
+        liquidNodes.removeAll()
+        gunNodes.removeAll()
+        
+        updateNodesIfNeeded()
     }
     
     func draw(in view: MTKView) {
@@ -289,7 +297,7 @@ class Renderer: NSObject, MTKViewDelegate {
         guard let mergeTexture = mergeTexture,
               let finalTexture = finalTexture,
               let mergePipelineState = mergePipelineState,
-              let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
+              let computeEncoder = commandBuffer.makeComputeCommandEncoder()
         else { return }
         
         computeEncoder.setComputePipelineState(mergePipelineState)

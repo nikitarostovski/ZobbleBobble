@@ -9,15 +9,17 @@ import Foundation
 
 enum Settings {
     enum Camera {
+        static let sceneWidth: CGFloat = 480
+        
         static let levelCameraScale: CGFloat = 1
         static let levelsMenuCameraScale: CGFloat = 2
         static let packsMenuCameraScale: CGFloat = 3
         
-        static let levelCenterOffset: CGFloat = -150
-        static let starCenterOffset: CGFloat = 600
+        static let levelCenterOffset: CGFloat = -70
+        static let starCenterOffset: CGFloat = 300
         
-        static let starMissleCenterOffset: CGFloat = 25
-        static let starMissleDeadZone: CGFloat = 40
+        static let starMissleCenterOffset: CGFloat = 10
+        static let starMissleDeadZone: CGFloat = 20
         
         static let missleRadiusShiftInsideStar: CGFloat = 3
         static let missleAngleShiftInsideStar = CGFloat(5).radians
