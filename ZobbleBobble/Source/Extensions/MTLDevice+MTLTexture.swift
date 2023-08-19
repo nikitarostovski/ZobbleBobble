@@ -11,7 +11,7 @@ extension MTLDevice {
     func makeTexture(width: Int,
                      height: Int,
                      pixelFormat: MTLPixelFormat = .bgra8Unorm,
-                     storageMode: MTLStorageMode = .shared,
+                     storageMode: MTLStorageMode = .private,
                      textureType: MTLTextureType = .type2D,
                      sampleCount: Int = 1,
                      usage: MTLTextureUsage = [.shaderRead, .shaderWrite]) -> MTLTexture? {

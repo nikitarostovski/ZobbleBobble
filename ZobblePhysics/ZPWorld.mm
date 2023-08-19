@@ -6,13 +6,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import "Box2D.h"
 #import "ZPWorld.h"
 #import "ZPBody.h"
 #import "Constants.h"
 #import "ZPParticle.h"
 #import "ZPParticleDef.h"
+
+#if TARGET_OS_OSX
+#import <Cocoa/Cocoa.h>
+#else
+#import <UIKit/UIKit.h>
+#endif
 
 static NSString *kParticlePositionKey = @"particle_position";
 static NSString *kParticleColorKey = @"particle_color";
@@ -258,8 +263,14 @@ ParticleIterations:(int)particleIterations {
     // Add particles
     for (NSDictionary *dict in _particlesToAdd) {
         ZPParticleDef *def = dict[kParticleUserDataKey];
+        
+#if TARGET_OS_OSX
+        CGPoint position = [dict[kParticlePositionKey] pointValue];
+        CGRect col = [dict[kParticleColorKey] rectValue];
+#else
         CGPoint position = [dict[kParticlePositionKey] CGPointValue];
         CGRect col = [dict[kParticleColorKey] CGRectValue];
+#endif
         
         b2ParticleColor color;
         color.Set(col.origin.x, col.origin.y, col.size.width, col.size.height);
@@ -317,8 +328,15 @@ ParticleIterations:(int)particleIterations {
 }
 
 - (void)addParticleAt:(CGPoint)position Color:(CGRect)color UserData:(ZPParticleDef *)userData {
-    NSDictionary *dict = @{kParticlePositionKey: [NSValue valueWithCGPoint:position],
-                           kParticleColorKey: [NSValue valueWithCGRect:color],
+#if TARGET_OS_OSX
+    NSValue *posValue = [NSValue valueWithPoint: position];
+    NSValue *colValue = [NSValue valueWithRect: color];
+#else
+    NSValue *posValue = [NSValue valueWithCGPoint: position];
+    NSValue *colValue = [NSValue valueWithCGRect: color];
+#endif
+    NSDictionary *dict = @{kParticlePositionKey: posValue,
+                           kParticleColorKey: colValue,
                            kParticleUserDataKey: userData
     };
     [_particlesToAdd addObject:dict];

@@ -5,7 +5,7 @@
 //  Created by Rost on 01.01.2023.
 //
 
-import UIKit
+import Foundation
 
 final class Animator {
     static func animate(duraion: Double, easing: Curve = .quadratic, step: @escaping (_ percentage: CGFloat) -> Void, completion: (() -> Void)? = nil) {

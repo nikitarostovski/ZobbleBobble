@@ -1,5 +1,5 @@
 //
-//  GameViewController.swift
+//  TouchGameViewController.swift
 //  ZobbleBobble
 //
 //  Created by Никита Ростовский on 27.12.2021.
@@ -12,7 +12,6 @@ final class GameViewController: UIViewController {
     
     lazy var renderView: MetalRenderView = {
         let view = MetalRenderView()
-        view.colorPixelFormat = .bgra8Unorm
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

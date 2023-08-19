@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,9 +21,9 @@
 		110DB2742A8FBF75002DEEAD /* MaterialRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2732A8FBF75002DEEAD /* MaterialRenderData.swift */; };
 		111E13792A7AB27600A786FD /* MissleBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E13782A7AB27600A786FD /* MissleBody.swift */; };
 		111E137B2A7AC90000A786FD /* LiquidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E137A2A7AC90000A786FD /* LiquidBody.swift */; };
-		1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C1A42773AFAF00C26BEC /* AppDelegate.swift */; };
+		1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C1A42773AFAF00C26BEC /* AppDelegate.swift */; platformFilter = ios; };
 		1126C1B22773AFB100C26BEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B12773AFB100C26BEC /* Assets.xcassets */; };
-		1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B32773AFB100C26BEC /* LaunchScreen.storyboard */; };
+		1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1126C1B32773AFB100C26BEC /* LaunchScreen.storyboard */; platformFilter = ios; };
 		112CD0F92A76547D0098D324 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD0F82A76547D0098D324 /* PhysicsWorld.swift */; };
 		112CD0FC2A7656230098D324 /* LiquidFunWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD0FB2A7656230098D324 /* LiquidFunWorld.swift */; };
 		112CD16B2A77D4EA0098D324 /* Body.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD16A2A77D4EA0098D324 /* Body.swift */; };
@@ -34,7 +34,7 @@
 		112CD17B2A7919010098D324 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD17A2A7919010098D324 /* Node.swift */; };
 		113228F62A8252A600CA8F49 /* MTLDevice+MTLTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113228F52A8252A600CA8F49 /* MTLDevice+MTLTexture.swift */; };
 		113228F82A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113228F72A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift */; };
-		1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* GameViewController.swift */; };
+		1133D44C2949A568009C8DBC /* TouchGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* TouchGameViewController.swift */; platformFilter = ios; };
 		1133D454294DAFA6009C8DBC /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF77292B8A5600AFD08C /* Constants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF552928E14400AFD08C /* ZPWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF68B2927C32B001EA051 /* ZPWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF592928E83900AFD08C /* ZPBody.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1160EF582928E83900AFD08C /* ZPBody.mm */; };
@@ -68,14 +68,17 @@
 		1194C9BF29910E9500ACAF97 /* ZPWorldDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */; };
 		1195528A2961CE85000C7A95 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119552892961CE85000C7A95 /* Animator.swift */; };
 		1195528C2961D162000C7A95 /* Easing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528B2961D162000C7A95 /* Easing.swift */; };
-		1195528E2961E124000C7A95 /* SwipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528D2961E124000C7A95 /* SwipeView.swift */; };
+		1195528E2961E124000C7A95 /* SwipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528D2961E124000C7A95 /* SwipeView.swift */; platformFilter = ios; };
 		119B46CD29FFCC8600845D1B /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119B46CC29FFCC8600845D1B /* BufferProvider.swift */; };
+		119E35532A9111F200A16F00 /* DesktopGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35522A9111F200A16F00 /* DesktopGameViewController.swift */; platformFilters = (macos, ); };
+		119E35552A91158700A16F00 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35542A91158700A16F00 /* main.swift */; platformFilters = (macos, ); };
+		119E35572A9123EE00A16F00 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 119E35562A9123EE00A16F00 /* CoreGraphics.framework */; };
 		11A850882A13880900574368 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A850872A13880900574368 /* main.swift */; };
 		11A850962A1388F600574368 /* ImageSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A850942A1388F600574368 /* ImageSampler.swift */; };
 		11A850972A1388F600574368 /* ImageSampling.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11A850952A1388F600574368 /* ImageSampling.metal */; };
 		11A850A02A13899100574368 /* Levels.h in Headers */ = {isa = PBXBuildFile; fileRef = 11A8509F2A13899100574368 /* Levels.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11A850A32A13899100574368 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilter = ios; };
-		11A850A42A13899100574368 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		11A850A32A13899100574368 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilters = (ios, macos, ); };
+		11A850A42A13899100574368 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; platformFilters = (ios, macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11A850A82A1389A400574368 /* MaterialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198B9FF298D22B800142DFD /* MaterialModel.swift */; };
 		11A850A92A1389A400574368 /* LevelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C0A707292248D100CA7954 /* LevelManager.swift */; };
 		11A850AA2A1389A400574368 /* PackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA05298D22D200142DFD /* PackModel.swift */; };
@@ -99,8 +102,8 @@
 		11C39E962A13B10E007B0371 /* Images in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11C39E932A13AF8D007B0371 /* Images */; };
 		11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB5AD12A8D33F000043A06 /* GUIView.swift */; };
 		11DFF3312927BB3B001EA051 /* ZobblePhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF3302927BB3B001EA051 /* ZobblePhysics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; platformFilter = ios; };
-		11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; };
+		11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11DFF6142927BEE8001EA051 /* b2Body.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5552927BEE7001EA051 /* b2Body.cpp */; };
 		11DFF6152927BEE8001EA051 /* b2World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5562927BEE7001EA051 /* b2World.cpp */; };
 		11DFF6162927BEE8001EA051 /* b2Fixture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DFF5572927BEE7001EA051 /* b2Fixture.cpp */; };
@@ -304,7 +307,7 @@
 		1126C1B12773AFB100C26BEC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1126C1B42773AFB100C26BEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1126C1F827787ADB00C26BEC /* CGRect+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Utils.swift"; sourceTree = "<group>"; };
-		1126C22F277A205600C26BEC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		1126C22F277A205600C26BEC /* TouchGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGameViewController.swift; sourceTree = "<group>"; };
 		1126C23A277A2B3900C26BEC /* CGFloat+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Utils.swift"; sourceTree = "<group>"; };
 		1126C23C277A2B4600C26BEC /* CGPoint+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
 		112CD0F82A76547D0098D324 /* PhysicsWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsWorld.swift; sourceTree = "<group>"; };
@@ -357,6 +360,9 @@
 		1198BA03298D22CB00142DFD /* LevelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
 		1198BA05298D22D200142DFD /* PackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackModel.swift; sourceTree = "<group>"; };
 		119B46CC29FFCC8600845D1B /* BufferProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
+		119E35522A9111F200A16F00 /* DesktopGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopGameViewController.swift; sourceTree = "<group>"; };
+		119E35542A91158700A16F00 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		119E35562A9123EE00A16F00 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.4.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		11A850852A13880900574368 /* LevelConverter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LevelConverter; sourceTree = BUILT_PRODUCTS_DIR; };
 		11A850872A13880900574368 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		11A850932A1388C800574368 /* Levels.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Levels.json; sourceTree = "<group>"; };
@@ -508,6 +514,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				119E35572A9123EE00A16F00 /* CoreGraphics.framework in Frameworks */,
 				11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */,
 				11A850A32A13899100574368 /* Levels.framework in Frameworks */,
 			);
@@ -595,6 +602,7 @@
 		1126C1BB2773AFCF00C26BEC /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				119E35542A91158700A16F00 /* main.swift */,
 				1126C1A42773AFAF00C26BEC /* AppDelegate.swift */,
 			);
 			path = Main;
@@ -603,7 +611,8 @@
 		1126C1BD2773B17C00C26BEC /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1126C22F277A205600C26BEC /* GameViewController.swift */,
+				1126C22F277A205600C26BEC /* TouchGameViewController.swift */,
+				119E35522A9111F200A16F00 /* DesktopGameViewController.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -796,6 +805,7 @@
 		11C0A726292254AB00CA7954 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				119E35562A9123EE00A16F00 /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1276,6 +1286,7 @@
 				11EC8BEF2A10AD80000F322C /* SIMDColor+Hex.swift in Sources */,
 				11889DE62A8CDCE200F8216B /* GarbageMarketScene.swift in Sources */,
 				110DB26E2A8FBF11002DEEAD /* GunRenderData.swift in Sources */,
+				119E35552A91158700A16F00 /* main.swift in Sources */,
 				11EC8BF12A10AD80000F322C /* CGPoint+Utils.swift in Sources */,
 				11889DEC2A8CDD0500F8216B /* PlanetScene.swift in Sources */,
 				112CD17B2A7919010098D324 /* Node.swift in Sources */,
@@ -1297,6 +1308,7 @@
 				116D7D882A89E707007ED1DD /* DotMask.swift in Sources */,
 				119095292954A22A006EE970 /* MetalRenderView.swift in Sources */,
 				110DB2632A8FA824002DEEAD /* PlanetModel.swift in Sources */,
+				119E35532A9111F200A16F00 /* DesktopGameViewController.swift in Sources */,
 				110DB2692A8FB97F002DEEAD /* GunShaders.metal in Sources */,
 				1195528A2961CE85000C7A95 /* Animator.swift in Sources */,
 				11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */,
@@ -1305,7 +1317,7 @@
 				11889DF82A8CF55300F8216B /* GUIShaders.metal in Sources */,
 				1193428B29FE3721001707B4 /* SIMD+Extensions.swift in Sources */,
 				116D7D842A89E0EB007ED1DD /* CGImage+Textures.swift in Sources */,
-				1133D44C2949A568009C8DBC /* GameViewController.swift in Sources */,
+				1133D44C2949A568009C8DBC /* TouchGameViewController.swift in Sources */,
 				11889DF22A8CF43700F8216B /* GUIButton.swift in Sources */,
 				112CD0FC2A7656230098D324 /* LiquidFunWorld.swift in Sources */,
 				110DB2722A8FBF2D002DEEAD /* GUIRenderData.swift in Sources */,
@@ -1430,7 +1442,10 @@
 /* Begin PBXTargetDependency section */
 		11A850A22A13899100574368 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			platformFilter = ios;
+			platformFilters = (
+				ios,
+				macos,
+			);
 			target = 11A8509C2A13899100574368 /* Levels */;
 			targetProxy = 11A850A12A13899100574368 /* PBXContainerItemProxy */;
 		};
@@ -1441,7 +1456,6 @@
 		};
 		11DFF3332927BB3B001EA051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			platformFilter = ios;
 			target = 11DFF32D2927BB3B001EA051 /* ZobblePhysics */;
 			targetProxy = 11DFF3322927BB3B001EA051 /* PBXContainerItemProxy */;
 		};
@@ -1485,12 +1499,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.ZobbleBobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1526,13 +1541,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.ZobbleBobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1549,7 +1565,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -1561,7 +1577,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -1591,6 +1607,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
@@ -1598,8 +1615,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1631,6 +1649,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
@@ -1638,8 +1657,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1790,11 +1810,15 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.ZobblePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1826,11 +1850,15 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.ZobblePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

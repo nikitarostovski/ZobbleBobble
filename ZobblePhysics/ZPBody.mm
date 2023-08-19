@@ -5,8 +5,8 @@
 //  Created by Rost on 19.11.2022.
 //
 
+#import <Foundation/Foundation.h>
 #import "ZPBody.h"
-#import <UIKit/UIKit.h>
 #import "Constants.h"
 #import "ZPBody.h"
 #import "ZPWorld.h"
@@ -18,7 +18,10 @@
 - (CGPoint)position {
     b2Body *body = (b2Body *)self.body;
     b2Vec2 p = body->GetPosition();
-    return CGPointMake(p.x, p.y);
+    CGPoint result;
+    result.x = p.x;
+    result.y = p.y;
+    return result;
 }
 
 - (id)initWithRadius:(float)radius IsDynamic:(BOOL)isDynamic Position:(CGPoint)position Color:(CGRect)color Density:(float)density Friction:(float)friction Restitution:(float)restitution AtWorld:(ZPWorld *)world IsExploding:(BOOL)isExploding {
