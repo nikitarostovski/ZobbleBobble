@@ -56,6 +56,7 @@ final class Game {
     }
     
     // MARK: - Methods
+    
     init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?) {
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
@@ -93,29 +94,9 @@ final class Game {
     }
     
     func update(_ time: CFTimeInterval) {
-        visibleScenes.forEach {
-            $0.update(time)
+        visibleScenes.forEach { scene in
+            scene.update(time)
         }
-    }
-    
-    func runGame() {
-        cameraState.camera = .zero
-        cameraState.cameraScale = 1
-        
-//        let scene = LevelScene(game: self)
-//        self.scene = scene
-//        self.state.scene = .planet
-//        self.menu = nil
-        delegate?.gameDidChangeState(self)
-    }
-    
-    func runMenu(isFromLevel: Bool = false) {
-//        let from = isFromLevel ? Settings.Camera.levelCameraScale : Settings.Camera.levelsMenuCameraScale
-//        let menu = MenuScene(game: self, from: from)
-//        self.menu = menu
-//        self.state.scene = .controlCenter
-//        self.scene = nil
-        delegate?.gameDidChangeState(self)
     }
     
     func onTouchDown(pos: CGPoint) {
@@ -153,23 +134,6 @@ final class Game {
 //            menu?.onSwipe(position.x)
 //        }
     }
-    
-    func onExitTap() {
-//        guard state.state == .level else { return }
-//        runMenu(isFromLevel: true)
-    }
-    
-//    func replace(stars: [StarBody]? = nil, terrains: [TerrainBody]? = nil, missles: [MissleBody]? = nil) {
-//        if let terrains = terrains {
-//            self.terrains = terrains
-//        }
-//        if let stars = stars {
-//            self.stars = stars
-//        }
-//        if let missles = missles {
-//            self.missles = missles
-//        }
-//    }
 }
 
 extension Game: TransitionableSceneDelegate {

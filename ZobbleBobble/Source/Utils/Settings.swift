@@ -9,39 +9,40 @@ import Foundation
 
 enum Settings {
     enum Camera {
-        static let sceneHeight: CGFloat = 960
+        static let sceneHeight: CGFloat = 960 / Graphics.resolutionDownscale
         
         static let levelCameraScale: CGFloat = 1
         static let levelsMenuCameraScale: CGFloat = 2
         static let packsMenuCameraScale: CGFloat = 3
         
-        static let levelCenterOffset: CGFloat = -60
-        static let starCenterOffset: CGFloat = 300
+        static let levelCenterOffset: CGFloat = -60 / Graphics.resolutionDownscale
+        static let gunCenterOffset: CGFloat = 300 / Graphics.resolutionDownscale
         
-        static let starMissleCenterOffset: CGFloat = 10
-        static let starMissleDeadZone: CGFloat = 20
+        static let gunRadius: CGFloat = 100 / Graphics.resolutionDownscale
+        static let gunMissleCenterOffset: CGFloat = 10 / Graphics.resolutionDownscale
+        static let gunMissleDeadZone: CGFloat = 20 / Graphics.resolutionDownscale
         
         static let missleRadiusShiftInsideStar: CGFloat = 3
         static let missleAngleShiftInsideStar = CGFloat(5).radians
         static let missleParticleMaxSpeedModifier: CGFloat = 2
         
-        static let starLevelScale: CGFloat = 1
-        static let starLevelMenuScale: CGFloat = 0.25
-        static let starPackMenuScale: CGFloat = 0.5
+//        static let starLevelScale: CGFloat = 1
+//        static let starLevelMenuScale: CGFloat = 0.25
+//        static let starPackMenuScale: CGFloat = 0.5
+//
+//        static let planetLevelScale: CGFloat = 1
+//        static let planetLevelMenuScale: CGFloat = 0.25
+//        static let planetPackMenuScale: CGFloat = 0
         
-        static let planetLevelScale: CGFloat = 1
-        static let planetLevelMenuScale: CGFloat = 0.25
-        static let planetPackMenuScale: CGFloat = 0
+        static let gunMaterialsUpscaleInGame: CGFloat = 1.75
         
-        static let planetMaterialsUpscaleInGame: CGFloat = 1.75
-        
-        static let starLevelAngle: CGFloat = CGFloat(90).radians
-        static let starLevelMenuAngle: CGFloat = CGFloat(30).radians
-        static let starPackMenuAngle: CGFloat = CGFloat(20).radians
-        
-        static let planetLevelAngle: CGFloat = CGFloat(90).radians
-        static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
-        static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
+//        static let starLevelAngle: CGFloat = CGFloat(90).radians
+//        static let starLevelMenuAngle: CGFloat = CGFloat(30).radians
+//        static let starPackMenuAngle: CGFloat = CGFloat(20).radians
+//
+//        static let planetLevelAngle: CGFloat = CGFloat(90).radians
+//        static let planetLevelMenuAngle: CGFloat = CGFloat(20).radians
+//        static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
         
         static let sceneTransitionDuration: Double = 0.15
         static let sceneTransitionEasing: Curve = .sine
@@ -69,8 +70,8 @@ enum Settings {
     enum Graphics {
         static let resolutionDownscale: CGFloat = 1
         
-        static let metaballsDownscale: Float = 1
-        static let metaballsBlurSigma: Float = 1.2
+        static let metaballsDownscale: Float = 0.7
+        static let metaballsBlurSigma: Float = 1.5
         
         static let fadeMultiplier: Float = 0.3
         

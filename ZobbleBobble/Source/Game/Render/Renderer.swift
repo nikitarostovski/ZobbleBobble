@@ -326,8 +326,8 @@ class Renderer: NSObject, MTKViewDelegate {
         // Recalc sizes
         gameSceneTextureSize = CGSize(width: size.width * Settings.Camera.sceneHeight / size.height,
                                       height: Settings.Camera.sceneHeight)
-        renderSize = CGSize(width: size.width / Settings.Graphics.resolutionDownscale,
-                            height: size.height / Settings.Graphics.resolutionDownscale)
+        renderSize = CGSize(width: size.width,
+                            height: size.height)
         
         // Regenerate textures and buffers
         mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))

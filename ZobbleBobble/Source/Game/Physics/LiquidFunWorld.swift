@@ -9,6 +9,8 @@ import Foundation
 import ZobblePhysics
 
 class LiquidFunWorld: PhysicsWorld {
+    private let queue = DispatchQueue(label: "liquidfunworld.update", qos: .userInteractive)
+    
     private let world: ZPWorld
     private let particleRadius: CGFloat
     
@@ -52,23 +54,28 @@ class LiquidFunWorld: PhysicsWorld {
     }
     
     func update(_ time: CFTimeInterval) {
-        autoreleasepool {
-            self.world.worldStep(time,
-                                 velocityIterations: Int32(Settings.Physics.velocityIterations),
-                                 positionIterations: Int32(Settings.Physics.positionIterations),
-                                 particleIterations: Int32(Settings.Physics.particleIterations))
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            autoreleasepool {
+                self.world.worldStep(time,
+                                     velocityIterations: Int32(Settings.Physics.velocityIterations),
+                                     positionIterations: Int32(Settings.Physics.positionIterations),
+                                     particleIterations: Int32(Settings.Physics.particleIterations))
+            }
         }
     }
     
     func addParticle(withPosition: CGPoint, color: SIMD4<UInt8>, flags: UInt32, isStatic: Bool, gravityScale: CGFloat, freezeVelocityThreshold: CGFloat, becomesLiquidOnContact: Bool, explosionRadius: CGFloat, shootImpulse: CGFloat) {
-        world.addParticle(withPosition: withPosition,
-                          color: CGRect(color),
-                          flags: flags,
-                          isStatic: isStatic,
-                          gravityScale: gravityScale,
-                          freezeVelocityThreshold: freezeVelocityThreshold,
-                          becomesLiquidOnContact: becomesLiquidOnContact,
-                          explosionRadius: explosionRadius,
-                          shootImpulse: shootImpulse)
+        queue.async { [weak self] in
+            self?.world.addParticle(withPosition: withPosition,
+                                    color: CGRect(color),
+                                    flags: flags,
+                                    isStatic: isStatic,
+                                    gravityScale: gravityScale,
+                                    freezeVelocityThreshold: freezeVelocityThreshold,
+                                    becomesLiquidOnContact: becomesLiquidOnContact,
+                                    explosionRadius: explosionRadius,
+                                    shootImpulse: shootImpulse)
+        }
     }
 }

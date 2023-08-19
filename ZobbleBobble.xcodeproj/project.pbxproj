@@ -93,6 +93,10 @@
 		11B643AA2A13A84500DCC56C /* DecodableFloatWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */; };
 		11B643AB2A13A85800DCC56C /* Array+Duplicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */; };
 		11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */; };
+		11BDF3DF2A914251005F78E2 /* LicenseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3DE2A914251005F78E2 /* LicenseModel.swift */; };
+		11BDF3E12A914266005F78E2 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E02A914266005F78E2 /* PlayerModel.swift */; };
+		11BDF3E52A914286005F78E2 /* ContainerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E42A914286005F78E2 /* ContainerModel.swift */; };
+		11BDF3E72A914312005F78E2 /* ShipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E62A914312005F78E2 /* ShipModel.swift */; };
 		11C39E872A13AB23007B0371 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; };
 		11C39E882A13AB23007B0371 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11C39E8D2A13ABF8007B0371 /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */; };
@@ -379,6 +383,10 @@
 		11B3FD0C298012330058FFEB /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		11B7D6DE2973E921008C5495 /* ZPParticle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticle.h; sourceTree = "<group>"; };
 		11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Formatting.swift"; sourceTree = "<group>"; };
+		11BDF3DE2A914251005F78E2 /* LicenseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseModel.swift; sourceTree = "<group>"; };
+		11BDF3E02A914266005F78E2 /* PlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
+		11BDF3E42A914286005F78E2 /* ContainerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerModel.swift; sourceTree = "<group>"; };
+		11BDF3E62A914312005F78E2 /* ShipModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipModel.swift; sourceTree = "<group>"; };
 		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
 		11C39E8E2A13AC3E007B0371 /* ThreadHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadHelper.swift; sourceTree = "<group>"; };
@@ -639,7 +647,6 @@
 		112CD1682A77CC400098D324 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				110DB2622A8FA824002DEEAD /* PlanetModel.swift */,
 				11889DDF2A8C953F00F8216B /* Core */,
 				11889DD72A8C87C100F8216B /* ControlCenterScene.swift */,
 				11889DE32A8CDCD300F8216B /* ImprovementsScene.swift */,
@@ -783,6 +790,7 @@
 			children = (
 				11FEFEFE295DEA7A00528A1C /* Game.swift */,
 				112CD1782A79141B0098D324 /* Game+RenderViewDataSource.swift */,
+				11BDF3DD2A91423B005F78E2 /* Models */,
 				112CD1682A77CC400098D324 /* Scenes */,
 				112CD1692A77CC460098D324 /* Objects */,
 			);
@@ -800,6 +808,18 @@
 				116D7D872A89E707007ED1DD /* DotMask.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		11BDF3DD2A91423B005F78E2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				11BDF3E02A914266005F78E2 /* PlayerModel.swift */,
+				11BDF3E62A914312005F78E2 /* ShipModel.swift */,
+				110DB2622A8FA824002DEEAD /* PlanetModel.swift */,
+				11BDF3DE2A914251005F78E2 /* LicenseModel.swift */,
+				11BDF3E42A914286005F78E2 /* ContainerModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		11C0A726292254AB00CA7954 /* Frameworks */ = {
@@ -1314,9 +1334,11 @@
 				11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */,
 				110DB26C2A8FBF04002DEEAD /* StarRenderData.swift in Sources */,
 				11889DEA2A8CDCFA00F8216B /* UtilizationPlantScene.swift in Sources */,
+				11BDF3E72A914312005F78E2 /* ShipModel.swift in Sources */,
 				11889DF82A8CF55300F8216B /* GUIShaders.metal in Sources */,
 				1193428B29FE3721001707B4 /* SIMD+Extensions.swift in Sources */,
 				116D7D842A89E0EB007ED1DD /* CGImage+Textures.swift in Sources */,
+				11BDF3E52A914286005F78E2 /* ContainerModel.swift in Sources */,
 				1133D44C2949A568009C8DBC /* TouchGameViewController.swift in Sources */,
 				11889DF22A8CF43700F8216B /* GUIButton.swift in Sources */,
 				112CD0FC2A7656230098D324 /* LiquidFunWorld.swift in Sources */,
@@ -1331,6 +1353,8 @@
 				111E137B2A7AC90000A786FD /* LiquidBody.swift in Sources */,
 				1195528E2961E124000C7A95 /* SwipeView.swift in Sources */,
 				11889DDE2A8C94B600F8216B /* Scene.swift in Sources */,
+				11BDF3E12A914266005F78E2 /* PlayerModel.swift in Sources */,
+				11BDF3DF2A914251005F78E2 /* LicenseModel.swift in Sources */,
 				11EC8C072A10DCDD000F322C /* ThreadHelper.swift in Sources */,
 				112CD0F92A76547D0098D324 /* PhysicsWorld.swift in Sources */,
 				113228F62A8252A600CA8F49 /* MTLDevice+MTLTexture.swift in Sources */,

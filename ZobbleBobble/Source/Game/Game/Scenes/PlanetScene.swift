@@ -18,7 +18,7 @@ final class PlanetScene: Scene {
     private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults)
     
     private let levelCenterPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
-    private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.starCenterOffset) }
+    private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.gunCenterOffset) }
     
     private var planet: PlanetModel
     private var player: PlayerModel
@@ -76,7 +76,7 @@ final class PlanetScene: Scene {
     override func setupLayout() {
         updateGUI()
         
-        let containerIndex = player.selectedContainerIndex ?? 0
+        let containerIndex = player.ship.loadedContainerIndex ?? 0
         let missleRange = gun.getWorldVisibleMissles(containerIndex: containerIndex, misslesFired: 0)
         
         gun.position = SIMD2<Float>(Float(gunCenterPoint.x), Float(gunCenterPoint.y))

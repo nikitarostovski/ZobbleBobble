@@ -21,8 +21,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(withTitle: "Quit", action:#selector(NSApplication.terminate), keyEquivalent: "q")
     }
     
-    func buildWnd() {
-        let height = Settings.Camera.sceneHeight
+    func buildWindow() {
+        let height = Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale
         let width = height * 0.7
         
         let controller = GameViewController()
@@ -43,7 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         buildMenu()
-        buildWnd()
+        buildWindow()
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

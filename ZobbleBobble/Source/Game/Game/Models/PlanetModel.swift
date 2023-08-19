@@ -8,21 +8,6 @@
 import Foundation
 import Levels
 
-struct PlayerModel {
-    var radius: CGFloat = 100
-    var containers: [ContainerModel]
-    
-    var selectedContainerIndex: Int?
-    
-    var selectedContainer: ContainerModel? { selectedContainerIndex.map { containers[$0] } }
-}
-
-struct ContainerModel {
-    var missles: [ChunkModel]
-    
-    var uniqueMaterials: [MaterialType] { missles.flatMap { $0.particles.map { $0.material } } }
-}
-
 struct PlanetModel {
     /// Rotation speed, degrees per second
     var speed: CGFloat
@@ -42,9 +27,10 @@ struct PlanetModel {
     let uniqueMaterials: [MaterialType]
     
     /// Object describing active conditions and restrictions
-//    var license: LicenseModel
+    var license: LicenseModel
     
-    init(speed: CGFloat, chunks: [ChunkModel], gravityRadius: CGFloat, gravitySthrength: CGFloat, particleRadius: CGFloat) {
+    init(speed: CGFloat, chunks: [ChunkModel], license: LicenseModel, gravityRadius: CGFloat, gravitySthrength: CGFloat, particleRadius: CGFloat) {
+        self.license = license
         self.speed = speed
         self.chunks = chunks
         self.gravityRadius = gravityRadius

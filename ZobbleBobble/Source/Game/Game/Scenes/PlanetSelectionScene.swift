@@ -116,19 +116,32 @@ final class PlanetSelectionScene: Scene {
     }
     
     private func goToPlanet() {
-        guard let pack = levelManager.allLevelPacks.first, let level = pack.levels.first else { return }
+        guard let pack = levelManager.allLevelPacks.first else { return }
         
         let containers: [ContainerModel] = pack.levels.map { .init(missles: $0.missleChunks) }
+        let planets = pack.levels.map {
+            let license = LicenseModel(price: 125,
+                                       radiusLimit: .init(value: $0.gravityRadius * 0.5, fine: 1),
+                                       sectorLimit: .init(value: [CGPoint(x: 0, y: 10)], fine: 2),
+                                       materialWhitelist: .init(value: [.soil, .rock], fine: 4),
+                                       totalParticleAmountLimit: .init(value: 2000, fine: 1),
+                                       outerSpaceLimit: .init(value: (), fine: 1))
+            return PlanetModel(speed: $0.rotationPerSecond,
+                               chunks: $0.initialChunks,
+                               license: license,
+                               gravityRadius: $0.gravityRadius,
+                               gravitySthrength: 1,
+                               particleRadius: pack.particleRadius)
+        }
         
-        var player = PlayerModel(containers: containers)
-        player.selectedContainerIndex = 0
+        var ship = ShipModel(containers: containers)
+        ship.loadedContainerIndex = 0
         
-        let planet = PlanetModel(speed: level.rotationPerSecond,
-                                 chunks: level.initialChunks,
-                                 gravityRadius: level.gravityRadius,
-                                 gravitySthrength: 1,
-                                 particleRadius: pack.particleRadius)
-        goToPlanet(planet, player: player)
+        var player = PlayerModel(availablePlanets: planets, ship: ship, day: 0)
+        
+        if let planet = planets.first {
+            goToPlanet(planet, player: player)
+        }
     }
     
     override func setupLayout() {

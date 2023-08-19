@@ -42,12 +42,12 @@ class GunBody: Body {
     
     init(player: PlayerModel) {
         self.player = player
-        self.radius = Float(player.radius)
+        self.radius = Float(Settings.Camera.gunRadius)
         self.mainColor = Colors.Container.mainColor
         self.missleRadius = 0
         
         var materials = [MaterialRenderData]()
-        for (i, c) in player.containers.enumerated() {
+        for (i, c) in player.ship.containers.enumerated() {
             for (j, m) in c.missles.enumerated() {
                 let number = CGFloat(i) + CGFloat(j) / CGFloat(c.missles.count)
                 let next = number + CGFloat(1) / CGFloat(c.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
@@ -63,8 +63,8 @@ class GunBody: Body {
     }
     
     func getWorldVisibleMissles(containerIndex: Int, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
-        guard 0..<player.containers.count ~= containerIndex else { return 0...0 }
-        let container = player.containers[containerIndex]
+        guard 0..<player.ship.containers.count ~= containerIndex else { return 0...0 }
+        let container = player.ship.containers[containerIndex]
         let missleWeight = CGFloat(1) / CGFloat(container.missles.count)
         
         let lo = CGFloat(containerIndex) + misslesFired * missleWeight
@@ -78,7 +78,7 @@ class GunBody: Body {
     func getMissleRadius(levelToPackProgress: CGFloat, containerIndex: Int, missleIndexFloating: CGFloat) -> Float {
         let missleIndexFloating = missleIndexFloating - 1
         let missleIndex = max(0, Int(missleIndexFloating))
-        let container = player.containers[containerIndex]
+        let container = player.ship.containers[containerIndex]
         
         var currentRadius: CGFloat = 0
         var nextRadius: CGFloat = 0
@@ -97,7 +97,7 @@ class GunBody: Body {
         let mp = missleIndexFloating - CGFloat(missleIndex)
         
         let levelsMissleRadius: CGFloat = 0
-        let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.Camera.starMissleDeadZone
+        let levelMissleRadius: CGFloat = currentRadius + (nextRadius - currentRadius) * mp + Settings.Camera.gunMissleDeadZone
         let missleRadius = levelMissleRadius + (levelsMissleRadius - levelMissleRadius) * scaleProgress
         
         return Float(max(0, missleRadius))
@@ -105,19 +105,19 @@ class GunBody: Body {
     
     func getRenderCenter(levelToPackProgress: CGFloat) -> SIMD2<Float> {
         let missleScale = 1 - max(0, min(1, levelToPackProgress - Settings.Camera.levelCameraScale))
-        let renderCenterVerticalOffset = missleScale * (CGFloat(radius) + Settings.Camera.starMissleCenterOffset)
+        let renderCenterVerticalOffset = missleScale * (CGFloat(radius) + Settings.Camera.gunMissleCenterOffset)
         return SIMD2<Float32>(position.x, position.y - Float(renderCenterVerticalOffset))
     }
     
     func getMissleCenter() -> SIMD2<Float> {
-        SIMD2<Float32>(position.x, position.y - radius - Float(Settings.Camera.starMissleCenterOffset))
+        SIMD2<Float32>(position.x, position.y - radius - Float(Settings.Camera.gunMissleCenterOffset))
     }
     
     func updateAppearance(levelToPackProgress: CGFloat, containerIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
         self.state.visibleMissleRange = visibleMissleRange
         self.state.currentContainerIndex = containerIndex
         
-        let container = player.containers[Int(containerIndex)]
+        let container = player.ship.containers[Int(containerIndex)]
         let missleIndex = CGFloat(container.missles.count) * (visibleMissleRange.lowerBound - CGFloat(Int(containerIndex)))
         self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress,
                                             containerIndex: Int(containerIndex),
@@ -128,7 +128,7 @@ class GunBody: Body {
         
         let p = max(0, min(1, levelToPackProgress - Settings.Camera.levelsMenuCameraScale))
         let addScale = 1 + (visibleMissleRange.upperBound - visibleMissleRange.lowerBound - 1) * p // for packs menu
-        let materialScale = min(max(1, Settings.Camera.packsMenuCameraScale - levelToPackProgress), Settings.Camera.planetMaterialsUpscaleInGame)
+        let materialScale = min(max(1, Settings.Camera.packsMenuCameraScale - levelToPackProgress), Settings.Camera.gunMaterialsUpscaleInGame)
         
         let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
         let colorMixStrength: CGFloat = 1 - max(0, min(1, levelToPackProgress - Settings.Camera.levelCameraScale))
@@ -216,7 +216,7 @@ extension GunBody: MissleHolder {
         let starCenter = CGPoint(x: CGFloat(position.x),
                                  y: CGFloat(position.y))
         return CGPoint(x: starCenter.x,
-                       y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
+                       y: starCenter.y - starRadius - Settings.Camera.gunMissleCenterOffset)
     }
     
     func getInitialPositions(particleCount: Int) -> [SIMD2<Float32>] {
@@ -226,7 +226,7 @@ extension GunBody: MissleHolder {
         let starCenter = CGPoint(x: CGFloat(position.x),
                                  y: CGFloat(position.y))
         let missleCenter = CGPoint(x: starCenter.x,
-                                   y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
+                                   y: starCenter.y - starRadius - Settings.Camera.gunMissleCenterOffset)
         
         let d = missleCenter.distance(to: starCenter)
         

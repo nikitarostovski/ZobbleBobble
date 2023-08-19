@@ -26,6 +26,7 @@ static NSString *kParticleUserDataKey = @"particle_user_data";
 static float kExplosiveImpulse = 1050000;
 
 @implementation ZPWorld {
+    CGFloat _particleMass;
     CGFloat _shotImpulseModifier;
     
     CGFloat _maxCenterToStaticParticle;
@@ -99,6 +100,7 @@ static float kExplosiveImpulse = 1050000;
     
     b2ParticleSystem *system = _world->CreateParticleSystem(&particleSystemDef);
     self.particleSystem = system;
+    _particleMass = system->GetDensity() * 3.141592 * system->GetRadius() * system->GetRadius();
     
     b2ParticleGroupDef staticGroupDef;
     staticGroupDef.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup | b2_particleGroupCanBeEmpty;
@@ -115,6 +117,7 @@ static float kExplosiveImpulse = 1050000;
 VelocityIterations:(int)velocityIterations
 PositionIterations:(int)positionIterations
 ParticleIterations:(int)particleIterations {
+    [_syncLock lock];
     
     b2World *_world = (b2World *)self.world;
     _world->Step(timeStep, velocityIterations, positionIterations, particleIterations);
@@ -142,6 +145,7 @@ ParticleIterations:(int)particleIterations {
     [self createAndRemoveBodies];
     [self updateGravity];
     
+    [_syncLock unlock];
 }
 
 - (void)rotateParticlesInGroup:(b2ParticleGroup *)group ShouldClampRotationToGravityField:(BOOL)shouldClampRotationToGravityField {
@@ -198,7 +202,6 @@ ParticleIterations:(int)particleIterations {
     int particleCount = _system->GetParticleCount();
     int particleContactCount = _system->GetContactCount();
     
-    b2Vec2 *positionBuffer = _system->GetPositionBuffer();
     const b2ParticleContact *particleContactBuffer = _system->GetContacts();
     void** ud = _system->GetUserDataBuffer();
     
@@ -309,10 +312,7 @@ ParticleIterations:(int)particleIterations {
     pos.y = (pos.y - _gravityCenter.y) * -1;
     pos.Normalize();
 
-    
-    b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
-    float mass = _system->GetDensity() * 3.141592 * _system->GetRadius() * _system->GetRadius();
-    b2Vec2 force = pos * mass * shootImpulse * _shotImpulseModifier;
+    b2Vec2 force = pos * _particleMass * shootImpulse * _shotImpulseModifier;
     
     ZPParticleDef *def = [[ZPParticleDef alloc] initWithState:isStatic ? ZPParticleStateStatic : ZPParticleStateDynamic
                                        BecomesLiquidOnContact:becomesLiquidOnContact
