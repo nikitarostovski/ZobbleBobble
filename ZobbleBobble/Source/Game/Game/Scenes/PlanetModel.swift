@@ -19,6 +19,8 @@ struct PlayerModel {
 
 struct ContainerModel {
     var missles: [ChunkModel]
+    
+    var uniqueMaterials: [MaterialType] { missles.flatMap { $0.particles.map { $0.material } } }
 }
 
 struct PlanetModel {

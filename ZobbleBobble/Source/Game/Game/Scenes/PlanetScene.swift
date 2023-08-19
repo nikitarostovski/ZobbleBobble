@@ -53,7 +53,12 @@ final class PlanetScene: Scene {
                                    gravityRadius: planet.gravityRadius,
                                    gravityCenter: levelCenterPoint * Settings.Physics.scale)
         self.physicsWorld = world
-        self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: planet.uniqueMaterials)
+        
+        let planetMaterials = planet.uniqueMaterials
+        let containerMaterials = player.selectedContainer?.uniqueMaterials ?? []
+        let uniqueMaterials = Array(Set(planetMaterials + containerMaterials))
+        
+        self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
         self.gun = GunBody(player: player)
         
         super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea)
