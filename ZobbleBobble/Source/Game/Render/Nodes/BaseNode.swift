@@ -44,9 +44,7 @@ class BaseNode<B: Body>: Node {
         return texture
     }
     
-    func render(commandBuffer: MTLCommandBuffer, cameraScale: Float32, camera: SIMD2<Float32>) -> MTLTexture? {
-        getClearTexture(commandBuffer: commandBuffer)
-    }
+    func render(commandBuffer: MTLCommandBuffer, cameraScale: Float32, camera: SIMD2<Float32>) -> MTLTexture? { nil }
 }
 
 extension BaseNode {

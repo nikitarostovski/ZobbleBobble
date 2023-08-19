@@ -46,12 +46,12 @@ kernel void draw_gun(device GunUniforms &uniforms [[buffer(0)]],
     float drc = distance(uv, rc);
     float dnc = distance(uv, nc);
     
-    // star masking
+    // masking
     if (dsc > sr || dnc <= nr || uv.y > sc.y || abs(uv.x - sc.x) >= sr / 2) {
         return;
     }
     
-    // last material is root star material
+    // last material is root container material
     for (int i = 0; i < materialCount - 1; i++) {
         Material m = materials[i];
         float mRadiusStart = m.position.x * sr + nr;

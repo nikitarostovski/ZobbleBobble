@@ -10,14 +10,6 @@ import MetalKit
 import MetalPerformanceShaders
 import Levels
 
-struct FragmentUniforms {
-    var alpha: Float
-    var white: Float
-    var dotMaskWidth: Int32
-    var dotMaskHeight: Int32
-    var scanlineDistance: Int32
-}
-
 struct ShaderOptions: Codable {
     var bloom: Int32
     var bloomRadiusR: Float
@@ -38,8 +30,15 @@ struct ShaderOptions: Codable {
     var disalignmentV: Float
 }
 
-
 class Renderer: NSObject, MTKViewDelegate {
+    struct FragmentUniforms {
+        var alpha: Float
+        var white: Float
+        var dotMaskWidth: Int32
+        var dotMaskHeight: Int32
+        var scanlineDistance: Int32
+    }
+    
     weak var renderDelegate: RenderViewDelegate?
     weak var renderDataSource: RenderViewDataSource?
     
