@@ -12,7 +12,7 @@ final class UtilizationPlantScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .utilizationPlant }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Utilization plant")
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.containerSelection) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [backButton],

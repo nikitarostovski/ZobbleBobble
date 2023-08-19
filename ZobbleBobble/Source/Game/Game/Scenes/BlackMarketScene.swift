@@ -12,7 +12,7 @@ final class BlackMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .blackMarket }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Black market")
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.planetSelection) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToPlanetSelection)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [backButton],

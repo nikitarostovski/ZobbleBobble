@@ -12,7 +12,7 @@ final class GarbageMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .garbageMarket }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Garbage market")
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.containerSelection) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [backButton],

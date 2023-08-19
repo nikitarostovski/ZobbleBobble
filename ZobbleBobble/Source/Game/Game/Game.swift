@@ -25,11 +25,10 @@ struct GameState {
 
 struct CameraState {
     var camera: CGPoint = .zero
-    var cameraScale: CGFloat = 1
+    var cameraScale: CGFloat = 2
 }
 
 final class Game {
-    let levelCenterPoint: CGPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
     

@@ -24,6 +24,7 @@ class Scene {
     var safeArea: CGRect
     
     var gui: GUIBody?
+    var background: SIMD4<UInt8> = .zero
     
     var userInteractionEnabled = false
     var transitionTargetCategory: TransitionTarget { .none }
@@ -89,6 +90,7 @@ class Scene {
         currentVisibility = visibility
         userInteractionEnabled = visibility + .leastNonzeroMagnitude >= 1
         gui?.alpha = visibility
+        background.w = UInt8(255 * visibility)
     }
     
     func onTransitionFinished() {
@@ -135,72 +137,47 @@ class Scene {
 }
 
 extension Scene {
-    func goTo(_ target: TransitionTarget) {
-        switch target {
-        case .none:
-            return
-        case .controlCenter:
-            goToControlCenter()
-        case .containerSelection:
-            goToContainerSelection()
-        case .improvements:
-            goToImprovements()
-        case .garbageMarket:
-            goToGarbageMarket()
-        case .blackMarket:
-            goToBlackMarket()
-        case .utilizationPlant:
-            goToUtilizationPlant()
-        case .planetSelection:
-            goToPlanetSelection()
-        case .planet:
-            goToPlanet()
-        case .gameResults:
-            goToGameResults()
-        }
-    }
-    
-    private func goToContainerSelection() {
+    func goToContainerSelection() {
         let scene = ContainerSelectionScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToImprovements() {
+    func goToImprovements() {
         let scene = ImprovementsScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToControlCenter() {
+    func goToControlCenter() {
         let scene = ControlCenterScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToUtilizationPlant() {
+    func goToUtilizationPlant() {
         let scene = UtilizationPlantScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToPlanetSelection() {
-        let scene = PlanetSelectionScene(size: size, safeArea: safeArea)
+    func goToPlanetSelection() {
+        guard let scene = PlanetSelectionScene(size: size, safeArea: safeArea) else { return }
         try? transition(to: scene)
     }
     
-    private func goToGarbageMarket() {
+    func goToGarbageMarket() {
         let scene = GarbageMarketScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToBlackMarket() {
+    func goToBlackMarket() {
         let scene = BlackMarketScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }
     
-    private func goToPlanet() {
-        let scene = PlanetScene(size: size, safeArea: safeArea)
+    func goToPlanet(_ planet: PlanetModel, player: PlayerModel) {
+        let scene = PlanetScene(size: size, safeArea: safeArea, planet: planet, player: player)
         try? transition(to: scene)
     }
     
-    private func goToGameResults() {
+    func goToGameResults() {
         let scene = GameResultsScene(size: size, safeArea: safeArea)
         try? transition(to: scene)
     }

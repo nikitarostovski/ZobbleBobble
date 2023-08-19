@@ -12,7 +12,7 @@ final class ImprovementsScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .improvements }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Improvements")
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.controlCenter) })
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToControlCenter)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [backButton],

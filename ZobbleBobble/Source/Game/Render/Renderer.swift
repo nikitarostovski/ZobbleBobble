@@ -55,6 +55,7 @@ class Renderer: NSObject, MTKViewDelegate {
     private var scanlinesPipelineState: MTLComputePipelineState!
     
     private var textureCountBufferProvider: BufferProvider
+    private var backgroundColorBufferProvider: BufferProvider
     private var optionsBuffer: MTLBuffer?
     private var fragUniformsBuffer: MTLBuffer?
     private var vertexBuffer: MTLBuffer?
@@ -71,15 +72,17 @@ class Renderer: NSObject, MTKViewDelegate {
     private var vertexCount: Int = 0
     
     private var renderSize: CGSize
+    // TODO: make game render into fixed size texture
+    private let gameSceneTextureSize = CGSize(width: 200, height: 400)
     
     private var lastDrawDate: Date?
     
-    private var starNodes = [StarNode]()
     private var liquidNodes = [LiquidNode]()
+    private var gunNodes = [GunNode]()
     private var guiNodes = [GUINode]()
     
     private var allNodes: [Node] {
-        starNodes + liquidNodes + guiNodes
+        liquidNodes + gunNodes + guiNodes
     }
     
     private var shaderOptions = ShaderOptions(bloom: 1, // 1
@@ -114,6 +117,10 @@ class Renderer: NSObject, MTKViewDelegate {
         self.textureCountBufferProvider = BufferProvider(device: device,
                                                          inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                          bufferSize: MemoryLayout<Int>.stride)
+        
+        self.backgroundColorBufferProvider = BufferProvider(device: device,
+                                                            inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                            bufferSize: MemoryLayout<SIMD4<UInt8>>.stride)
         super.init()
         view.device = device
         view.delegate = self
@@ -142,8 +149,8 @@ class Renderer: NSObject, MTKViewDelegate {
         self.fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
         
         guiNodes.removeAll()
-        starNodes.removeAll()
         liquidNodes.removeAll()
+        gunNodes.removeAll()
         
         updateNodesIfNeeded()
     }
@@ -213,24 +220,24 @@ class Renderer: NSObject, MTKViewDelegate {
                 }
             }
             if !found {
-                starNodes.removeAll(where: { $0 === node })
                 liquidNodes.removeAll(where: { $0 === node })
                 guiNodes.removeAll(where: { $0 === node })
+                gunNodes.removeAll(where: { $0 === node })
             }
         }
     }
     
     private func addNode(for body: any Body) {
         switch body {
-//        case is StarBody:
-//            let node = StarNode(device, screenSize: screenSize, renderSize: renderSize, body: body as? StarBody)
-//            starNodes.append(node)
-//        case is LiquidBody:
-//            for material in body.uniqueMaterials {
-//                if let node = LiquidNode(device, screenSize: screenSize, renderSize: renderSize, material: material, body: body as? LiquidBody) {
-//                    liquidNodes.append(node)
-//                }
-//            }
+        case is GunBody:
+            let node = GunNode(device, renderSize: renderSize/*gameSceneTextureSize*/, body: body as? GunBody)
+            gunNodes.append(node)
+        case is LiquidBody:
+            for material in body.uniqueMaterials {
+                if let node = LiquidNode(device, renderSize: renderSize/*gameSceneTextureSize*/, material: material, body: body as? LiquidBody) {
+                    liquidNodes.append(node)
+                }
+            }
         case is GUIBody:
             let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
             guiNodes.append(node)
@@ -256,7 +263,6 @@ class Renderer: NSObject, MTKViewDelegate {
         
         updateNodesIfNeeded()
         
-        
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
         
         let allTextures = allNodes.map { $0.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera) }
@@ -268,13 +274,13 @@ class Renderer: NSObject, MTKViewDelegate {
         _ = textureCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let textureCountBuffer = textureCountBufferProvider.nextUniformsBuffer(data: &textureCount, length: MemoryLayout<Int>.stride)
         
-//        _ = timeBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-//        var timePassed: Float = 0//nextTime
-//        let timeBuffer = timeBufferProvider.nextUniformsBuffer(data: &timePassed, length: MemoryLayout<Float>.stride)
+        _ = backgroundColorBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        var backgroundColor = renderDataSource?.backgroundColor ?? .zero
+        let backgroundColorBuffer = backgroundColorBufferProvider.nextUniformsBuffer(data: &backgroundColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
         
         commandBuffer.addCompletedHandler { _ in
             self.textureCountBufferProvider.avaliableResourcesSemaphore.signal()
-//            self.timeBufferProvider.avaliableResourcesSemaphore.signal()
+            self.backgroundColorBufferProvider.avaliableResourcesSemaphore.signal()
         }
         
         guard let mergeTexture = mergeTexture,
@@ -286,6 +292,7 @@ class Renderer: NSObject, MTKViewDelegate {
         computeEncoder.setTexture(mergeTexture, index: 0)
         computeEncoder.setTextures(allTextures, range: 1..<(textureCount + 1))
         computeEncoder.setBuffer(textureCountBuffer, offset: 0, index: 0)
+        computeEncoder.setBuffer(backgroundColorBuffer, offset: 0, index: 1)
         computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: mergePipelineState, width: mergeTexture.width, height: mergeTexture.height)
         

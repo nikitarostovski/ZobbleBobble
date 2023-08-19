@@ -16,15 +16,15 @@ class GUIBody: Body {
     var backgroundColor: SIMD4<UInt8> = .zero
     var alpha: Float = 1
     
-    private var buttons: [GUIButton]
-    private var labels: [GUILabel]
+    var buttons: [GUIButton] { didSet { updatePointersIfNeeded() }}
+    var labels: [GUILabel] { didSet { updatePointersIfNeeded() }}
     
     private var buttonsPointer: UnsafeMutableRawPointer?
     private var labelsPointer: UnsafeMutableRawPointer?
     private var textTextureData = [GUIRenderData.TextRenderData?]()
     
     var renderData: GUIRenderData? {
-        updateButtonsPointerIfNeeded()
+        updatePointersIfNeeded()
         return GUIRenderData(alpha: alpha,
                              textTexturesData: textTextureData,
                              buttonCount: buttons.count,
@@ -33,7 +33,7 @@ class GUIBody: Body {
                              labels: labelsPointer)
     }
     
-    init(buttons: [GUIButton] = [], labels: [GUILabel] = [], backgroundColor: SIMD4<UInt8> = .zero) {
+    init(buttons: [GUIButton] = [], labels: [GUILabel] = [], backgroundColor: SIMD4<UInt8> = .init(1, 1, 1, 0)) {
         self.backgroundColor = backgroundColor
         self.buttons = buttons
         self.labels = labels
@@ -44,7 +44,7 @@ class GUIBody: Body {
                                                               alignment: MemoryLayout<GUIRenderData.LabelModel>.alignment)
     }
     
-    private func updateButtonsPointerIfNeeded() {
+    private func updatePointersIfNeeded() {
         // Set texture index here
         var newTextTextureData = [GUIRenderData.TextRenderData?]()
         
@@ -63,6 +63,10 @@ class GUIBody: Body {
         buttonsPointer?.copyMemory(from: &buttonsRenderData, byteCount: MemoryLayout<GUIRenderData.ButtonModel>.stride * buttons.count)
         labelsPointer?.copyMemory(from: &labelsRenderData, byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * labels.count)
         textTextureData = newTextTextureData
+    }
+    
+    func hitTest(pos: CGPoint) -> Bool {
+        buttons.first(where: { $0.frame.contains(pos) }) != nil
     }
     
     func onTouchDown(pos: CGPoint) {

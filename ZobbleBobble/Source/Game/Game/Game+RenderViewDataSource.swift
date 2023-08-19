@@ -8,6 +8,10 @@
 import Foundation
 
 extension Game: RenderViewDataSource {
+    var backgroundColor: SIMD4<UInt8> {
+        visibleScenes.last?.background ?? .zero
+    }
+    
     var visibleBodies: [any Body] {
         return visibleScenes.flatMap { $0.visibleBodies }
     }

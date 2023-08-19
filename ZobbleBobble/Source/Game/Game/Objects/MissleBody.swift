@@ -8,12 +8,16 @@
 import Foundation
 import Levels
 
+protocol MissleHolder: AnyObject {
+    func getMissleCenter() -> SIMD2<Float32>
+    func getInitialPositions(particleCount: Int) -> [SIMD2<Float32>]
+}
+
 class MissleBody: LiquidBody {
     private let liquidFadeMultiplier: Float = 0
     
     var missleModel: ChunkModel
-    weak var game: Game?
-    weak var star: StarBody?
+    weak var parent: MissleHolder?
     
     var positions: [SIMD2<Float32>] = []
     var colors: [SIMD4<UInt8>] = []
@@ -26,10 +30,9 @@ class MissleBody: LiquidBody {
     
     private var speedModifiers: [CGFloat] = []
     
-    init(missleModel: ChunkModel, star: StarBody, game: Game?) {
+    init(missleModel: ChunkModel, parent: MissleHolder) {
         self.missleModel = missleModel
-        self.game = game
-        self.star = star
+        self.parent = parent
         
         super.init()
         
@@ -40,42 +43,13 @@ class MissleBody: LiquidBody {
     }
     
     private func updateTargetPositions() {
-        guard let star = star else { return }
-        
-        let starRadius = CGFloat(star.radius)
-        let missleRadius = CGFloat(star.missleRadius) + Settings.Camera.missleRadiusShiftInsideStar
-        
-        let starCenter = CGPoint(x: CGFloat(star.position.x),
-                                 y: CGFloat(star.position.y))
-        let missleCenter = CGPoint(x: starCenter.x,
-                                   y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
-        
-        let d = missleCenter.distance(to: starCenter)
-        
-        // angle from missle center to star edge (intersection point)
-        let intersectionAngle = CGFloat.circleIntersectionAngle(r1: missleRadius, r2: starRadius, d: d)
-        let angleShift = missleCenter.angle(to: starCenter).radians
-        
-        // fill idle
-        let idleAngleStart = intersectionAngle - Settings.Camera.missleAngleShiftInsideStar
-        let idleAngleEnd = -intersectionAngle + Settings.Camera.missleAngleShiftInsideStar
-        
-        let angleStep = (idleAngleEnd - idleAngleStart) / CGFloat(missleModel.particles.count - 1)
-        
-        idlePositions = missleModel.particles.indices.map { i in
-            let angle = angleShift + idleAngleStart + CGFloat(i) * angleStep
-            
-            let idleX = missleCenter.x + missleRadius * cos(angle)
-            let idleY = missleCenter.y + missleRadius * sin(angle)
-            
-            return SIMD2<Float32>(x: Float32(idleX),
-                                  y: Float32(idleY))
-        }.shuffled()
+        idlePositions = parent?.getInitialPositions(particleCount: missleModel.particles.count) ?? []
+        let missleCenter = parent?.getMissleCenter() ?? .zero
         
         // fill ready positions
         readyPositions = missleModel.particles.map { particle in
-            SIMD2<Float32>(x: Float32(particle.position.x + missleCenter.x),
-                           y: Float32(particle.position.y + missleCenter.y))
+            SIMD2<Float32>(x: Float32(particle.position.x) + missleCenter.x,
+                           y: Float32(particle.position.y) + missleCenter.y)
         }
         
         // fill speed
@@ -121,7 +95,7 @@ class MissleBody: LiquidBody {
     }
     
     private func updateRenderData() {
-        guard let star = star, positions.count > 0 else {
+        guard positions.count > 0 else {
             invalidateRenderData()
             return
         }
@@ -141,7 +115,7 @@ class MissleBody: LiquidBody {
         colors.copyMemory(from: &self.colors,
                           byteCount: MemoryLayout<SIMD4<UInt8>>.stride * self.colors.count)
         
-        self.renderData = .init(particleRadius: Float(star.pack.particleRadius),
+        self.renderData = .init(particleRadius: Float(1.5),
                                 liquidFadeModifier: liquidFadeMultiplier,
                                 scale: 1,
                                 liquidCount: self.positions.count,

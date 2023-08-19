@@ -12,8 +12,8 @@ final class ControlCenterScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .controlCenter }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Control center")
-    private lazy var containerButton: GUIButton = GUIButton(title: "Container", tapAction: { [weak self] in self?.goTo(.containerSelection) })
-    private lazy var improvementsButton: GUIButton = GUIButton(style: .secondary, title: "Improvements", tapAction: { [weak self] in self?.goTo(.improvements) })
+    private lazy var containerButton: GUIButton = GUIButton(title: "Container", tapAction: goToContainerSelection)
+    private lazy var improvementsButton: GUIButton = GUIButton(style: .secondary, title: "Improvements", tapAction: goToImprovements)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [containerButton, improvementsButton],

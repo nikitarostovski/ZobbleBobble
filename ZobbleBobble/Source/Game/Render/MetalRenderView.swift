@@ -10,6 +10,7 @@ import MetalKit
 
 protocol RenderViewDataSource: AnyObject {
     var visibleBodies: [any Body] { get }
+    var backgroundColor: SIMD4<UInt8> { get }
     
     var cameraX: Float { get }
     var cameraY: Float { get }

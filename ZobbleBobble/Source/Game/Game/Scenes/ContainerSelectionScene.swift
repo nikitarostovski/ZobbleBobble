@@ -12,10 +12,10 @@ final class ContainerSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .containerSelection }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Container selection")
-    private lazy var utilizationPlantButton: GUIButton = GUIButton(style: .secondary, title: "Utilization plant", tapAction: { [weak self] in self?.goTo(.utilizationPlant) })
-    private lazy var garbageMarketButton: GUIButton = GUIButton(style: .secondary, title: "Garbage market", tapAction: { [weak self] in self?.goTo(.garbageMarket) })
-    private lazy var planetSelectionButton: GUIButton = GUIButton(title: "Planet selection", tapAction: { [weak self] in self?.goTo(.planetSelection) })
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: { [weak self] in self?.goTo(.controlCenter) })
+    private lazy var utilizationPlantButton: GUIButton = GUIButton(style: .secondary, title: "Utilization plant", tapAction: goToUtilizationPlant)
+    private lazy var garbageMarketButton: GUIButton = GUIButton(style: .secondary, title: "Garbage market", tapAction: goToGarbageMarket)
+    private lazy var planetSelectionButton: GUIButton = GUIButton(title: "Planet selection", tapAction: goToPlanetSelection)
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToControlCenter)
     
     override func setupLayout() {
         gui = GUIBody(buttons: [backButton, utilizationPlantButton, garbageMarketButton, planetSelectionButton],

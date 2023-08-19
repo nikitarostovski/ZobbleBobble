@@ -9,17 +9,6 @@ import MetalKit
 import MetalPerformanceShaders
 import Levels
 
-struct LiquidRenderData {
-    let particleRadius: Float
-    let liquidFadeModifier: Float
-    let scale: Float
-    
-    let liquidCount: Int
-    let liquidPositions: UnsafeMutableRawPointer
-    let liquidVelocities: UnsafeMutableRawPointer
-    let liquidColors: UnsafeMutableRawPointer
-}
-
 class LiquidNode: BaseNode<LiquidBody> {
     struct Uniforms {
         let particleRadius: Float32
@@ -96,8 +85,6 @@ class LiquidNode: BaseNode<LiquidBody> {
     var finalAlphaCorrectedTexture: MTLTexture?
     var finalTexture: MTLTexture?
     
-    
-    let screenSize: CGSize
     let renderSize: CGSize
     
     var pointCount = 0
@@ -108,7 +95,7 @@ class LiquidNode: BaseNode<LiquidBody> {
     var moveThreshold: Float
     var blurSigma: Float
     
-    init?(_ device: MTLDevice?, screenSize: CGSize, renderSize: CGSize, material: MaterialType, body: LiquidBody?) {
+    init?(_ device: MTLDevice?, renderSize: CGSize, material: MaterialType, body: LiquidBody?) {
         self.positionBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.Physics.maxParticleCount)
@@ -134,7 +121,6 @@ class LiquidNode: BaseNode<LiquidBody> {
                                                              inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                              bufferSize: MemoryLayout<Int>.stride)
         
-        self.screenSize = screenSize
         self.renderSize = renderSize
         self.material = material
         
@@ -181,7 +167,7 @@ class LiquidNode: BaseNode<LiquidBody> {
                          cameraScale: Float32,
                          camera: SIMD2<Float32>) -> MTLTexture? {
         
-        guard let renderData = body?.renderData else { return super.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera) }
+        guard let renderData = body?.renderData else { return nil }
         
         let vertices = renderData.liquidPositions
         let velocities = renderData.liquidVelocities
@@ -193,12 +179,12 @@ class LiquidNode: BaseNode<LiquidBody> {
               let linearSamplerState = linearSamplerState,
               pointCount > 0
         else {
-            return super.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera)
+            return nil
         }
         
         self.fadeMultiplier = renderData.liquidFadeModifier
         
-        let defaultScale = Float(renderSize.width / screenSize.width)
+        let defaultScale = Float(1)//Float(renderSize.width / screenSize.width)
         var uniforms = Uniforms(particleRadius: renderData.particleRadius,
                                 downScale: Settings.Graphics.metaballsDownscale,
                                 alphaTextureRadiusModifier: material.alphaTextureRadiusModifier,
@@ -239,7 +225,7 @@ class LiquidNode: BaseNode<LiquidBody> {
               let computeThresholdPipelineState = computeThresholdPipelineState,
               let computeUpscalePipelineState = computeUpscalePipelineState
         else {
-            return getClearTexture(commandBuffer: commandBuffer)
+            return nil
         }
         
         let _ = renderAlphaTexture(commandBuffer: commandBuffer,

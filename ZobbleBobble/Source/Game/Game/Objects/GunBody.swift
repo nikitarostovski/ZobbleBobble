@@ -1,22 +1,17 @@
 //
-//  StarBody.swift
+//  GunBody.swift
 //  ZobbleBobble
 //
-//  Created by Rost on 31.07.2023.
+//  Created by Rost on 18.08.2023.
 //
 
 import Foundation
 import Levels
 
-struct StarMaterialData {
-    let color: SIMD4<UInt8>
-    let position: SIMD2<Float>
-}
-
-class StarBody: Body {
+class GunBody: Body {
     struct State {
-        var visibleMaterials = [StarMaterialData]()
-        var currentLevelIndex: CGFloat = 0
+        var visibleMaterials = [MaterialRenderData]()
+        var currentContainerIndex: CGFloat = 0
         var currentMissleIndex: CGFloat = 0
         var visibleMissleRange: ClosedRange<CGFloat> = 0...0
     }
@@ -24,12 +19,18 @@ class StarBody: Body {
     var userInteractive: Bool = false
     var renderData: StarRenderData?
     
-    weak var game: Game?
-    
-    let pack: PackModel
+    var player: PlayerModel
     var state = State()
     
-    private let initialMaterials: [StarMaterialData]
+    private let initialMaterials: [MaterialRenderData]
+    
+    var selectedContainer: ContainerModel? { player.selectedContainer }
+    
+    var selectedMissle: ChunkModel? {
+        let index = Int(state.currentMissleIndex)
+        guard let selectedContainer = selectedContainer, 0..<selectedContainer.missles.count ~= index else { return nil }
+        return selectedContainer.missles[index]
+    }
     
     var position = SIMD2<Float>(0, 0)
     var radius: Float
@@ -39,24 +40,20 @@ class StarBody: Body {
     private(set) var renderCenter = SIMD2<Float>(0, 0)
     private(set) var missleCenter = SIMD2<Float>(0, 0)
     
-    var uniqueMaterials: [MaterialType] { [] }
-    
-    init(game: Game, pack: PackModel) {
-        self.pack = pack
-        self.game = game
-        
-        self.radius = Float(pack.radius)
-        self.mainColor = Colors.Stars.mainColor
+    init(player: PlayerModel) {
+        self.player = player
+        self.radius = Float(player.radius)
+        self.mainColor = Colors.Container.mainColor
         self.missleRadius = 0
         
-        var materials = [StarMaterialData]()
-        for (i, l) in pack.levels.enumerated() {
-            for (j, m) in l.missleChunks.enumerated() {
-                let number = CGFloat(i) + CGFloat(j) / CGFloat(l.missleChunks.count)
-                let next = number + CGFloat(1) / CGFloat(l.missleChunks.count)// - 0.01//CGFloat.leastNonzeroMagnitude
+        var materials = [MaterialRenderData]()
+        for (i, c) in player.containers.enumerated() {
+            for (j, m) in c.missles.enumerated() {
+                let number = CGFloat(i) + CGFloat(j) / CGFloat(c.missles.count)
+                let next = number + CGFloat(1) / CGFloat(c.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
                 var color = m.particles.first?.material.color ?? SIMD4<UInt8>(repeating: 0)//m.material.color
                 color.w = 255;
-                let material = StarMaterialData(color: color, position: SIMD2(Float(number), Float(next)))
+                let material = MaterialRenderData(color: color, position: SIMD2(Float(number), Float(next)))
                 materials.append(material)
             }
         }
@@ -65,63 +62,34 @@ class StarBody: Body {
         updateRenderData()
     }
     
-    func getMenuVisibleMissles(levelToPackProgress: CGFloat, levelIndex: CGFloat, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
-        let level = pack.levels[Int(levelIndex)]
-        let missleWeight = CGFloat(1) / CGFloat(level.missleChunks.count)
+    func getWorldVisibleMissles(containerIndex: Int, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
+        guard 0..<player.containers.count ~= containerIndex else { return 0...0 }
+        let container = player.containers[containerIndex]
+        let missleWeight = CGFloat(1) / CGFloat(container.missles.count)
         
-        let packsLo: CGFloat = 0
-        let packsHi: CGFloat = CGFloat(pack.levels.count)
-        
-        let levelsLo = levelIndex
-        let levelsHi = levelIndex + 1
-        
-        let levelLo: CGFloat = levelIndex + misslesFired * missleWeight
-        let levelHi: CGFloat = levelIndex + 1
-        
-        var lo: CGFloat = 0
-        var hi: CGFloat = 0
-        if Settings.Camera.levelCameraScale...Settings.Camera.levelsMenuCameraScale ~= levelToPackProgress {
-            // level to levels menu
-            let p = levelToPackProgress - Settings.Camera.levelCameraScale
-            lo = levelLo + (levelsLo - levelLo) * p
-            hi = levelHi + (levelsHi - levelHi) * p
-        } else if Settings.Camera.levelsMenuCameraScale...Settings.Camera.packsMenuCameraScale ~= levelToPackProgress {
-            // levels to packs menu
-            let p = levelToPackProgress - Settings.Camera.levelsMenuCameraScale
-            lo = levelsLo + (packsLo - levelsLo) * p
-            hi = levelsHi + (packsHi - levelsHi) * p
-        }
-        return min(lo, hi)...max(lo, hi)
-    }
-    
-    func getWorldVisibleMissles(levelIndex: Int, misslesFired: CGFloat) -> ClosedRange<CGFloat> {
-        guard 0..<pack.levels.count ~= levelIndex else { return 0...0 }
-        let level = pack.levels[levelIndex]
-        let missleWeight = CGFloat(1) / CGFloat(level.missleChunks.count)
-        
-        let lo = CGFloat(levelIndex) + misslesFired * missleWeight
-        let hi = CGFloat(Int(levelIndex)) + 1
+        let lo = CGFloat(containerIndex) + misslesFired * missleWeight
+        let hi = CGFloat(Int(containerIndex)) + 1
         
         guard lo <= hi else { return 0...0 }
         
         return lo...hi
     }
     
-    func getMissleRadius(levelToPackProgress: CGFloat, levelIndex: Int, missleIndexFloating: CGFloat) -> Float {
+    func getMissleRadius(levelToPackProgress: CGFloat, containerIndex: Int, missleIndexFloating: CGFloat) -> Float {
         let missleIndexFloating = missleIndexFloating - 1
         let missleIndex = max(0, Int(missleIndexFloating))
-        let level = pack.levels[levelIndex]
+        let container = player.containers[containerIndex]
         
         var currentRadius: CGFloat = 0
         var nextRadius: CGFloat = 0
         
-        if 0..<level.missleChunks.count ~= missleIndex {
-            let currentMissle = level.missleChunks[missleIndex]
+        if 0..<container.missles.count ~= missleIndex {
+            let currentMissle = container.missles[missleIndex]
             currentRadius = currentMissle.boundingRadius
         }
         
-        if 0..<(level.missleChunks.count - 1) ~= missleIndex {
-            let nextMissle = level.missleChunks[missleIndex + 1]
+        if 0..<(container.missles.count - 1) ~= missleIndex {
+            let nextMissle = container.missles[missleIndex + 1]
             nextRadius = nextMissle.boundingRadius
         }
         
@@ -145,14 +113,14 @@ class StarBody: Body {
         SIMD2<Float32>(position.x, position.y - radius - Float(Settings.Camera.starMissleCenterOffset))
     }
     
-    func updateStarAppearance(levelToPackProgress: CGFloat, levelIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
+    func updateAppearance(levelToPackProgress: CGFloat, containerIndex: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
         self.state.visibleMissleRange = visibleMissleRange
-        self.state.currentLevelIndex = levelIndex
+        self.state.currentContainerIndex = containerIndex
         
-        let level = pack.levels[Int(levelIndex)]
-        let missleIndex = CGFloat(level.missleChunks.count) * (visibleMissleRange.lowerBound - CGFloat(Int(levelIndex)))
+        let container = player.containers[Int(containerIndex)]
+        let missleIndex = CGFloat(container.missles.count) * (visibleMissleRange.lowerBound - CGFloat(Int(containerIndex)))
         self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress,
-                                            levelIndex: Int(levelIndex),
+                                            containerIndex: Int(containerIndex),
                                             missleIndexFloating: missleIndex)
         
         self.renderCenter = getRenderCenter(levelToPackProgress: levelToPackProgress)
@@ -165,18 +133,18 @@ class StarBody: Body {
         let visibilityRange: Range<CGFloat> = CGFloat.leastNonzeroMagnitude..<materialScale
         let colorMixStrength: CGFloat = 1 - max(0, min(1, levelToPackProgress - Settings.Camera.levelCameraScale))
         
-        var visibleCorrectedMaterials: [StarMaterialData] = initialMaterials.enumerated().compactMap { _, m in
+        var visibleCorrectedMaterials: [MaterialRenderData] = initialMaterials.enumerated().compactMap { _, m in
             let start = CGFloat(m.position.x)
             let end = CGFloat(m.position.y)
             
-            let isInCurrentLevel = Int(start) == Int(levelIndex)
-            let color = isInCurrentLevel ? m.color : m.color.mix(with: mainColor, progress: colorMixStrength)
+            let isInCurrentContainer = Int(start) == Int(containerIndex)
+            let color = isInCurrentContainer ? m.color : m.color.mix(with: mainColor, progress: colorMixStrength)
             
             let convertedStart = (start - visibleMissleRange.lowerBound) * materialScale / addScale
             let convertedEnd = (end - visibleMissleRange.lowerBound) * materialScale / addScale
             
             if visibilityRange.contains(convertedStart) || visibilityRange.contains(convertedEnd) {
-                return StarMaterialData(color: color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
+                return MaterialRenderData(color: color, position: SIMD2(Float(convertedStart), Float(convertedEnd)))
             }
             return nil
         }
@@ -185,7 +153,7 @@ class StarBody: Body {
             rootColor = mainColor
         }
         let rootPosition = SIMD2<Float>(Float(visibilityRange.lowerBound), Float(visibilityRange.upperBound))
-        let rootMaterial = StarMaterialData(color: rootColor, position: rootPosition)
+        let rootMaterial = MaterialRenderData(color: rootColor, position: rootPosition)
         visibleCorrectedMaterials.append(rootMaterial)
         
         self.state.visibleMaterials = visibleCorrectedMaterials
@@ -234,9 +202,52 @@ class StarBody: Body {
     }
     
     private var materialsPointer: UnsafeMutableRawPointer {
-        let pointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<StarMaterialData>.stride * materialCount,
-                                                       alignment: MemoryLayout<StarMaterialData>.alignment)
-        pointer.copyMemory(from: self.state.visibleMaterials, byteCount: MemoryLayout<StarMaterialData>.stride * materialCount)
+        let pointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<MaterialRenderData>.stride * materialCount,
+                                                       alignment: MemoryLayout<MaterialRenderData>.alignment)
+        pointer.copyMemory(from: self.state.visibleMaterials, byteCount: MemoryLayout<MaterialRenderData>.stride * materialCount)
         return pointer
+    }
+}
+
+extension GunBody: MissleHolder {
+    func getMissleCenter() -> CGPoint {
+        let starRadius = CGFloat(radius)
+        
+        let starCenter = CGPoint(x: CGFloat(position.x),
+                                 y: CGFloat(position.y))
+        return CGPoint(x: starCenter.x,
+                       y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
+    }
+    
+    func getInitialPositions(particleCount: Int) -> [SIMD2<Float32>] {
+        let starRadius = CGFloat(radius)
+        let missleRadius = CGFloat(missleRadius) + Settings.Camera.missleRadiusShiftInsideStar
+        
+        let starCenter = CGPoint(x: CGFloat(position.x),
+                                 y: CGFloat(position.y))
+        let missleCenter = CGPoint(x: starCenter.x,
+                                   y: starCenter.y - starRadius - Settings.Camera.starMissleCenterOffset)
+        
+        let d = missleCenter.distance(to: starCenter)
+        
+        // angle from missle center to star edge (intersection point)
+        let intersectionAngle = CGFloat.circleIntersectionAngle(r1: missleRadius, r2: starRadius, d: d)
+        let angleShift = missleCenter.angle(to: starCenter).radians
+        
+        // fill idle
+        let idleAngleStart = intersectionAngle - Settings.Camera.missleAngleShiftInsideStar
+        let idleAngleEnd = -intersectionAngle + Settings.Camera.missleAngleShiftInsideStar
+        
+        let angleStep = (idleAngleEnd - idleAngleStart) / CGFloat(particleCount - 1)
+        
+        return (0..<particleCount).map { i in
+            let angle = angleShift + idleAngleStart + CGFloat(i) * angleStep
+            
+            let idleX = missleCenter.x + missleRadius * cos(angle)
+            let idleY = missleCenter.y + missleRadius * sin(angle)
+            
+            return SIMD2<Float32>(x: Float32(idleX),
+                                  y: Float32(idleY))
+        }.shuffled()
     }
 }

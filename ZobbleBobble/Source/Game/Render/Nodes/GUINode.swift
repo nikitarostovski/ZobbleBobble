@@ -8,47 +8,6 @@
 import Foundation
 import MetalKit
 
-struct GUIRenderData {
-    struct ButtonModel {
-        var backgroundColor: SIMD4<UInt8>
-        var textColor: SIMD4<UInt8>
-        var origin: SIMD2<Float>
-        var size: SIMD2<Float>
-        var foregroundPadding: SIMD2<Float> = SIMD2(36, 18)
-        var textTextureIndex: Int32 = 0
-    }
-    
-    struct LabelModel {
-        var backgroundColor: SIMD4<UInt8>
-        var textColor: SIMD4<UInt8>
-        var origin: SIMD2<Float>
-        var size: SIMD2<Float>
-        var textTextureIndex: Int32 = 0
-    }
-    
-    struct TextRenderData: Hashable {
-        var text: String
-        var fontName: String = "JoystixMonospace-Regular"
-        var fontSize: Int = 36
-        var textColor: SIMD4<UInt8> = .one
-
-        init?(text: String?) {
-            guard let text = text else { return nil }
-            self.text = text
-        }
-    }
-    
-    var alpha: Float
-    
-    var textTexturesData: [TextRenderData?]
-    
-    let buttonCount: Int
-    let buttons: UnsafeMutableRawPointer?
-    
-    let labelCount: Int
-    let labels: UnsafeMutableRawPointer?
-}
-
 class GUINode: BaseNode<GUIBody> {
     struct Uniforms {
         var alpha: Float
@@ -108,7 +67,7 @@ class GUINode: BaseNode<GUIBody> {
               let finalTexture = finalTexture,
               let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
         else {
-            return super.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera)
+            return nil
         }
         
         var uniforms = Uniforms(alpha: body.alpha, backgroundColor: body.backgroundColor)

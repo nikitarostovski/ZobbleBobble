@@ -33,8 +33,8 @@ public enum Colors {
         }
     }
     
-    public enum Stars {
-        public static let mainColor: SIMD4<UInt8> = .init(rgb: 0xCCCCAA)
+    public enum Container {
+        public static let mainColor: SIMD4<UInt8> = .init(rgb: 0x444455)
     }
     
     public enum Materials {
@@ -46,6 +46,6 @@ public enum Colors {
     }
     
     public enum Background {
-        public static let defaultPack: SIMD4<UInt8> = .init(rgb: 0x00FF00)
+        public static let defaultPack: SIMD4<UInt8> = .init(rgb: 0x100012)
     }
 }
