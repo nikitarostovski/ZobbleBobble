@@ -39,18 +39,10 @@ final class GameViewController: UIViewController {
                       height: 1 - newSafeArea.bottom - newSafeArea.top)
     }
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self, scrollHolder: self, screenSize: UIScreen.main.nativeBounds.size, safeArea: safeAreaRectangle)
+        self.game = Game(delegate: self, scrollHolder: self)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -71,11 +63,7 @@ final class GameViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        let newSafeAreaRect = safeAreaRectangle
-        if let game = game, newSafeAreaRect != game.safeArea {
-            game.safeArea = newSafeAreaRect
-        }
+        updateGameSizeData()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -110,11 +98,18 @@ final class GameViewController: UIViewController {
         let pos = CGPoint(x: CGFloat.greatestFiniteMagnitude, y: CGFloat.greatestFiniteMagnitude)
         game?.onTouchUp(pos: pos)
     }
+    
+    private func updateGameSizeData(newSize: CGSize? = nil) {
+        let size = newSize ?? renderView.drawableSize
+        guard size != .zero else { return }
+        
+        game?.updateSceneSize(newScreenSize: size, newSafeArea: safeAreaRectangle, newScreenScale: UIScreen.main.scale)
+    }
 }
 
 extension GameViewController: RenderViewDelegate {
     func rendererSizeDidChange(size: CGSize) {
-        game?.screenSize = size
+        updateGameSizeData(newSize: size)
     }
     
     func updateRenderData(time: TimeInterval) {

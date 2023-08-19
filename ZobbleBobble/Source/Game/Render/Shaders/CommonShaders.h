@@ -10,6 +10,8 @@
 #ifndef CommonShaders_h
 #define CommonShaders_h
 
+#define MAX_TEXTURES 96
+
 using namespace metal;
 
 float3 rgb2hsv(float3 c);

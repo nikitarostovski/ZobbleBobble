@@ -20,8 +20,9 @@ class Scene {
     
     weak var delegate: TransitionableSceneDelegate?
     
-    var size: CGSize
-    var safeArea: CGRect
+    private(set) var size: CGSize
+    private(set) var safeArea: CGRect
+    private(set) var screenScale: CGFloat
     
     var gui: GUIBody?
     var background: SIMD4<UInt8> = .zero
@@ -45,15 +46,19 @@ class Scene {
     private var activeTransitionType: TransitionType? {
         activeTransition.map { $0.from === self ? .fromMe : .toMe }
     }
+    
     private var activeTransitionScene: Scene? {
         activeTransition.map { $0.from === self ? $0.to : $0.from }
     }
     
-    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect) {
+    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
         self.size = size
         self.safeArea = safeArea
+        self.screenScale = screenScale
+        
         setupLayout()
-        onSizeChanged(size, newSafeArea: safeArea)
+        updateLayout()
+        
         updateVisibility(currentVisibility)
     }
     
@@ -61,14 +66,23 @@ class Scene {
     
     func updateLayout() { }
     
-    func onSizeChanged(_ newSize: CGSize, newSafeArea: CGRect) {
+    func onSizeChanged(_ newSize: CGSize, newSafeArea: CGRect, newScreenScale: CGFloat) {
+        var needsLayout = false
         if size != newSize {
+            needsLayout = true
             size = newSize
         }
         if safeArea != newSafeArea {
+            needsLayout = true
             safeArea = newSafeArea
         }
-        updateLayout()
+        if newScreenScale != screenScale {
+            needsLayout = true
+            screenScale = newScreenScale
+        }
+        if needsLayout {
+            updateLayout()
+        }
     }
     
     /// Called when scene visibility should be changed. Do not override for scene updates. Use `updateForTransition`
@@ -138,57 +152,66 @@ class Scene {
 
 extension Scene {
     func goToContainerSelection() {
-        let scene = ContainerSelectionScene(size: size, safeArea: safeArea)
+        let scene = ContainerSelectionScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToImprovements() {
-        let scene = ImprovementsScene(size: size, safeArea: safeArea)
+        let scene = ImprovementsScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToControlCenter() {
-        let scene = ControlCenterScene(size: size, safeArea: safeArea)
+        let scene = ControlCenterScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToUtilizationPlant() {
-        let scene = UtilizationPlantScene(size: size, safeArea: safeArea)
+        let scene = UtilizationPlantScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToPlanetSelection() {
-        guard let scene = PlanetSelectionScene(size: size, safeArea: safeArea) else { return }
+        guard let scene = PlanetSelectionScene(size: size, safeArea: safeArea, screenScale: screenScale) else { return }
         try? transition(to: scene)
     }
     
     func goToGarbageMarket() {
-        let scene = GarbageMarketScene(size: size, safeArea: safeArea)
+        let scene = GarbageMarketScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToBlackMarket() {
-        let scene = BlackMarketScene(size: size, safeArea: safeArea)
+        let scene = BlackMarketScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
     
     func goToPlanet(_ planet: PlanetModel, player: PlayerModel) {
-        let scene = PlanetScene(size: size, safeArea: safeArea, planet: planet, player: player)
+        let scene = PlanetScene(size: size, safeArea: safeArea, screenScale: screenScale, planet: planet, player: player)
         try? transition(to: scene)
     }
     
     func goToGameResults() {
-        let scene = GameResultsScene(size: size, safeArea: safeArea)
+        let scene = GameResultsScene(size: size, safeArea: safeArea, screenScale: screenScale)
         try? transition(to: scene)
     }
 }
 
 extension Scene {
+    var verticalScale: CGFloat { 1 / size.height * screenScale }
+    var horizontalScale: CGFloat { 1 / size.width * screenScale }
+    
+    var buttonHeight: CGFloat { Constants.buttonHeight * verticalScale }
+    var titleHeight: CGFloat { Constants.titleHeight * verticalScale }
+    
+    var paddingHorizontal: CGFloat { Constants.paddingHorizontal * horizontalScale }
+    var paddingVertical: CGFloat { Constants.paddingVertical * verticalScale }
+    
     enum Constants {
-        static let buttonHeight: CGFloat = 120
-        static let titleHeight: CGFloat = 80
+        static let buttonHeight: CGFloat = 60
+        static let titleHeight: CGFloat = 60
         
-        static let paddingHorizontal: CGFloat = 64
-        static let paddingVertical: CGFloat = 32
+        static let paddingHorizontal: CGFloat = 32
+        static let paddingVertical: CGFloat = 16
     }
 }

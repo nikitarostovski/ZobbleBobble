@@ -70,10 +70,11 @@ final class PlanetSelectionScene: Scene {
 //    }
     
     init?(currentVisibility: Float = 1,
-                  size: CGSize,
-                  safeArea: CGRect,
-                  from: CGFloat = Settings.Camera.levelsMenuCameraScale,
-                  to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
+          size: CGSize,
+          safeArea: CGRect,
+          screenScale: CGFloat,
+          from: CGFloat = Settings.Camera.levelsMenuCameraScale,
+          to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
         
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
@@ -86,7 +87,7 @@ final class PlanetSelectionScene: Scene {
             return nil
         }
         
-        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea)
+        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
         
 //        self.state = PlanetSelectionState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
 //
@@ -137,14 +138,14 @@ final class PlanetSelectionScene: Scene {
     }
     
     override func updateLayout() {
-        let vp = Constants.paddingVertical / size.height
-        let hp = Constants.paddingHorizontal / size.width
+        let vp = paddingVertical
+        let hp = paddingHorizontal
         
         let buttonWidth = safeArea.width - 2 * hp
-        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonHeight = buttonHeight
         let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
         
-        let labelHeight = Constants.titleHeight / size.height
+        let labelHeight = titleHeight
         
         titleLabel.frame = CGRect(x: safeArea.minX + hp,
                                   y: safeArea.minY + vp,

@@ -6,6 +6,7 @@
 //
 
 #include <metal_stdlib>
+#include "CommonShaders.h"
 using namespace metal;
 
 struct GUIUniforms {
@@ -131,7 +132,7 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
                      device GUILabel *labels [[buffer(3)]],
                      device int &labelCount [[buffer(4)]],
                      texture2d<float, access::write> output [[texture(0)]],
-                     array<texture2d<float, access::read>, 96> textTextures [[texture(1)]],
+                     array<texture2d<float, access::read>, (MAX_TEXTURES - 1)> textTextures [[texture(1)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
     if (uniforms.alpha == 0) {

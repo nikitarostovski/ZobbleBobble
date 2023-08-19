@@ -21,14 +21,14 @@ final class ImprovementsScene: Scene {
     }
     
     override func updateLayout() {
-        let vp = Constants.paddingVertical / size.height
-        let hp = Constants.paddingHorizontal / size.width
+        let vp = paddingVertical
+        let hp = paddingHorizontal
         
         let buttonWidth = safeArea.width - 2 * hp
-        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonHeight = buttonHeight
         let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
         
-        let labelHeight = Constants.titleHeight / size.height
+        let labelHeight = titleHeight
         
         titleLabel.frame = CGRect(x: safeArea.minX + hp,
                                   y: safeArea.minY + vp,

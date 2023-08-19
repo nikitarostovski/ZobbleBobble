@@ -89,7 +89,6 @@
 		11B3FD0D298012330058FFEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0C298012330058FFEB /* Settings.swift */; };
 		11B643AA2A13A84500DCC56C /* DecodableFloatWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */; };
 		11B643AB2A13A85800DCC56C /* Array+Duplicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */; };
-		11BA63542987F724008A4B56 /* OffscreenStars.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11BA63532987F724008A4B56 /* OffscreenStars.metal */; };
 		11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */; };
 		11C39E872A13AB23007B0371 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; };
 		11C39E882A13AB23007B0371 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -373,7 +372,6 @@
 		11B3FD0A297FBC540058FFEB /* CommonShaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonShaders.h; sourceTree = "<group>"; };
 		11B3FD0C298012330058FFEB /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		11B7D6DE2973E921008C5495 /* ZPParticle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticle.h; sourceTree = "<group>"; };
-		11BA63532987F724008A4B56 /* OffscreenStars.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenStars.metal; sourceTree = "<group>"; };
 		11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Formatting.swift"; sourceTree = "<group>"; };
 		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
@@ -750,7 +748,6 @@
 			children = (
 				11B3FD0A297FBC540058FFEB /* CommonShaders.h */,
 				1190952729549010006EE970 /* CommonShaders.metal */,
-				11BA63532987F724008A4B56 /* OffscreenStars.metal */,
 				11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */,
 				110DB2682A8FB97F002DEEAD /* GunShaders.metal */,
 				11889DF72A8CF55300F8216B /* GUIShaders.metal */,
@@ -1274,7 +1271,6 @@
 				110DB2672A8FB956002DEEAD /* GunNode.swift in Sources */,
 				1190952829549010006EE970 /* CommonShaders.metal in Sources */,
 				11889DD82A8C87C100F8216B /* ControlCenterScene.swift in Sources */,
-				11BA63542987F724008A4B56 /* OffscreenStars.metal in Sources */,
 				11889DDC2A8C931100F8216B /* SceneTransition.swift in Sources */,
 				11B321712965CCA3000F4180 /* BaseNode.swift in Sources */,
 				11EC8BEF2A10AD80000F322C /* SIMDColor+Hex.swift in Sources */,

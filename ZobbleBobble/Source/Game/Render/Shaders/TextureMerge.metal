@@ -97,7 +97,7 @@ float4 lerpColor(float4 fraction, float4 from, float4 to) {
 }
 
 kernel void merge(texture2d<float, access::write> output [[texture(0)]],
-                  array<texture2d<float, access::read>, 96> textures [[texture(1)]],
+                  array<texture2d<float, access::read>, (MAX_TEXTURES - 1)> textures [[texture(1)]],
                   device int const &textureCount [[buffer(0)]],
                   device uchar4 const &backgroundColor [[buffer(1)]],
                   uint2 gid [[thread_position_in_grid]]) {

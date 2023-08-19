@@ -185,9 +185,13 @@ class Renderer: NSObject, MTKViewDelegate {
         
         self.upscaleSamplerState = device.nearestSampler
         
-        self.mergePipelineState = try? device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
-        self.upscalePipelineState = try? device.makeComputePipelineState(function: library.makeFunction(name: "upscale_texture")!)
-        self.channelSplitPipelineState = try? device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
+        do {
+            self.mergePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
+            self.upscalePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "upscale_texture")!)
+            self.channelSplitPipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
+        } catch {
+            print(error)
+        }
         
         self.optionsBuffer = device.makeBuffer(bytes: &shaderOptions, length: MemoryLayout<ShaderOptions>.stride)
     }
@@ -284,6 +288,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         guard let mergeTexture = mergeTexture,
               let finalTexture = finalTexture,
+              let mergePipelineState = mergePipelineState,
               let computeEncoder = commandBuffer.makeComputeCommandEncoder(descriptor: computePassDescriptor)
         else { return }
         

@@ -45,7 +45,7 @@ final class PlanetScene: Scene {
         return result
     }
     
-    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, planet: PlanetModel, player: PlayerModel) {
+    init(currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat, planet: PlanetModel, player: PlayerModel) {
         self.planet = planet
         self.player = player
         let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
@@ -61,7 +61,7 @@ final class PlanetScene: Scene {
         self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
         self.gun = GunBody(player: player)
         
-        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea)
+        super.init(currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
         
         self.gui = GUIBody(buttons: [], labels: [titleLabel])
         
@@ -86,15 +86,15 @@ final class PlanetScene: Scene {
     }
     
     override func updateLayout() {
-        let vp = Constants.paddingVertical / size.height
-        let hp = Constants.paddingHorizontal / size.width
+        let vp = paddingVertical
+        let hp = paddingHorizontal
         
         let buttonWidth = safeArea.width - 2 * hp
-        let buttonHeight = Constants.buttonHeight / size.height
+        let buttonHeight = buttonHeight
         let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
-        let squareButtonWidth = Constants.buttonHeight / size.width
         
-        let labelHeight = Constants.titleHeight / size.height
+        let labelHeight = titleHeight
+        let squareButtonWidth = Constants.buttonHeight * horizontalScale
         
         titleLabel.frame = CGRect(x: safeArea.minX + hp,
                                   y: safeArea.minY + vp,

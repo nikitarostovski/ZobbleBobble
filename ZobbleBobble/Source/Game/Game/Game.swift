@@ -32,17 +32,10 @@ final class Game {
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
     
-    var safeArea: CGRect {
-        didSet {
-            visibleScenes.forEach { $0.onSizeChanged(screenSize, newSafeArea: safeArea) }
-        }
-    }
+    private(set) var safeArea: CGRect = .zero
+    private(set) var screenSize: CGSize = .zero
+    private(set) var screenScale: CGFloat = 1
     
-    var screenSize: CGSize {
-        didSet {
-            visibleScenes.forEach { $0.onSizeChanged(screenSize, newSafeArea: safeArea) }
-        }
-    }
     let levelManager: LevelManager
     
     var state: GameState
@@ -63,31 +56,40 @@ final class Game {
     }
     
     // MARK: - Methods
-    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?, screenSize: CGSize, safeArea: CGRect) {
-        let levelManager: LevelManager
+    init?(delegate: GameDelegate?, scrollHolder: ScrollHolder?) {
         if let levelDataPath = Bundle(for: LevelManager.self).path(forResource: "/Data/Levels", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
-                levelManager = try LevelManager(levelData: data)
+                self.levelManager = try LevelManager(levelData: data)
             } catch {
                 return nil
             }
         } else {
             return nil
         }
-        self.levelManager = levelManager
-        self.screenSize = screenSize
-        self.safeArea = safeArea
         
         self.delegate = delegate
         self.scrollHolder = scrollHolder
         
         self.state = GameState(/*scene: .controlCenter, */packIndex: 0, levelIndex: 0)
         
-        let rootScene = ControlCenterScene(size: screenSize, safeArea: safeArea)
+        let rootScene = ControlCenterScene(size: screenSize, safeArea: safeArea, screenScale: screenScale)
         self.visibleScenes = [rootScene]
         
         rootScene.delegate = self
+    }
+    
+    func updateSceneSize(newScreenSize: CGSize, newSafeArea: CGRect, newScreenScale: CGFloat) {
+        if screenSize != newScreenSize {
+            screenSize = newScreenSize
+        }
+        if safeArea != newSafeArea {
+            safeArea = newSafeArea
+        }
+        if screenScale != newScreenScale {
+            screenScale = newScreenScale
+        }
+        visibleScenes.forEach { $0.onSizeChanged(screenSize, newSafeArea: safeArea, newScreenScale: screenScale) }
     }
     
     func update(_ time: CFTimeInterval) {
