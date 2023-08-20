@@ -9,9 +9,11 @@
 #include "CommonShaders.h"
 using namespace metal;
 
-kernel void fill_clear(texture2d<float, access::write> output [[texture(0)]],
+kernel void fill_color(texture2d<float, access::write> output [[texture(0)]],
+                       device uchar4 const &color [[buffer(0)]],
                        uint2 gid [[thread_position_in_grid]]) {
-    output.write(float4(0), gid);
+    float4 result = float4(color) / 255;
+    output.write(result, gid);
 }
 
 kernel void upscale_texture(texture2d<float, access::sample> input [[texture(0)]],
@@ -25,6 +27,15 @@ kernel void upscale_texture(texture2d<float, access::sample> input [[texture(0)]
 
     output.write(oldColor, gid);
     return;
+}
+
+kernel void alpha_multiply(texture2d<float, access::read> input [[texture(0)]],
+                           texture2d<float, access::write> output [[texture(1)]],
+                           device float const &alpha [[buffer(0)]],
+                           uint2 gid [[thread_position_in_grid]]) {
+    float4 color = input.read(gid);
+    color.a *= alpha;
+    output.write(color, gid);
 }
 
 float3 rgb2hsv(float3 c) {

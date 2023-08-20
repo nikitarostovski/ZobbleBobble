@@ -30,21 +30,23 @@ class Scene {
     }
     
     weak var transitionDelegate: TransitionableSceneDelegate?
+    weak var game: GameInteractive?
+    var gui: GUIBody?
     
     private(set) var size: CGSize
     private(set) var safeArea: CGRect
     private(set) var screenScale: CGFloat
     
-    weak var game: GameInteractive?
-    var gui: GUIBody?
-    var background: SIMD4<UInt8> = .zero
-    
     var userInteractionEnabled = false
-    var transitionTargetCategory: TransitionTarget { .none }
-    var visibleBodies: [any Body] { [gui].compactMap { $0 } }
+    var opacity: Float32 = 0
+    var background: SIMD4<UInt8> = .zero
+    var cameraScale: Float32 = 1
+    var camera: SIMD2<Float32> = .zero
     
     private(set) var activeTransition: SceneTransition?
-    private(set) var currentVisibility: Float = 0
+    var transitionTargetCategory: TransitionTarget { .none }
+    
+    var visibleBodies: [any Body] { [gui].compactMap { $0 } }
     
     var activeTransitionTarget: TransitionTarget? {
         guard let transition = activeTransition else { return nil }
@@ -64,10 +66,10 @@ class Scene {
     }
     
     convenience init(_ scene: Scene) {
-        self.init(game: scene.game, currentVisibility: scene.currentVisibility, size: scene.size, safeArea: scene.safeArea, screenScale: scene.screenScale)
+        self.init(game: scene.game, size: scene.size, safeArea: scene.safeArea, screenScale: scene.screenScale)
     }
     
-    init(game: GameInteractive?, currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
+    init(game: GameInteractive?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         self.game = game
         self.size = size
         self.safeArea = safeArea
@@ -76,7 +78,7 @@ class Scene {
         setupLayout()
         updateLayout()
         
-        updateVisibility(currentVisibility)
+        updateVisibility(opacity)
     }
     
     func setupLayout() { }
@@ -118,17 +120,15 @@ class Scene {
     ///   - visibility: Current scene visibility. [0...1]. If zero, current scene is presented 100%, other scene is 0% visible. if one then vice versa
     ///   - scene: other scene if there is a transition. nil if no transition is running
     func updateVisibility(_ visibility: Float, transitionTarget: TransitionTarget? = nil) {
-        currentVisibility = visibility
         userInteractionEnabled = visibility + .leastNonzeroMagnitude >= 1
-        gui?.alpha = visibility
-        background.w = UInt8(255 * visibility)
+        opacity = visibility
     }
     
     func onTransitionFinished() {
         if activeTransitionType == .fromMe {
             transitionDelegate?.onTransitionableSceneRemovalRequest(sender: self)
         }
-        self.activeTransition = nil
+        activeTransition = nil
     }
     
     func transition(to scene: Scene, becomesActive: Bool = true) throws {

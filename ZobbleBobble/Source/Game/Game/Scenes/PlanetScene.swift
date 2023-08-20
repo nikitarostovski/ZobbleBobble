@@ -40,7 +40,7 @@ final class PlanetScene: Scene {
         return result
     }
     
-    override init(game: GameInteractive?, currentVisibility: Float = 1, size: CGSize, safeArea: CGRect, screenScale: CGFloat) {
+    override init(game: GameInteractive?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         guard let player = game?.player else { fatalError() }
         self.planet = player.selectedPlanet
         
@@ -57,7 +57,7 @@ final class PlanetScene: Scene {
         self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
         self.gun = GunBody(player: player)
         
-        super.init(game: game, currentVisibility: currentVisibility, size: size, safeArea: safeArea, screenScale: screenScale)
+        super.init(game: game, size: size, safeArea: safeArea, screenScale: screenScale, opacity: opacity)
         
         gui = GUIBody(buttons: [], labels: [titleLabel])
         updateGUI()

@@ -48,6 +48,7 @@ kernel void draw_gun(device GunUniforms &uniforms [[buffer(0)]],
     
     // masking
     if (dsc > sr || dnc <= nr || uv.y > sc.y || abs(uv.x - sc.x) >= sr / 2) {
+        output.write(float4(0), gid);
         return;
     }
     

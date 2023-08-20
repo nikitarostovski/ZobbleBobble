@@ -46,6 +46,6 @@ public enum Colors {
     }
     
     public enum Background {
-        public static let defaultPack: SIMD4<UInt8> = .init(rgb: 0x100012)
+        public static let defaultPack: SIMD4<UInt8> = .init(rgb: 0x120014)
     }
 }

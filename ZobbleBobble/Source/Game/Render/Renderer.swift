@@ -10,6 +10,15 @@ import MetalKit
 import MetalPerformanceShaders
 import Levels
 
+protocol RenderDataSource: AnyObject {
+    var visibleScenes: [Scene] { get }
+}
+
+protocol RenderDelegate: AnyObject {
+    func rendererSizeDidChange(size: CGSize)
+    func updateRenderData(time: TimeInterval)
+}
+
 struct ShaderOptions: Codable {
     var bloom: Int32
     var bloomRadiusR: Float
@@ -39,27 +48,25 @@ class Renderer: NSObject, MTKViewDelegate {
         var scanlineDistance: Int32
     }
     
-    weak var renderDelegate: RenderViewDelegate?
-    weak var renderDataSource: RenderViewDataSource?
+    weak var delegate: RenderDelegate?
+    weak var dataSource: RenderDataSource?
     
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     
     private var drawableRenderPipelineState: MTLRenderPipelineState!
     private var mergePipelineState: MTLComputePipelineState!
-    private var upscalePipelineState: MTLComputePipelineState!
     private var channelSplitPipelineState: MTLComputePipelineState!
-    private var scanlinesPipelineState: MTLComputePipelineState!
     
     private var textureCountBufferProvider: BufferProvider
     private var backgroundColorBufferProvider: BufferProvider
     private var optionsBuffer: MTLBuffer?
     private var fragUniformsBuffer: MTLBuffer?
+    private var blendModeBuffer: MTLBuffer?
     private var vertexBuffer: MTLBuffer?
     private var upscaleSamplerState: MTLSamplerState?
     
     private var finalTexture: MTLTexture?
-    private var mergeTexture: MTLTexture?
     
     private var bloomTextureR: MTLTexture!
     private var bloomTextureG: MTLTexture!
@@ -68,18 +75,14 @@ class Renderer: NSObject, MTKViewDelegate {
     
     private var vertexCount: Int = 0
     
+    /// Blending mode for texture merge shader. Look at `blend` shader method for details
+    private var blendMode: Int32 = 1
+    
     private var renderSize: CGSize = .zero
-    private var gameSceneTextureSize: CGSize = .zero
+    private var gameTextureSize: CGSize = .zero
     
     private var lastDrawDate: Date?
-    
-    private var liquidNodes = [LiquidNode]()
-    private var gunNodes = [GunNode]()
-    private var guiNodes = [GUINode]()
-    
-    private var allNodes: [Node] {
-        liquidNodes + gunNodes + guiNodes
-    }
+    private var sceneRenderers = [SceneRenderer]()
     
     private var shaderOptions = ShaderOptions(bloom: 1, // 1
                                               bloomRadiusR: 4.0, // 1.0
@@ -101,10 +104,10 @@ class Renderer: NSObject, MTKViewDelegate {
                                             dotMaskHeight: 0,
                                             scanlineDistance: 6)
     
-    init(view: MTKView, delegate: RenderViewDelegate?, dataSource: RenderViewDataSource?, renderSize: CGSize) {
+    init(view: MTKView, delegate: RenderDelegate?, dataSource: RenderDataSource?, renderSize: CGSize) {
         self.device = view.device!
-        self.renderDelegate = delegate
-        self.renderDataSource = dataSource
+        self.delegate = delegate
+        self.dataSource = dataSource
         self.commandQueue = device.makeCommandQueue()!
         
         self.textureCountBufferProvider = BufferProvider(device: device,
@@ -122,7 +125,7 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        renderDelegate?.rendererSizeDidChange(size: size)
+        delegate?.rendererSizeDidChange(size: size)
     }
     
     func draw(in view: MTKView) {
@@ -135,52 +138,37 @@ class Renderer: NSObject, MTKViewDelegate {
             time = now.timeIntervalSince(lastDrawDate)
         }
         lastDrawDate = now
-        renderDelegate?.updateRenderData(time: time)
         
-        let cameraScale = renderDataSource?.cameraScale ?? 1
-        let camera = SIMD2<Float32>(renderDataSource?.cameraX ?? 0, renderDataSource?.cameraY ?? 0)
-        
-        updateNodesIfNeeded()
+        delegate?.updateRenderData(time: time)
+        updateSceneRenderersIfNeeded()
         
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+        defer { commandBuffer.commit() }
         
-        let allTextures = allNodes.map { $0.render(commandBuffer: commandBuffer, cameraScale: cameraScale, camera: camera) }
-        var textureCount = allTextures.count
+        let sceneTextures = sceneRenderers.map { $0.render(commandBuffer) }
+        var sceneCount = sceneTextures.count
         
-        guard textureCount > 0 else { return }
-//        print("[Renderer] texture count: \(textureCount)")
+        guard sceneCount > 0 else { return }
         
         _ = textureCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let textureCountBuffer = textureCountBufferProvider.nextUniformsBuffer(data: &textureCount, length: MemoryLayout<Int>.stride)
-        
-        _ = backgroundColorBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        var backgroundColor = renderDataSource?.backgroundColor ?? .zero
-        let backgroundColorBuffer = backgroundColorBufferProvider.nextUniformsBuffer(data: &backgroundColor, length: MemoryLayout<SIMD4<UInt8>>.stride)
+        let textureCountBuffer = textureCountBufferProvider.nextUniformsBuffer(data: &sceneCount, length: MemoryLayout<Int>.stride)
         
         commandBuffer.addCompletedHandler { _ in
             self.textureCountBufferProvider.avaliableResourcesSemaphore.signal()
-            self.backgroundColorBufferProvider.avaliableResourcesSemaphore.signal()
         }
         
-        guard let mergeTexture = mergeTexture,
-              let finalTexture = finalTexture,
+        guard let finalTexture = finalTexture,
               let mergePipelineState = mergePipelineState,
               let computeEncoder = commandBuffer.makeComputeCommandEncoder()
         else { return }
         
         computeEncoder.setComputePipelineState(mergePipelineState)
-        computeEncoder.setTexture(mergeTexture, index: 0)
-        computeEncoder.setTextures(allTextures, range: 1..<(textureCount + 1))
+        computeEncoder.setTexture(finalTexture, index: 0)
+        computeEncoder.setTextures(sceneTextures, range: 1..<(sceneCount + 1))
         computeEncoder.setBuffer(textureCountBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(backgroundColorBuffer, offset: 0, index: 1)
+        computeEncoder.setBuffer(blendModeBuffer, offset: 0, index: 1)
         computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: mergePipelineState, width: mergeTexture.width, height: mergeTexture.height)
-        
-        computeEncoder.setComputePipelineState(upscalePipelineState)
-        computeEncoder.setTexture(mergeTexture, index: 0)
-        computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: upscalePipelineState, width: finalTexture.width, height: finalTexture.height)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: mergePipelineState, width: finalTexture.width, height: finalTexture.height)
         
         if shaderOptions.bloom != 0 {
             func applyGauss(_ texture: inout MTLTexture, radius: Float) {
@@ -223,7 +211,6 @@ class Renderer: NSObject, MTKViewDelegate {
         renderEncoder.endEncoding()
         
         commandBuffer.present(view.currentDrawable!)
-        commandBuffer.commit()
     }
     
     private func setupPipeline() {
@@ -255,83 +242,57 @@ class Renderer: NSObject, MTKViewDelegate {
             options: .storageModeShared)!
         vertexCount = vertices.count
         
-        self.upscaleSamplerState = device.nearestSampler
+        upscaleSamplerState = device.nearestSampler
         
         do {
-            self.mergePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
-            self.upscalePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "upscale_texture")!)
-            self.channelSplitPipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
+            mergePipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "merge")!)
+            channelSplitPipelineState = try device.makeComputePipelineState(function: library.makeFunction(name: "split")!)
         } catch {
             print(error)
         }
         self.optionsBuffer = device.makeBuffer(bytes: &shaderOptions, length: MemoryLayout<ShaderOptions>.stride)
+        self.blendModeBuffer = device.makeBuffer(bytes: &blendMode, length: MemoryLayout<Int32>.stride)
     }
     
-    private func updateNodesIfNeeded() {
-        guard let bodies = renderDataSource?.visibleBodies else { return }
+    private func updateSceneRenderersIfNeeded() {
+        guard let visibleScenes = dataSource?.visibleScenes else { return }
         
-        let nodes = allNodes
+        var newRenderers = sceneRenderers
         
-        for body in bodies {
+        // Add new
+        for scene in visibleScenes {
             var found = false
-            for node in nodes {
-                if node.linkedBody === body {
+            for renderer in newRenderers {
+                if renderer.scene === scene {
                     found = true
                     break
                 }
             }
             if !found {
-                addNode(for: body)
+                let renderer = SceneRenderer(scene: scene, device: device, renderSize: renderSize, gameTextureSize: gameTextureSize)
+                newRenderers.append(renderer)
             }
         }
         
-        for node in nodes {
-            var found = false
-            for body in bodies {
-                if body === node.linkedBody {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                liquidNodes.removeAll(where: { $0 === node })
-                guiNodes.removeAll(where: { $0 === node })
-                gunNodes.removeAll(where: { $0 === node })
-            }
+        // Remove old
+        newRenderers = newRenderers.filter { renderer in
+            visibleScenes.first(where: { renderer.scene === $0 }) != nil
         }
-    }
-    
-    private func addNode(for body: any Body) {
-        switch body {
-        case is GunBody:
-            let node = GunNode(device, renderSize: gameSceneTextureSize, body: body as? GunBody)
-            gunNodes.append(node)
-        case is LiquidBody:
-            for material in body.uniqueMaterials {
-                if let node = LiquidNode(device, renderSize: gameSceneTextureSize, material: material, body: body as? LiquidBody) {
-                    liquidNodes.append(node)
-                }
-            }
-        case is GUIBody:
-            let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)
-            guiNodes.append(node)
-        default:
-            break
-        }
+        
+        sceneRenderers = newRenderers
     }
     
     private func onSizeUpdate(_ size: CGSize) {
         guard size.width > 0, size.height > 0 else { return }
         
         // Recalc sizes
-        gameSceneTextureSize = CGSize(width: size.width * Settings.Camera.sceneHeight / size.height,
-                                      height: Settings.Camera.sceneHeight)
         renderSize = CGSize(width: size.width,
                             height: size.height)
+        gameTextureSize = CGSize(width: size.width * Settings.Camera.sceneHeight / size.height,
+                                 height: Settings.Camera.sceneHeight)
         
         // Regenerate textures and buffers
-        mergeTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
-        finalTexture = device.makeTexture(width: Int(size.width), height: Int(size.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
+        finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height), usage: [.shaderRead, .shaderWrite, .renderTarget])
         
         bloomTextureR = device.makeTexture(width: Int(size.width), height: Int(size.height))
         bloomTextureG = device.makeTexture(width: Int(size.width), height: Int(size.height))
@@ -344,10 +305,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         fragUniformsBuffer = device.makeBuffer(bytes: &uniforms, length: MemoryLayout<FragmentUniforms>.stride)
         
-        // Reset nodes
-        guiNodes.removeAll()
-        liquidNodes.removeAll()
-        gunNodes.removeAll()
-        updateNodesIfNeeded()
+        // Reset scene renderers
+        updateSceneRenderersIfNeeded()
     }
 }

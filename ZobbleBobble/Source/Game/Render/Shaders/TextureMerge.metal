@@ -13,22 +13,22 @@ using namespace metal;
 kernel void merge(texture2d<float, access::write> output [[texture(0)]],
                   array<texture2d<float, access::sample>, (MAX_TEXTURES - 1)> textures [[texture(1)]],
                   device int const &textureCount [[buffer(0)]],
-                  device uchar4 const &backgroundColor [[buffer(1)]],
+                  device int const &blendMode [[buffer(1)]],
                   sampler sampler [[sampler(0)]],
                   uint2 gid [[thread_position_in_grid]]) {
     
     float2 uv = float2(gid) / float2(output.get_width(), output.get_height());
     
-    float4 currentColor = float4(1, 1, 1, 0);
+    float4 currentColor;
     for (int i = 0; i < textureCount; i++) {
         float4 col = textures[i].sample(sampler, uv);
-        currentColor = blend(1, currentColor, col);
+        if (i == 0) {
+            currentColor = col;
+        } else {
+            currentColor = blend(blendMode, col, currentColor);
+        }
     }
-    if (currentColor.a == 0) {
-        currentColor = float4(backgroundColor) / 255;
-        currentColor.a = 1;
-    }
-    output.write(float4(currentColor.rgb, 1), gid);
+    output.write(currentColor, gid);
     return;
     // material mix (checkboard)
 //    int visibleCount = 0;

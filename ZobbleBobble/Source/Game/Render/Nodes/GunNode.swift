@@ -88,11 +88,8 @@ class GunNode: BaseNode<GunBody> {
         let radius = renderData.radiusPointer
         let missleRadius = renderData.missleRadiusPointer
         let materials = renderData.materialsPointer
-        
-        let defaultScale = Float(1)//Float(renderSize.width / screenSize.width)
-        var uniforms = Uniforms(cameraScale: cameraScale * defaultScale, camera: camera)
-        
         var materialCount = renderData.materialCount
+        var uniforms = Uniforms(cameraScale: cameraScale, camera: camera)
         
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
@@ -128,8 +125,6 @@ class GunNode: BaseNode<GunBody> {
             self.materialsBufferProvider.avaliableResourcesSemaphore.signal()
             self.materialCountsBufferProvider.avaliableResourcesSemaphore.signal()
         }
-        
-        clearTexture(texture: finalTexture, computeEncoder: computeEncoder)
         
         computeEncoder.setComputePipelineState(computeDrawGunPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)

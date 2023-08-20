@@ -183,12 +183,11 @@ class LiquidNode: BaseNode<LiquidBody> {
         
         self.fadeMultiplier = renderData.liquidFadeModifier
         
-        let defaultScale = Float(1)//Float(renderSize.width / screenSize.width)
         var uniforms = Uniforms(particleRadius: renderData.particleRadius,
                                 downScale: Settings.Graphics.metaballsDownscale,
                                 alphaTextureRadiusModifier: material.alphaTextureRadiusModifier,
                                 movementTextureRadiusModifier: material.movmentTextureRadiusModifier,
-                                cameraScale: cameraScale * defaultScale / renderData.scale,
+                                cameraScale: cameraScale / renderData.scale,
                                 camera: camera)
         
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)

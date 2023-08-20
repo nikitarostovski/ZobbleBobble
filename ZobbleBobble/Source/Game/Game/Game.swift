@@ -16,26 +16,14 @@ protocol ScrollHolder: AnyObject {
     func updateScrollPosition(pageCount: Int, selectedPage: Int)
 }
 
-struct GameState {
-    /// index of selected pack for level selection mode
-    var packIndex: Int
-    /// index of level for level mode
-    var levelIndex: Int
-}
-
-struct CameraState {
-    var camera: CGPoint = .zero
-    var cameraScale: CGFloat = 2
-}
-
-final class Game {
+final class Game: RenderDataSource {
     weak var delegate: GameDelegate?
     weak var scrollHolder: ScrollHolder?
     
     private(set) var safeArea: CGRect = .zero
     private(set) var screenSize: CGSize = .zero
     private(set) var screenScale: CGFloat = 1
-    private(set) var cameraState = CameraState()
+    
     private(set) var visibleScenes: [Scene]
     private(set) var player: PlayerModel
     
@@ -71,7 +59,7 @@ final class Game {
         loadContainer(0)
         //
         
-        let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale)
+        let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
         rootScene.transitionDelegate = self
         visibleScenes = [rootScene]
     }

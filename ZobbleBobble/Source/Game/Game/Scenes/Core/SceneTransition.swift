@@ -54,8 +54,8 @@ class SceneTransition {
             newTo = 0
         } else {
             // finish transition immediately
-            newFrom = from.currentVisibility
-            newTo = to.currentVisibility
+            newFrom = from.opacity
+            newTo = to.opacity
         }
         from.onTransitionProgressChange(newFrom, isFinished: true)
         to.onTransitionProgressChange(newTo, isFinished: true)

@@ -93,7 +93,6 @@ class GUINode: BaseNode<GUIBody> {
             self.labelsBufferProvider.avaliableResourcesSemaphore.signal()
             self.labelCountBufferProvider.avaliableResourcesSemaphore.signal()
         }
-        clearTexture(texture: finalTexture, computeEncoder: computeEncoder)
         
         computeEncoder.setComputePipelineState(drawGUIPipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)

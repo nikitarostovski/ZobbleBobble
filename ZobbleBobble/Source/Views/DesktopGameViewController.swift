@@ -128,7 +128,7 @@ final class GameViewController: NSViewController {
     }
 }
 
-extension GameViewController: RenderViewDelegate {
+extension GameViewController: RenderDelegate {
     func rendererSizeDidChange(size: CGSize) {
         updateGameSizeData(newSize: size)
     }
