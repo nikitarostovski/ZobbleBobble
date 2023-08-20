@@ -29,6 +29,7 @@ class GUINode: BaseNode<GUIBody> {
     private let labelsBufferProvider: BufferProvider
     private let labelCountBufferProvider: BufferProvider
     
+    private var sampler: MTLSamplerState?
     private var finalTexture: MTLTexture?
     private var textTextureCache = [GUIRenderData.TextRenderData: MTLTexture]()
     
@@ -54,6 +55,7 @@ class GUINode: BaseNode<GUIBody> {
         self.body = body
         self.device = device
         self.finalTexture = device?.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
+        self.sampler = device?.nearestSampler
     }
     
     override func render(commandBuffer: MTLCommandBuffer, cameraScale: Float, camera: SIMD2<Float>) -> MTLTexture? {
@@ -104,6 +106,7 @@ class GUINode: BaseNode<GUIBody> {
         computeEncoder.setBuffer(buttonCountBuffer, offset: 0, index: 2)
         computeEncoder.setBuffer(labelsBuffer, offset: 0, index: 3)
         computeEncoder.setBuffer(labelCountBuffer, offset: 0, index: 4)
+        computeEncoder.setSamplerState(sampler, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: drawGUIPipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.endEncoding()

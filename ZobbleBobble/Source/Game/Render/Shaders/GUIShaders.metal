@@ -33,7 +33,7 @@ struct GUILabel {
 
 // TODO: unify button and label text drawings
 
-float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::read> textTexture) {
+float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::sample> textTexture, sampler sampler) {
     float4 result = float4(0);
     
     float x = float(gid.x) / float(texture.get_width());
@@ -47,7 +47,7 @@ float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write>
         float paddingH = button.textPadding.x / texture.get_width();
         float paddingV = button.textPadding.y / texture.get_height();
         
-        ushort2 texCoords;
+        float2 texCoords;
         float xp = (x - button.origin.x - paddingH) / (button.size.x - 2 * paddingH);
         float yp = 1 - (y - button.origin.y - paddingV) / (button.size.y - 2 * paddingV);
         texCoords.x = xp * textTexture.get_width();
@@ -68,8 +68,10 @@ float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write>
         texCoords.y /= scaleY;
         //
         
+        texCoords /= float2(textTexture.get_width(), textTexture.get_height());
+        
         float4 backgroundColor = float4(button.backgroundColor) / 255;
-        float4 textTextureColor = textTexture.read(texCoords);
+        float4 textTextureColor = textTexture.sample(sampler, texCoords);
         
         result.a = 1;
         if (textTextureColor.a > 0) {
@@ -81,7 +83,7 @@ float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write>
     return result;
 }
 
-float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::read> textTexture) {
+float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::sample> textTexture, sampler sampler) {
     float4 result = float4(0);
     
     float x = float(gid.x) / float(texture.get_width());
@@ -132,7 +134,8 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
                      device GUILabel *labels [[buffer(3)]],
                      device int &labelCount [[buffer(4)]],
                      texture2d<float, access::write> output [[texture(0)]],
-                     array<texture2d<float, access::read>, (MAX_TEXTURES - 1)> textTextures [[texture(1)]],
+                     array<texture2d<float, access::sample>, (MAX_TEXTURES - 1)> textTextures [[texture(1)]],
+                     sampler sampler [[sampler(0)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
     if (uniforms.alpha == 0) {
@@ -145,7 +148,7 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
         int ti = buttons[i].textureIndex;
         auto textTexture = textTextures[ti];
         
-        float4 color = button_color(buttons[i], gid, output, textTexture);
+        float4 color = button_color(buttons[i], gid, output, textTexture, sampler);
         if (color.a > 0) {
             resultColor = color;
             break;
@@ -156,7 +159,7 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
         int ti = labels[i].textureIndex;
         auto textTexture = textTextures[ti];
         
-        float4 color = label_color(labels[i], gid, output, textTexture);
+        float4 color = label_color(labels[i], gid, output, textTexture, sampler);
         if (color.a > 0) {
             resultColor = color;
             break;
