@@ -94,7 +94,7 @@ float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> te
         y >= label.origin.y &&
         y <= label.origin.y + label.size.y) {
         
-        ushort2 texCoords;
+        float2 texCoords;
         float xp = (x - label.origin.x) / (label.size.x);
         float yp = 1 - (y - label.origin.y) / (label.size.y);
         texCoords.x = xp * textTexture.get_width();
@@ -115,8 +115,10 @@ float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> te
         texCoords.y /= scaleY;
         //
         
+        texCoords /= float2(textTexture.get_width(), textTexture.get_height());
+        
         float4 backgroundColor = float4(label.backgroundColor) / 255;
-        float4 textTextureColor = textTexture.read(texCoords);
+        float4 textTextureColor = textTexture.sample(sampler, texCoords);
         
         if (textTextureColor.a > 0) {
             result.rgb = float3(label.textColor.rgb) / 255;
