@@ -152,16 +152,28 @@ class Scene {
     
     func hitTest(pos: CGPoint) -> Bool { userInteractionEnabled }
     
-    func onTouchDown(pos: CGPoint) {
-        gui?.onTouchDown(pos: pos)
+    @discardableResult
+    func onTouchDown(pos: CGPoint) -> Bool {
+        guard let gui = gui else { return false }
+        let hit = gui.hitTest(pos: pos)
+        gui.onTouchDown(pos: pos)
+        return hit
     }
     
-    func onTouchMove(pos: CGPoint) {
-        gui?.onTouchMove(pos: pos)
+    @discardableResult
+    func onTouchMove(pos: CGPoint) -> Bool {
+        guard let gui = gui else { return false }
+        let hit = gui.hitTest(pos: pos)
+        gui.onTouchMove(pos: pos)
+        return hit
     }
     
-    func onTouchUp(pos: CGPoint) {
-        gui?.onTouchUp(pos: pos)
+    @discardableResult
+    func onTouchUp(pos: CGPoint) -> Bool {
+        guard let gui = gui else { return false }
+        let hit = gui.hitTest(pos: pos)
+        gui.onTouchUp(pos: pos)
+        return hit
     }
     
     func update(_ time: CFTimeInterval) { }

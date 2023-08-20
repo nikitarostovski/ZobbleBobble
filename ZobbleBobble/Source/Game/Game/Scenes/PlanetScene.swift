@@ -16,7 +16,9 @@ final class PlanetScene: Scene {
     private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.gunCenterOffset) }
     
     private lazy var titleLabel: GUILabel = GUILabel(text: "Planet")
-    private lazy var controlCenterButton: GUIButton = GUIButton(style: .utility, title: "X", tapAction: goToControlCenter)
+    private lazy var pauseButton: GUIButton = GUIButton(style: .utility,title: "||", tapAction: onPauseTap)
+    private lazy var backToGameButton: GUIButton = GUIButton(style: .utility,title: "Cancel", tapAction: onBackToGameTap)
+    private lazy var exitButton: GUIButton = GUIButton(title: "Exit", tapAction: goToControlCenter)
     private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults)
     
     private var planet: PlanetModel
@@ -25,11 +27,8 @@ final class PlanetScene: Scene {
     private var gun: GunBody
     private var missle: MissleBody?
     
-    var isGameOver: Bool = false {
-        didSet {
-            updateGUI()
-        }
-    }
+    var isGameOver: Bool = false { didSet { onStateUpdate() } }
+    var isPaused: Bool = true { didSet { onStateUpdate() } }
     
     override var visibleBodies: [any Body] {
         var result = super.visibleBodies
@@ -76,6 +75,8 @@ final class PlanetScene: Scene {
         
         gun.position = SIMD2<Float>(Float(gunCenterPoint.x), Float(gunCenterPoint.y))
         gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
+        
+        isPaused = false
     }
     
     override func updateLayout() {
@@ -98,33 +99,60 @@ final class PlanetScene: Scene {
                                      y: safeArea.maxY - 2 * (buttonHeight + vp),
                                      width: buttonWidth,
                                      height: buttonHeight)
-        controlCenterButton.frame = CGRect(x: safeArea.maxX - hp - squareButtonWidth,
-                                           y: safeArea.minY + vp,
-                                           width: squareButtonWidth,
-                                           height: buttonHeight)
+        
+        exitButton.frame = CGRect(x: buttonX,
+                                  y: safeArea.maxY - 2 * (buttonHeight + vp),
+                                  width: buttonWidth,
+                                  height: buttonHeight)
+        
+        backToGameButton.frame = CGRect(x: buttonX,
+                                     y: safeArea.maxY - (buttonHeight + vp),
+                                     width: buttonWidth,
+                                     height: buttonHeight)
+        
+        pauseButton.frame = CGRect(x: safeArea.maxX - hp - squareButtonWidth,
+                                   y: safeArea.minY + vp,
+                                   width: squareButtonWidth,
+                                   height: buttonHeight)
+    }
+    
+    private func onPauseTap() {
+        isPaused = true
+    }
+    
+    private func onBackToGameTap() {
+        isPaused = false
     }
     
     private func updateGUI() {
         guard let gui = gui else { return }
-        if isGameOver {
+        
+        switch (isGameOver, isPaused) {
+        case (true, _):
             gui.buttons = [resultsButton]
-        } else {
-            gui.buttons = [controlCenterButton]
+        case (false, true):
+            gui.buttons = [backToGameButton, exitButton]
+        case (false, false):
+            gui.buttons = [pauseButton]
         }
+    }
+    
+    private func onStateUpdate() {
+        updateGUI()
     }
     
     override func update(_ time: CFTimeInterval) {
-        physicsWorld.update(time)
+        if !isPaused {
+            physicsWorld.update(time)
+        }
     }
     
-    override func onTouchUp(pos: CGPoint) {
-        super.onTouchUp(pos: pos)
-        guard userInteractionEnabled else { return }
+    override func onTouchUp(pos: CGPoint) -> Bool {
+        guard userInteractionEnabled, !super.onTouchUp(pos: pos), !isPaused, !isGameOver else { return false }
         
-        if gui?.hitTest(pos: pos) != true {
-            launchCurrentMissle(to: pos)
-            spawnNextMissle()
-        }
+        launchCurrentMissle(to: pos)
+        spawnNextMissle()
+        return true
     }
 
     private func spawnChunk(_ chunk: ChunkModel) {
