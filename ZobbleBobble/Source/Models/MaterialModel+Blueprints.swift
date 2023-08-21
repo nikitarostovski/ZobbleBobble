@@ -21,7 +21,7 @@ extension MaterialType {
     
     static func getMaterials(for categories: [MaterialCategory]) -> [MaterialType] {
         MaterialType.allCases.filter { material in
-            categories.firstIndex(where: { material.categoryMask.intersection($0).rawValue != 0 }) != nil
+            categories.firstIndex(where: { material.categoryMask.contains($0) }) != nil
         }
     }
 }

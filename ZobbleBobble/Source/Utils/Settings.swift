@@ -78,6 +78,8 @@ enum Settings {
         static let fadeMultiplier: Float = 0.3
         
         static let inflightBufferCount = 3
+        
+        static let postprocessingEnabled = false
         static let dotMaskType: DotMask.MaskType = .trisectedShifted
     }
 }

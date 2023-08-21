@@ -53,8 +53,9 @@ for folder in ["Missles", "Planets"] {
                 let yConverted = (($0.y * aabb.height) - aabb.height / 2)
                 return ParticleBlueprintModel(x: xConverted, y: yConverted)
             }
-            return .init(positions: positions, possibleMaterials: possibleMaterials)
+            return .init(positions: positions, possibleMaterialCategories: possibleMaterials)
         }
+        guard !groups.isEmpty else { return nil }
         return ChunkBlueprintModel(particleGroups: groups, boundingRadius: boundingRadius)
     }
     
@@ -65,7 +66,7 @@ for folder in ["Missles", "Planets"] {
 }
 
 extension MaterialCategory {
-    private static var colorDiffThreshold: Float { 0.5 }
+    private static var colorDiffThreshold: Float { 0.8 }
     
     /// Returns material categories available for use in procedural generation for passed color
     public static func possibleMaterialCategories(for color: SIMD4<UInt8>) -> [MaterialCategory] {

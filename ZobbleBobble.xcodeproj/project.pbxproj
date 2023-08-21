@@ -370,10 +370,6 @@
 		1195528B2961D162000C7A95 /* Easing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Easing.swift; sourceTree = "<group>"; };
 		1195528D2961E124000C7A95 /* SwipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeView.swift; sourceTree = "<group>"; };
 		1198B9FB298D0BA100142DFD /* SIMDColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMDColor+Hex.swift"; sourceTree = "<group>"; };
-		1198B9FF298D22B800142DFD /* MaterialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialModel.swift; sourceTree = "<group>"; };
-		1198BA01298D22BF00142DFD /* ChunkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkModel.swift; sourceTree = "<group>"; };
-		1198BA03298D22CB00142DFD /* LevelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
-		1198BA05298D22D200142DFD /* PackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackModel.swift; sourceTree = "<group>"; };
 		119B46CC29FFCC8600845D1B /* BufferProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
 		119E35522A9111F200A16F00 /* DesktopGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopGameViewController.swift; sourceTree = "<group>"; };
 		119E35542A91158700A16F00 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -392,11 +388,8 @@
 		11A850932A1388C800574368 /* Levels.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Levels.json; sourceTree = "<group>"; };
 		11A850942A1388F600574368 /* ImageSampler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSampler.swift; sourceTree = "<group>"; };
 		11A850952A1388F600574368 /* ImageSampling.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageSampling.metal; sourceTree = "<group>"; };
-		11A8509F2A13899100574368 /* Levels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Levels.h; sourceTree = "<group>"; };
 		11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPParticleDef.mm; sourceTree = "<group>"; };
 		11A8BE92296D3F8800DE77A3 /* ZPParticleDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticleDef.h; sourceTree = "<group>"; };
-		11AF7D952A167792000FB177 /* SIMD4+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMD4+Colors.swift"; sourceTree = "<group>"; };
-		11AF7D972A16794B000FB177 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		11B321702965CCA3000F4180 /* BaseNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseNode.swift; sourceTree = "<group>"; };
 		11B3FD0A297FBC540058FFEB /* CommonShaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonShaders.h; sourceTree = "<group>"; };
 		11B3FD0C298012330058FFEB /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -405,10 +398,8 @@
 		11BDF3E02A914266005F78E2 /* PlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
 		11BDF3E42A914286005F78E2 /* ContainerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerModel.swift; sourceTree = "<group>"; };
 		11BDF3E82A91DAE0005F78E2 /* SceneRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderer.swift; sourceTree = "<group>"; };
-		11C0A707292248D100CA7954 /* LevelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
 		11C39E8E2A13AC3E007B0371 /* ThreadHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadHelper.swift; sourceTree = "<group>"; };
-		11C39E902A13AE85007B0371 /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Data; sourceTree = "<group>"; };
 		11C39E932A13AF8D007B0371 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		11CB5AD12A8D33F000043A06 /* GUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUIView.swift; sourceTree = "<group>"; };
 		11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobblePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -527,9 +518,6 @@
 		11DFF6892927C31C001EA051 /* ZPWorld.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPWorld.mm; sourceTree = "<group>"; };
 		11DFF68B2927C32B001EA051 /* ZPWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPWorld.h; sourceTree = "<group>"; };
 		11E0CBD728AE266D00D24C5C /* Project.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Project.md; sourceTree = "<group>"; };
-		11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecodableFloatWrapper.swift; sourceTree = "<group>"; };
-		11EC8BE62A0F6A0A000F322C /* ParticleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleModel.swift; sourceTree = "<group>"; };
-		11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Duplicates.swift"; sourceTree = "<group>"; };
 		11EC8C062A10DCDD000F322C /* ThreadHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadHelper.swift; sourceTree = "<group>"; };
 		11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenLiquid.metal; sourceTree = "<group>"; };
 		11FEFEFE295DEA7A00528A1C /* MainGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainGame.swift; sourceTree = "<group>"; };
@@ -774,25 +762,6 @@
 			path = LevelConverter;
 			sourceTree = "<group>";
 		};
-		11A8509E2A13899100574368 /* Levels */ = {
-			isa = PBXGroup;
-			children = (
-				11A8509F2A13899100574368 /* Levels.h */,
-				11C39E902A13AE85007B0371 /* Data */,
-				11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */,
-				11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */,
-				11AF7D972A16794B000FB177 /* Colors.swift */,
-				11C0A707292248D100CA7954 /* LevelManager.swift */,
-				1198BA05298D22D200142DFD /* PackModel.swift */,
-				1198BA03298D22CB00142DFD /* LevelModel.swift */,
-				1198BA01298D22BF00142DFD /* ChunkModel.swift */,
-				1198B9FF298D22B800142DFD /* MaterialModel.swift */,
-				11EC8BE62A0F6A0A000F322C /* ParticleModel.swift */,
-				11AF7D952A167792000FB177 /* SIMD4+Colors.swift */,
-			);
-			path = Levels;
-			sourceTree = "<group>";
-		};
 		11B3FD0B297FBC5A0058FFEB /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -837,12 +806,12 @@
 			isa = PBXGroup;
 			children = (
 				11B3FD0C298012330058FFEB /* Settings.swift */,
+				117B3F402A934A9A00C25EE7 /* Colors.swift */,
 				119552892961CE85000C7A95 /* Animator.swift */,
 				1195528B2961D162000C7A95 /* Easing.swift */,
 				11EC8C062A10DCDD000F322C /* ThreadHelper.swift */,
 				119B46CC29FFCC8600845D1B /* BufferProvider.swift */,
 				116D7D872A89E707007ED1DD /* DotMask.swift */,
-				117B3F402A934A9A00C25EE7 /* Colors.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -878,7 +847,6 @@
 				1126C1A32773AFAF00C26BEC /* ZobbleBobble */,
 				11DFF32F2927BB3B001EA051 /* ZobblePhysics */,
 				11A850862A13880900574368 /* LevelConverter */,
-				11A8509E2A13899100574368 /* Levels */,
 				11A5C8AE2A93C82400817D68 /* Blueprints */,
 				11D113A725D9A7B60063F332 /* Products */,
 				11C0A726292254AB00CA7954 /* Frameworks */,

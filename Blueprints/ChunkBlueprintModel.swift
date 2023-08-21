@@ -22,11 +22,11 @@ public struct ParticleBlueprintModel: Codable {
 public struct ChunkBlueprintModel: Codable {
     public struct FuzzyParticleGroup: Codable {
         public let positions: [ParticleBlueprintModel]
-        public let possibleMaterials: [MaterialCategory]
+        public let possibleMaterialCategories: [MaterialCategory]
         
-        public init(positions: [ParticleBlueprintModel], possibleMaterials: [MaterialCategory]) {
+        public init(positions: [ParticleBlueprintModel], possibleMaterialCategories: [MaterialCategory]) {
             self.positions = positions
-            self.possibleMaterials = possibleMaterials
+            self.possibleMaterialCategories = possibleMaterialCategories
         }
     }
     

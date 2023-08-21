@@ -30,7 +30,7 @@ extension ChunkModel {
     init(blueprint: ChunkBlueprintModel, startImpulse: CGFloat, materialChoice: MaterialChoiceStrategy = .random) {
         var particles = [ParticleModel]()
         for group in blueprint.particleGroups {
-            let possibleMaterials = MaterialType.getMaterials(for: group.possibleMaterials)
+            let possibleMaterials = MaterialType.getMaterials(for: group.possibleMaterialCategories)
             let material = materialChoice.make(possibleMaterials)
             for position in group.positions {
                 let particle = ParticleModel(blueprint: position, material: material)
