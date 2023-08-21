@@ -14,9 +14,7 @@ final class ImprovementsScene: Scene {
     private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToControlCenter)
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [backButton],
-                      labels: [titleLabel],
-                      backgroundColor: Colors.GUI.Background.light)
+        gui = GUIBody(views: [titleLabel, backButton], backgroundColor: Colors.GUI.Background.light)
     }
     
     override func updateLayout() {

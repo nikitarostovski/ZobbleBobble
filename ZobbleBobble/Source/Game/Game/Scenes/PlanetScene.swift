@@ -51,7 +51,7 @@ final class PlanetScene: Scene {
         
         super.init(game: game, size: size, safeArea: safeArea, screenScale: screenScale, opacity: opacity)
         
-        gui = GUIBody(buttons: [], labels: [titleLabel])
+        gui = GUIBody(views: [titleLabel])
         updateGUI()
         
         planet.chunks.forEach { [weak self] chunk in
@@ -119,14 +119,18 @@ final class PlanetScene: Scene {
     private func updateGUI() {
         guard let gui = gui else { return }
         
+        var visible: [GUIView] = [titleLabel]
+        
         switch (isGameOver, isPaused) {
         case (true, _):
-            gui.buttons = [resultsButton]
+            visible.append(resultsButton)
         case (false, true):
-            gui.buttons = [backToGameButton, exitButton]
+            visible.append(backToGameButton)
+            visible.append(exitButton)
         case (false, false):
-            gui.buttons = [pauseButton]
+            visible.append(pauseButton)
         }
+        gui.views = visible
     }
     
     private func onStateUpdate() {

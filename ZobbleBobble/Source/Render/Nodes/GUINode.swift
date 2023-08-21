@@ -24,8 +24,8 @@ class GUINode: BaseNode<GUIBody> {
     private let ciContext = CIContext()
     
     private let uniformsBufferProvider: BufferProvider
-    private let buttonsBufferProvider: BufferProvider
-    private let buttonCountBufferProvider: BufferProvider
+    private let rectsBufferProvider: BufferProvider
+    private let rectCountBufferProvider: BufferProvider
     private let labelsBufferProvider: BufferProvider
     private let labelCountBufferProvider: BufferProvider
     
@@ -37,10 +37,10 @@ class GUINode: BaseNode<GUIBody> {
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
-        self.buttonsBufferProvider = BufferProvider(device: device,
+        self.rectsBufferProvider = BufferProvider(device: device,
                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                    bufferSize: MemoryLayout<GUIRenderData.ButtonModel>.stride * GUIBody.maxButtonCount)
-        self.buttonCountBufferProvider = BufferProvider(device: device,
+                                                    bufferSize: MemoryLayout<GUIRenderData.RectModel>.stride * GUIBody.maxRectCount)
+        self.rectCountBufferProvider = BufferProvider(device: device,
                                                         inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                         bufferSize: MemoryLayout<Int32>.stride)
         self.labelsBufferProvider = BufferProvider(device: device,
@@ -62,7 +62,7 @@ class GUINode: BaseNode<GUIBody> {
         let allTextTextures = buildTextTextures(body?.renderData?.textTexturesData, commandBuffer: commandBuffer)
         
         guard let body = body,
-              var buttonCount = body.renderData?.buttonCount,
+              var rectCount = body.renderData?.rectCount,
               var labelCount = body.renderData?.labelCount,
               let drawGUIPipelineState = drawGUIPipelineState,
               let finalTexture = finalTexture,
@@ -76,11 +76,11 @@ class GUINode: BaseNode<GUIBody> {
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
         
-        _ = buttonsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let buttonsBuffer = buttonsBufferProvider.nextUniformsBuffer(data: body.renderData?.buttons, length: MemoryLayout<GUIRenderData.ButtonModel>.stride * buttonCount)
+        _ = rectsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let rectsBuffer = rectsBufferProvider.nextUniformsBuffer(data: body.renderData?.rects, length: MemoryLayout<GUIRenderData.RectModel>.stride * rectCount)
         
-        _ = buttonCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let buttonCountBuffer = buttonCountBufferProvider.nextUniformsBuffer(data: &buttonCount, length: MemoryLayout<Int32>.stride)
+        _ = rectCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let rectCountBuffer = rectCountBufferProvider.nextUniformsBuffer(data: &rectCount, length: MemoryLayout<Int32>.stride)
         
         _ = labelsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let labelsBuffer = labelsBufferProvider.nextUniformsBuffer(data: body.renderData?.labels, length: MemoryLayout<GUIRenderData.LabelModel>.stride * labelCount)
@@ -90,8 +90,8 @@ class GUINode: BaseNode<GUIBody> {
         
         commandBuffer.addCompletedHandler { _ in
             self.uniformsBufferProvider.avaliableResourcesSemaphore.signal()
-            self.buttonsBufferProvider.avaliableResourcesSemaphore.signal()
-            self.buttonCountBufferProvider.avaliableResourcesSemaphore.signal()
+            self.rectsBufferProvider.avaliableResourcesSemaphore.signal()
+            self.rectCountBufferProvider.avaliableResourcesSemaphore.signal()
             self.labelsBufferProvider.avaliableResourcesSemaphore.signal()
             self.labelCountBufferProvider.avaliableResourcesSemaphore.signal()
         }
@@ -102,8 +102,8 @@ class GUINode: BaseNode<GUIBody> {
             computeEncoder.setTextures(allTextTextures, range: 1..<(allTextTextures.count + 1))
         }
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(buttonsBuffer, offset: 0, index: 1)
-        computeEncoder.setBuffer(buttonCountBuffer, offset: 0, index: 2)
+        computeEncoder.setBuffer(rectsBuffer, offset: 0, index: 1)
+        computeEncoder.setBuffer(rectCountBuffer, offset: 0, index: 2)
         computeEncoder.setBuffer(labelsBuffer, offset: 0, index: 3)
         computeEncoder.setBuffer(labelCountBuffer, offset: 0, index: 4)
         computeEncoder.setSamplerState(sampler, index: 0)

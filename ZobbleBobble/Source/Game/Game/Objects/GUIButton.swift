@@ -7,13 +7,21 @@
 
 import Foundation
 
-class GUIButton: GUIView<GUIRenderData.ButtonModel> {
+class GUIButton: GUIView {
     private var normalBackgroundColor: SIMD4<UInt8>
     private var highlightedBackgroundColor: SIMD4<UInt8>
     private var normalTextColor: SIMD4<UInt8>
     private var highlightedTextColor: SIMD4<UInt8>
     
     var tapAction: (() -> Void)?
+    
+    var textInsets: CGSize {
+        didSet {
+            if oldValue != textInsets {
+                needsDisplay = true
+            }
+        }
+    }
     
     var textColor: SIMD4<UInt8> {
         didSet {
@@ -37,8 +45,12 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
         }
     }
     
-    init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil) {
+    private var rectRenderData: GUIRenderData.RectModel?
+    private var labelRenderData: GUIRenderData.LabelModel?
+    
+    init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil, textInsets: CGSize = .zero) {
         self.tapAction = tapAction
+        self.textInsets = textInsets
         self.text = title
         self.normalTextColor = style.titleColorNormal
         self.highlightedTextColor = style.titleColorHighlighted
@@ -48,29 +60,40 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
         self.highlightedBackgroundColor = style.backgroundColorHighlighted
         
         super.init(backgroundColor: style.backgroundColorNormal, frame: frame)
+        
+        isInteractive = true
     }
     
-    override func makeRenderData() -> GUIRenderData.ButtonModel {
+    override func makeRenderData() -> RenderData {
         if needsDisplay {
-            renderData = GUIRenderData.ButtonModel(backgroundColor: backgroundColor,
-                                                   textColor: textColor,
-                                                   origin: SIMD2<Float>(Float(frame.origin.x),
-                                                                        Float(frame.origin.y)),
-                                                   size: SIMD2<Float>(Float(frame.size.width),
-                                                                      Float(frame.size.height)))
+            let origin = SIMD2<Float>(Float(frame.origin.x), Float(frame.origin.y))
+            let size = SIMD2<Float>(Float(frame.size.width), Float(frame.size.height))
             
+            var textOrigin = origin
+            textOrigin.x += Float(textInsets.width)
+            textOrigin.y += Float(textInsets.height)
+            var textSize = size
+            textSize.x -= 2 * Float(textInsets.width)
+            textSize.y -= 2 * Float(textInsets.height)
             
+            rectRenderData = .init(backgroundColor: backgroundColor, origin: origin,  size: size)
+            labelRenderData = .init(backgroundColor: .zero, textColor: textColor, origin: textOrigin, size: textSize)
         }
         needsDisplay = false
-        return renderData
+        
+        var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
+        if let labelRenderData = labelRenderData, let textData = makeTextData() {
+            labels.append((labelRenderData, textData))
+        }
+        return ([rectRenderData].compactMap { $0 }, labels)
     }
     
-    override func makeTextData() -> GUIRenderData.TextRenderData? {
+    func makeTextData() -> GUIRenderData.TextRenderData? {
         let data = GUIRenderData.TextRenderData(text: text)
         return data
     }
     
-    func onTouchDown(pos: CGPoint) -> Bool {
+    override func onTouchDown(pos: CGPoint) -> Bool {
         guard frame.contains(pos) else {
             isHighlighted = false
             return false
@@ -79,7 +102,7 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
         return true
     }
     
-    func onTouchMove(pos: CGPoint) -> Bool {
+    override func onTouchMove(pos: CGPoint) -> Bool {
         guard frame.contains(pos) else {
             isHighlighted = false
             return false
@@ -88,7 +111,7 @@ class GUIButton: GUIView<GUIRenderData.ButtonModel> {
         return true
     }
     
-    func onTouchUp(pos: CGPoint) -> Bool {
+    override func onTouchUp(pos: CGPoint) -> Bool {
         isHighlighted = false
         if frame.contains(pos) {
             tapAction?()

@@ -9,75 +9,80 @@ import Foundation
 import MetalKit
 
 class GUIBody: Body {
-    static let maxButtonCount = 32
+    static let maxRectCount = 32
     static let maxLabelCount = 32
     
     var userInteractive = true
     var backgroundColor: SIMD4<UInt8> = .zero
     var alpha: Float = 1
+    var views: [GUIView] { didSet { updatePointersIfNeeded() } }
     
-    var buttons: [GUIButton] { didSet { updatePointersIfNeeded() }}
-    var labels: [GUILabel] { didSet { updatePointersIfNeeded() }}
-    
-    private var buttonsPointer: UnsafeMutableRawPointer?
+    private var rectsPointer: UnsafeMutableRawPointer?
+    private var rectCount: Int = 0
     private var labelsPointer: UnsafeMutableRawPointer?
+    private var labelCount: Int = 0
+    
     private var textTextureData = [GUIRenderData.TextRenderData?]()
     
     var renderData: GUIRenderData? {
         updatePointersIfNeeded()
+        
         return GUIRenderData(alpha: alpha,
                              textTexturesData: textTextureData,
-                             buttonCount: buttons.count,
-                             buttons: buttonsPointer,
-                             labelCount: labels.count,
+                             rectCount: rectCount,
+                             rects: rectsPointer,
+                             labelCount: labelCount,
                              labels: labelsPointer)
     }
     
-    init(buttons: [GUIButton] = [], labels: [GUILabel] = [], backgroundColor: SIMD4<UInt8> = .init(1, 1, 1, 0)) {
+    init(views: [GUIView] = [], backgroundColor: SIMD4<UInt8> = .init(1, 1, 1, 0)) {
         self.backgroundColor = backgroundColor
-        self.buttons = buttons
-        self.labels = labels
-        
-        self.buttonsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.ButtonModel>.stride * Self.maxButtonCount,
-                                                               alignment: MemoryLayout<GUIRenderData.ButtonModel>.alignment)
+        self.views = views
+        self.rectsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.RectModel>.stride * Self.maxRectCount,
+                                                               alignment: MemoryLayout<GUIRenderData.RectModel>.alignment)
         self.labelsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * Self.maxLabelCount,
                                                               alignment: MemoryLayout<GUIRenderData.LabelModel>.alignment)
     }
     
     private func updatePointersIfNeeded() {
         // Set texture index here
-        var newTextTextureData = [GUIRenderData.TextRenderData?]()
+        var newTextTextureData = [GUIRenderData.TextRenderData]()
         
-        var buttonsRenderData = buttons.map {
-            var data = $0.makeRenderData()
-            data.textTextureIndex = Int32(newTextTextureData.count)
-            newTextTextureData.append($0.makeTextData())
-            return data
+        var rects = [GUIRenderData.RectModel]()
+        var labels = [GUIRenderData.LabelModel]()
+        
+        let allRenderData = views.map { $0.makeRenderData() }
+        
+        allRenderData.forEach { rectsRenderData, labelsRenderData in
+            rects.append(contentsOf: rectsRenderData)
+            for (labelRenderData, texture) in labelsRenderData {
+                var labelRenderData = labelRenderData
+                labelRenderData.textTextureIndex = Int32(newTextTextureData.count)
+                labels.append(labelRenderData)
+                newTextTextureData.append(texture)
+            }
         }
-        var labelsRenderData = labels.map {
-            var data = $0.makeRenderData()
-            data.textTextureIndex = Int32(newTextTextureData.count)
-            newTextTextureData.append($0.makeTextData())
-            return data
-        }
-        buttonsPointer?.copyMemory(from: &buttonsRenderData, byteCount: MemoryLayout<GUIRenderData.ButtonModel>.stride * buttons.count)
-        labelsPointer?.copyMemory(from: &labelsRenderData, byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * labels.count)
+        
+        rectsPointer?.copyMemory(from: &rects, byteCount: MemoryLayout<GUIRenderData.RectModel>.stride * rects.count)
+        labelsPointer?.copyMemory(from: &labels, byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * labels.count)
+        rectCount = rects.count
+        labelCount = labels.count
         textTextureData = newTextTextureData
     }
     
     func hitTest(pos: CGPoint) -> Bool {
-        buttons.first(where: { $0.frame.contains(pos) }) != nil
+        views.filter { $0.isInteractive }.first(where: { $0.frame.contains(pos) }) != nil
     }
     
     func onTouchDown(pos: CGPoint) {
-        let _ = buttons.reversed().first(where: { $0.onTouchDown(pos: pos) })
+        let _ = views.reversed().first(where: { $0.onTouchDown(pos: pos) })
     }
     
     func onTouchMove(pos: CGPoint) {
-        let _ = buttons.reversed().first(where: { $0.onTouchMove(pos: pos) })
+        let _ = views.reversed().first(where: { $0.onTouchMove(pos: pos) })
     }
     
     func onTouchUp(pos: CGPoint) {
-        let _ = buttons.reversed().first(where: { $0.onTouchUp(pos: pos) })
+        let _ = views.reversed().first(where: { $0.onTouchUp(pos: pos) })
     }
 }

@@ -17,8 +17,7 @@ final class ContainerSelectionScene: Scene {
     private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToControlCenter)
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [backButton, utilizationPlantButton, garbageMarketButton, planetSelectionButton],
-                      labels: [titleLabel],
+        gui = GUIBody(views: [titleLabel, backButton, utilizationPlantButton, garbageMarketButton, planetSelectionButton],
                       backgroundColor: Colors.GUI.Background.light)
     }
     

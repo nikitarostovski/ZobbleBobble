@@ -16,8 +16,7 @@ final class ControlCenterScene: Scene {
     private lazy var improvementsButton: GUIButton = GUIButton(style: .secondary, title: "Improvements", tapAction: goToImprovements)
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [containerButton, improvementsButton],
-                      labels: [titleLabel, creditsLabel],
+        gui = GUIBody(views: [titleLabel, creditsLabel, containerButton, improvementsButton],
                       backgroundColor: Colors.GUI.Background.light)
     }
     

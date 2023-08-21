@@ -15,8 +15,7 @@ final class GameResultsScene: Scene {
     private lazy var improvementsButton: GUIButton = GUIButton(style: .secondary, title: "Improvements", tapAction: goToImprovements)
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [controlCenterButton, improvementsButton],
-                      labels: [titleLabel],
+        gui = GUIBody(views: [titleLabel, controlCenterButton, improvementsButton],
                       backgroundColor: Colors.GUI.Background.light)
     }
     

@@ -671,8 +671,8 @@
 				111E13782A7AB27600A786FD /* MissleBody.swift */,
 				11889DF52A8CF4AA00F8216B /* GUIBody.swift */,
 				11CB5AD12A8D33F000043A06 /* GUIView.swift */,
-				11889DF12A8CF43700F8216B /* GUIButton.swift */,
 				110DB25E2A8E28BF002DEEAD /* GUILabel.swift */,
+				11889DF12A8CF43700F8216B /* GUIButton.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";

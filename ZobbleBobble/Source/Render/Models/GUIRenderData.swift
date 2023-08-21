@@ -8,13 +8,10 @@
 import Foundation
 
 struct GUIRenderData {
-    struct ButtonModel {
+    struct RectModel {
         var backgroundColor: SIMD4<UInt8>
-        var textColor: SIMD4<UInt8>
         var origin: SIMD2<Float>
         var size: SIMD2<Float>
-        var foregroundPadding: SIMD2<Float> = SIMD2(36, 18)
-        var textTextureIndex: Int32 = 0
     }
     
     struct LabelModel {
@@ -41,8 +38,8 @@ struct GUIRenderData {
     
     var textTexturesData: [TextRenderData?]
     
-    let buttonCount: Int
-    let buttons: UnsafeMutableRawPointer?
+    let rectCount: Int
+    let rects: UnsafeMutableRawPointer?
     
     let labelCount: Int
     let labels: UnsafeMutableRawPointer?

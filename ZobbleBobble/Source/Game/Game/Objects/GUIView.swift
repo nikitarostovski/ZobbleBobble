@@ -7,8 +7,11 @@
 
 import Foundation
 
-class GUIView<RenderData> {
-    var renderData: RenderData!
+class GUIView {
+    typealias RenderData = ([GUIRenderData.RectModel], [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)])
+    
+    var isInteractive = false
+    var needsDisplay = true
     
     var backgroundColor: SIMD4<UInt8> {
         didSet {
@@ -25,19 +28,17 @@ class GUIView<RenderData> {
             }
         }
     }
-    var needsDisplay = true
     
     func makeRenderData() -> RenderData {
         fatalError("method must be overriden")
-    }
-    
-    func makeTextData() -> GUIRenderData.TextRenderData? {
-        nil
     }
     
     init(backgroundColor: SIMD4<UInt8>, frame: CGRect) {
         self.backgroundColor = backgroundColor
         self.frame = frame
     }
+    
+    func onTouchDown(pos: CGPoint) -> Bool { false }
+    func onTouchMove(pos: CGPoint) -> Bool { false }
+    func onTouchUp(pos: CGPoint) -> Bool { false }
 }
-

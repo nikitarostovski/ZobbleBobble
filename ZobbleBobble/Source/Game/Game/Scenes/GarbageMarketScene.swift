@@ -14,8 +14,7 @@ final class GarbageMarketScene: Scene {
     private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection)
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [backButton],
-                      labels: [titleLabel],
+        gui = GUIBody(views: [titleLabel, backButton],
                       backgroundColor: Colors.GUI.Background.light)
     }
     

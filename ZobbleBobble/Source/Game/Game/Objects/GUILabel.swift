@@ -7,7 +7,7 @@
 
 import Foundation
 
-class GUILabel: GUIView<GUIRenderData.LabelModel> {
+class GUILabel: GUIView {
     var textColor: SIMD4<UInt8> {
         didSet {
             if oldValue != textColor {
@@ -23,6 +23,8 @@ class GUILabel: GUIView<GUIRenderData.LabelModel> {
             }
         }
     }
+    
+    private var labelRenderData: GUIRenderData.LabelModel?
 
     init(frame: CGRect = .zero, style: Style = .header, text: String? = nil) {
         self.text = text
@@ -30,20 +32,24 @@ class GUILabel: GUIView<GUIRenderData.LabelModel> {
         super.init(backgroundColor: style.backgroundColor, frame: frame)
     }
 
-    override func makeRenderData() -> GUIRenderData.LabelModel {
+    override func makeRenderData() -> RenderData {
         if needsDisplay {
-            renderData = GUIRenderData.LabelModel(backgroundColor: backgroundColor,
-                                                  textColor: textColor,
-                                                  origin: SIMD2<Float>(Float(frame.origin.x),
-                                                                       Float(frame.origin.y)),
-                                                  size: SIMD2<Float>(Float(frame.size.width),
-                                                                     Float(frame.size.height)))
+            labelRenderData = GUIRenderData.LabelModel(backgroundColor: backgroundColor,
+                                                       textColor: textColor,
+                                                       origin: SIMD2<Float>(Float(frame.origin.x),
+                                                                            Float(frame.origin.y)),
+                                                       size: SIMD2<Float>(Float(frame.size.width),
+                                                                          Float(frame.size.height)))
         }
         needsDisplay = false
-        return renderData
+        var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
+        if let labelRenderData = labelRenderData, let textData = makeTextData() {
+            labels.append((labelRenderData, textData))
+        }
+        return ([], labels)
     }
     
-    override func makeTextData() -> GUIRenderData.TextRenderData? {
+    func makeTextData() -> GUIRenderData.TextRenderData? {
         let data = GUIRenderData.TextRenderData(text: text)
         return data
     }

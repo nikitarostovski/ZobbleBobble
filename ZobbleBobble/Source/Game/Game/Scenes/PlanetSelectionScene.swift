@@ -101,9 +101,7 @@ final class PlanetSelectionScene: Scene {
     }
     
     override func setupLayout() {
-        gui = GUIBody(buttons: [blackMarketButton, planetButton, backButton],
-                      labels: [titleLabel],
-                      backgroundColor: Colors.GUI.Background.light)
+        gui = GUIBody(views: [titleLabel, blackMarketButton, planetButton, backButton], backgroundColor: Colors.GUI.Background.light)
     }
     
     override func updateLayout() {
