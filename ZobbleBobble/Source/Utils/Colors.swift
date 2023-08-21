@@ -16,6 +16,7 @@ public enum Colors {
         
         public enum Label {
             public static let textHeader: SIMD4<UInt8> = .init(rgb: 0xDDDDDD)
+            public static let textInfo: SIMD4<UInt8> = .init(rgb: 0xDDDDAA)
         }
         
         public enum Button {

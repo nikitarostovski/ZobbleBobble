@@ -52,16 +52,16 @@ class GUILabel: GUIView<GUIRenderData.LabelModel> {
 extension GUILabel {
     enum Style {
         case header
+        case info
         
         var backgroundColor: SIMD4<UInt8> {
-            switch self {
-            case .header: return .zero
-            }
+            .zero
         }
         
         var textColor: SIMD4<UInt8> {
             switch self {
             case .header: return Colors.GUI.Label.textHeader
+            case .info: return Colors.GUI.Label.textInfo
             }
         }
     }
