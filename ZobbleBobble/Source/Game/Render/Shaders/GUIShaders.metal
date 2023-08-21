@@ -31,13 +31,37 @@ struct GUILabel {
     int textureIndex;
 };
 
-// TODO: unify button and label text drawings
+float2 text_texture_coordinates(float2 uv, float2 origin, float2 size, float2 outTextureSize, float2 textTextureSize) {
+    float2 coords;
+    coords.x = (uv.x - origin.x) / size.x;
+    coords.y = 1 - (uv.y - origin.y) / size.y;
+    
+    // Aspect fit
+    float scaleX = size.x * outTextureSize.x / textTextureSize.x;
+    float scaleY = size.y * outTextureSize.y / textTextureSize.y;
+
+    if (scaleX < scaleY) {
+        scaleY = scaleX / scaleY;
+        scaleX = 1.0;
+    } else {
+        scaleX = scaleY / scaleX;
+        scaleY = 1.0;
+    }
+    coords.x /= scaleX;
+    coords.y /= scaleY;
+    
+    return coords;
+}
 
 float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::sample> textTexture, sampler sampler) {
     float4 result = float4(0);
     
     float x = float(gid.x) / float(texture.get_width());
     float y = float(gid.y) / float(texture.get_height());
+    
+    float2 uv = float2(x, y);
+    float2 outTextureSize = float2(texture.get_width(), texture.get_height());
+    float2 textTextureSize = float2(textTexture.get_width(), textTexture.get_height());
     
     if (x >= button.origin.x &&
         x <= button.origin.x + button.size.x &&
@@ -47,28 +71,15 @@ float4 button_color(GUIButton button, uint2 gid, texture2d<float, access::write>
         float paddingH = button.textPadding.x / texture.get_width();
         float paddingV = button.textPadding.y / texture.get_height();
         
-        float2 texCoords;
-        float xp = (x - button.origin.x - paddingH) / (button.size.x - 2 * paddingH);
-        float yp = 1 - (y - button.origin.y - paddingV) / (button.size.y - 2 * paddingV);
-        texCoords.x = xp * textTexture.get_width();
-        texCoords.y = yp * textTexture.get_height();
+        float2 origin = button.origin;
+        origin.x += paddingH;
+        origin.y += paddingV;
         
-        // Aspect fit
-        float scaleX = (button.size.x - 2 * paddingH) * texture.get_width() / textTexture.get_width();
-        float scaleY = (button.size.y - 2 * paddingV) * texture.get_height() / textTexture.get_height();
-
-        if (scaleX < scaleY) {
-            scaleY = scaleX / scaleY;
-            scaleX = 1.0;
-        } else {
-            scaleX = scaleY / scaleX;
-            scaleY = 1.0;
-        }
-        texCoords.x /= scaleX;
-        texCoords.y /= scaleY;
-        //
+        float2 size = button.size;
+        size.x -= 2 * paddingH;
+        size.y -= 2 * paddingV;
         
-        texCoords /= float2(textTexture.get_width(), textTexture.get_height());
+        float2 texCoords = text_texture_coordinates(uv, origin, size, outTextureSize, textTextureSize);
         
         float4 backgroundColor = float4(button.backgroundColor) / 255;
         float4 textTextureColor = textTexture.sample(sampler, texCoords);
@@ -89,33 +100,16 @@ float4 label_color(GUILabel label, uint2 gid, texture2d<float, access::write> te
     float x = float(gid.x) / float(texture.get_width());
     float y = float(gid.y) / float(texture.get_height());
     
+    float2 uv = float2(x, y);
+    float2 outTextureSize = float2(texture.get_width(), texture.get_height());
+    float2 textTextureSize = float2(textTexture.get_width(), textTexture.get_height());
+    
     if (x >= label.origin.x &&
         x <= label.origin.x + label.size.x &&
         y >= label.origin.y &&
         y <= label.origin.y + label.size.y) {
         
-        float2 texCoords;
-        float xp = (x - label.origin.x) / (label.size.x);
-        float yp = 1 - (y - label.origin.y) / (label.size.y);
-        texCoords.x = xp * textTexture.get_width();
-        texCoords.y = yp * textTexture.get_height();
-        
-        // Aspect fit
-        float scaleX = label.size.x * texture.get_width() / textTexture.get_width();
-        float scaleY = label.size.y * texture.get_height() / textTexture.get_height();
-
-        if (scaleX < scaleY) {
-            scaleY = scaleX / scaleY;
-            scaleX = 1.0;
-        } else {
-            scaleX = scaleY / scaleX;
-            scaleY = 1.0;
-        }
-        texCoords.x /= scaleX;
-        texCoords.y /= scaleY;
-        //
-        
-        texCoords /= float2(textTexture.get_width(), textTexture.get_height());
+        float2 texCoords = text_texture_coordinates(uv, label.origin, label.size, outTextureSize, textTextureSize);
         
         float4 backgroundColor = float4(label.backgroundColor) / 255;
         float4 textTextureColor = textTexture.sample(sampler, texCoords);
