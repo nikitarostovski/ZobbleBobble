@@ -8,8 +8,6 @@
 import Foundation
 
 public enum MaterialType: String, Codable, CaseIterable {
-    private static let colorDiffThreshold: Float = 0.5
-    
     case soil
     case sand
     case rock

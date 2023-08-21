@@ -8,7 +8,7 @@
 import Foundation
 
 public struct ChunkModel: Codable {
-    public var startImpulse: CGFloat
-    public var particles: [ParticleModel]
-    public var boundingRadius: CGFloat
+    public let startImpulse: CGFloat
+    public let particles: [ParticleModel]
+    public let boundingRadius: CGFloat
 }

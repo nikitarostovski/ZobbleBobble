@@ -47,12 +47,11 @@
 		117B3F312A93246100C25EE7 /* ContainerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F302A93246100C25EE7 /* ContainerService.swift */; };
 		117B3F352A9328C200C25EE7 /* PlanetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F342A9328C200C25EE7 /* PlanetService.swift */; };
 		117B3F372A93443D00C25EE7 /* ChunkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F362A93443D00C25EE7 /* ChunkService.swift */; };
-		117B3F392A93459900C25EE7 /* Planets.json in Resources */ = {isa = PBXBuildFile; fileRef = 117B3F382A93459900C25EE7 /* Planets.json */; };
 		117B3F3B2A93463700C25EE7 /* ChunkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F3A2A93463700C25EE7 /* ChunkModel.swift */; };
 		117B3F3D2A93468000C25EE7 /* ParticleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F3C2A93468000C25EE7 /* ParticleModel.swift */; };
 		117B3F3F2A93469500C25EE7 /* MaterialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F3E2A93469500C25EE7 /* MaterialModel.swift */; };
 		117B3F412A934A9A00C25EE7 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117B3F402A934A9A00C25EE7 /* Colors.swift */; };
-		117B3F462A93517C00C25EE7 /* Missles.json in Resources */ = {isa = PBXBuildFile; fileRef = 117B3F452A93517C00C25EE7 /* Missles.json */; };
+		117B3F4A2A93B0C800C25EE7 /* JSON in Resources */ = {isa = PBXBuildFile; fileRef = 117B3F492A93B0C800C25EE7 /* JSON */; };
 		11889DD82A8C87C100F8216B /* ControlCenterScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11889DD72A8C87C100F8216B /* ControlCenterScene.swift */; };
 		11889DDC2A8C931100F8216B /* SceneTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11889DDB2A8C931100F8216B /* SceneTransition.swift */; };
 		11889DDE2A8C94B600F8216B /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11889DDD2A8C94B600F8216B /* Scene.swift */; };
@@ -82,32 +81,30 @@
 		119E35532A9111F200A16F00 /* DesktopGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35522A9111F200A16F00 /* DesktopGameViewController.swift */; platformFilters = (macos, ); };
 		119E35552A91158700A16F00 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35542A91158700A16F00 /* main.swift */; platformFilters = (macos, ); };
 		119E35572A9123EE00A16F00 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 119E35562A9123EE00A16F00 /* CoreGraphics.framework */; };
+		11A5C8B02A93C82400817D68 /* Blueprints.h in Headers */ = {isa = PBXBuildFile; fileRef = 11A5C8AF2A93C82400817D68 /* Blueprints.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		11A5C8B32A93C82400817D68 /* Blueprints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A5C8AD2A93C82400817D68 /* Blueprints.framework */; };
+		11A5C8B42A93C82400817D68 /* Blueprints.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A5C8AD2A93C82400817D68 /* Blueprints.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		11A5C8B92A93C85600817D68 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8B82A93C85600817D68 /* Colors.swift */; };
+		11A5C8BB2A93C86200817D68 /* ChunkBlueprintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8BA2A93C86200817D68 /* ChunkBlueprintModel.swift */; };
+		11A5C8BD2A93C89500817D68 /* SIMD4+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8BC2A93C89500817D68 /* SIMD4+Colors.swift */; };
+		11A5C8BF2A93C8E500817D68 /* ChunkModel+Blueprints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8BE2A93C8E500817D68 /* ChunkModel+Blueprints.swift */; };
+		11A5C8C12A93C8F500817D68 /* ParticleModel+Blueprints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8C02A93C8F500817D68 /* ParticleModel+Blueprints.swift */; };
+		11A5C8C32A93C93300817D68 /* MaterialCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8C22A93C93300817D68 /* MaterialCategory.swift */; };
+		11A5C8C52A93CAB200817D68 /* MaterialModel+Blueprints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5C8C42A93CAB200817D68 /* MaterialModel+Blueprints.swift */; };
+		11A5C8C62A93D00F00817D68 /* Blueprints.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A5C8AD2A93C82400817D68 /* Blueprints.framework */; };
+		11A5C8C72A93D00F00817D68 /* Blueprints.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A5C8AD2A93C82400817D68 /* Blueprints.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11A850882A13880900574368 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A850872A13880900574368 /* main.swift */; };
 		11A850962A1388F600574368 /* ImageSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A850942A1388F600574368 /* ImageSampler.swift */; };
 		11A850972A1388F600574368 /* ImageSampling.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11A850952A1388F600574368 /* ImageSampling.metal */; };
-		11A850A02A13899100574368 /* Levels.h in Headers */ = {isa = PBXBuildFile; fileRef = 11A8509F2A13899100574368 /* Levels.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11A850A82A1389A400574368 /* MaterialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198B9FF298D22B800142DFD /* MaterialModel.swift */; };
-		11A850A92A1389A400574368 /* LevelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C0A707292248D100CA7954 /* LevelManager.swift */; };
-		11A850AA2A1389A400574368 /* PackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA05298D22D200142DFD /* PackModel.swift */; };
-		11A850AB2A1389A400574368 /* ChunkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA01298D22BF00142DFD /* ChunkModel.swift */; };
-		11A850AC2A1389A400574368 /* ParticleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BE62A0F6A0A000F322C /* ParticleModel.swift */; };
-		11A850AD2A1389A400574368 /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1198BA03298D22CB00142DFD /* LevelModel.swift */; };
 		11A8BE91296D3F8000DE77A3 /* ZPParticleDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */; };
-		11AF7D962A167792000FB177 /* SIMD4+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AF7D952A167792000FB177 /* SIMD4+Colors.swift */; };
-		11AF7D992A1679B5000FB177 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AF7D972A16794B000FB177 /* Colors.swift */; };
 		11B321712965CCA3000F4180 /* BaseNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B321702965CCA3000F4180 /* BaseNode.swift */; };
 		11B3FD0D298012330058FFEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B3FD0C298012330058FFEB /* Settings.swift */; };
-		11B643AA2A13A84500DCC56C /* DecodableFloatWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BE42A0F67C2000F322C /* DecodableFloatWrapper.swift */; };
-		11B643AB2A13A85800DCC56C /* Array+Duplicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8BFC2A10B19F000F322C /* Array+Duplicates.swift */; };
 		11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BD1CC429EFF8500005DC7C /* CGFloat+Formatting.swift */; };
 		11BDF3E12A914266005F78E2 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E02A914266005F78E2 /* PlayerModel.swift */; };
 		11BDF3E52A914286005F78E2 /* ContainerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E42A914286005F78E2 /* ContainerModel.swift */; };
 		11BDF3E92A91DAE0005F78E2 /* SceneRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDF3E82A91DAE0005F78E2 /* SceneRenderer.swift */; };
-		11C39E872A13AB23007B0371 /* Levels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; };
-		11C39E882A13AB23007B0371 /* Levels.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11A8509D2A13899100574368 /* Levels.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		11C39E8D2A13ABF8007B0371 /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C39E8C2A13ABF8007B0371 /* BufferProvider.swift */; };
 		11C39E8F2A13AC3E007B0371 /* ThreadHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C39E8E2A13AC3E007B0371 /* ThreadHelper.swift */; };
-		11C39E912A13AE85007B0371 /* Data in Resources */ = {isa = PBXBuildFile; fileRef = 11C39E902A13AE85007B0371 /* Data */; };
 		11C39E922A13AF6A007B0371 /* Levels.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11A850932A1388C800574368 /* Levels.json */; };
 		11C39E962A13B10E007B0371 /* Images in CopyFiles */ = {isa = PBXBuildFile; fileRef = 11C39E932A13AF8D007B0371 /* Images */; };
 		11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB5AD12A8D33F000043A06 /* GUIView.swift */; };
@@ -236,12 +233,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		11C39E892A13AB23007B0371 /* PBXContainerItemProxy */ = {
+		11A5C8B12A93C82400817D68 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 11D1139925D9A7B50063F332 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 11A8509C2A13899100574368;
-			remoteInfo = Levels;
+			remoteGlobalIDString = 11A5C8AC2A93C82400817D68;
+			remoteInfo = Blueprints;
+		};
+		11A5C8C82A93D00F00817D68 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 11D1139925D9A7B50063F332 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 11A5C8AC2A93C82400817D68;
+			remoteInfo = Blueprints;
 		};
 		11DFF3322927BB3B001EA051 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -259,6 +263,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				11A5C8B42A93C82400817D68 /* Blueprints.framework in Embed Frameworks */,
 				11DFF3352927BB3B001EA051 /* ZobblePhysics.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -281,7 +286,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				11C39E882A13AB23007B0371 /* Levels.framework in Embed Frameworks */,
+				11A5C8C72A93D00F00817D68 /* Blueprints.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -334,12 +339,11 @@
 		117B3F302A93246100C25EE7 /* ContainerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerService.swift; sourceTree = "<group>"; };
 		117B3F342A9328C200C25EE7 /* PlanetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetService.swift; sourceTree = "<group>"; };
 		117B3F362A93443D00C25EE7 /* ChunkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkService.swift; sourceTree = "<group>"; };
-		117B3F382A93459900C25EE7 /* Planets.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Planets.json; sourceTree = "<group>"; };
 		117B3F3A2A93463700C25EE7 /* ChunkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkModel.swift; sourceTree = "<group>"; };
 		117B3F3C2A93468000C25EE7 /* ParticleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleModel.swift; sourceTree = "<group>"; };
 		117B3F3E2A93469500C25EE7 /* MaterialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialModel.swift; sourceTree = "<group>"; };
 		117B3F402A934A9A00C25EE7 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
-		117B3F452A93517C00C25EE7 /* Missles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Missles.json; sourceTree = "<group>"; };
+		117B3F492A93B0C800C25EE7 /* JSON */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JSON; sourceTree = "<group>"; };
 		11889DD72A8C87C100F8216B /* ControlCenterScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlCenterScene.swift; sourceTree = "<group>"; };
 		11889DDB2A8C931100F8216B /* SceneTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneTransition.swift; sourceTree = "<group>"; };
 		11889DDD2A8C94B600F8216B /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
@@ -374,12 +378,20 @@
 		119E35522A9111F200A16F00 /* DesktopGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopGameViewController.swift; sourceTree = "<group>"; };
 		119E35542A91158700A16F00 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		119E35562A9123EE00A16F00 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.4.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		11A5C8AD2A93C82400817D68 /* Blueprints.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Blueprints.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		11A5C8AF2A93C82400817D68 /* Blueprints.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Blueprints.h; sourceTree = "<group>"; };
+		11A5C8B82A93C85600817D68 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		11A5C8BA2A93C86200817D68 /* ChunkBlueprintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkBlueprintModel.swift; sourceTree = "<group>"; };
+		11A5C8BC2A93C89500817D68 /* SIMD4+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMD4+Colors.swift"; sourceTree = "<group>"; };
+		11A5C8BE2A93C8E500817D68 /* ChunkModel+Blueprints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChunkModel+Blueprints.swift"; sourceTree = "<group>"; };
+		11A5C8C02A93C8F500817D68 /* ParticleModel+Blueprints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParticleModel+Blueprints.swift"; sourceTree = "<group>"; };
+		11A5C8C22A93C93300817D68 /* MaterialCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialCategory.swift; sourceTree = "<group>"; };
+		11A5C8C42A93CAB200817D68 /* MaterialModel+Blueprints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MaterialModel+Blueprints.swift"; sourceTree = "<group>"; };
 		11A850852A13880900574368 /* LevelConverter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LevelConverter; sourceTree = BUILT_PRODUCTS_DIR; };
 		11A850872A13880900574368 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		11A850932A1388C800574368 /* Levels.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Levels.json; sourceTree = "<group>"; };
 		11A850942A1388F600574368 /* ImageSampler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSampler.swift; sourceTree = "<group>"; };
 		11A850952A1388F600574368 /* ImageSampling.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = ImageSampling.metal; sourceTree = "<group>"; };
-		11A8509D2A13899100574368 /* Levels.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Levels.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		11A8509F2A13899100574368 /* Levels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Levels.h; sourceTree = "<group>"; };
 		11A8BE90296D3F7F00DE77A3 /* ZPParticleDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPParticleDef.mm; sourceTree = "<group>"; };
 		11A8BE92296D3F8800DE77A3 /* ZPParticleDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPParticleDef.h; sourceTree = "<group>"; };
@@ -528,8 +540,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11A5C8B32A93C82400817D68 /* Blueprints.framework in Frameworks */,
 				119E35572A9123EE00A16F00 /* CoreGraphics.framework in Frameworks */,
 				11DFF3342927BB3B001EA051 /* ZobblePhysics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11A5C8AA2A93C82400817D68 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,14 +557,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11C39E872A13AB23007B0371 /* Levels.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		11A8509A2A13899100574368 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				11A5C8C62A93D00F00817D68 /* Blueprints.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,7 +609,6 @@
 				1126C1BD2773B17C00C26BEC /* Views */,
 				11BDF3DD2A91423B005F78E2 /* Models */,
 				117B3F2D2A931F4700C25EE7 /* Services */,
-				112CD0FA2A7656100098D324 /* Physics */,
 				11B821032985694E005300DC /* Game */,
 				11B8210229856908005300DC /* Render */,
 				11B8210429856977005300DC /* Utils */,
@@ -608,7 +620,7 @@
 		1126C1BA2773AFC800C26BEC /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				117B3F422A93515100C25EE7 /* JSON */,
+				117B3F492A93B0C800C25EE7 /* JSON */,
 				110DB25A2A8E21BF002DEEAD /* Fonts */,
 				1126C1B12773AFB100C26BEC /* Assets.xcassets */,
 				1126C1B32773AFB100C26BEC /* LaunchScreen.storyboard */,
@@ -707,15 +719,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		117B3F422A93515100C25EE7 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				117B3F382A93459900C25EE7 /* Planets.json */,
-				117B3F452A93517C00C25EE7 /* Missles.json */,
-			);
-			path = JSON;
-			sourceTree = "<group>";
-		};
 		11889DDF2A8C953F00F8216B /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -743,6 +746,18 @@
 				116D7D852A89E11F007ED1DD /* UInt32+Colors.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		11A5C8AE2A93C82400817D68 /* Blueprints */ = {
+			isa = PBXGroup;
+			children = (
+				11A5C8AF2A93C82400817D68 /* Blueprints.h */,
+				11A5C8BA2A93C86200817D68 /* ChunkBlueprintModel.swift */,
+				11A5C8C22A93C93300817D68 /* MaterialCategory.swift */,
+				11A5C8B82A93C85600817D68 /* Colors.swift */,
+				11A5C8BC2A93C89500817D68 /* SIMD4+Colors.swift */,
+			);
+			path = Blueprints;
 			sourceTree = "<group>";
 		};
 		11A850862A13880900574368 /* LevelConverter */ = {
@@ -810,6 +825,7 @@
 			children = (
 				117B3F2E2A93243100C25EE7 /* Game.swift */,
 				11FEFEFE295DEA7A00528A1C /* MainGame.swift */,
+				112CD0FA2A7656100098D324 /* Physics */,
 				112CD1682A77CC400098D324 /* Scenes */,
 				112CD1692A77CC460098D324 /* Objects */,
 			);
@@ -838,8 +854,11 @@
 				110DB2622A8FA824002DEEAD /* PlanetModel.swift */,
 				11BDF3E42A914286005F78E2 /* ContainerModel.swift */,
 				117B3F3A2A93463700C25EE7 /* ChunkModel.swift */,
+				11A5C8BE2A93C8E500817D68 /* ChunkModel+Blueprints.swift */,
 				117B3F3C2A93468000C25EE7 /* ParticleModel.swift */,
+				11A5C8C02A93C8F500817D68 /* ParticleModel+Blueprints.swift */,
 				117B3F3E2A93469500C25EE7 /* MaterialModel.swift */,
+				11A5C8C42A93CAB200817D68 /* MaterialModel+Blueprints.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -860,6 +879,7 @@
 				11DFF32F2927BB3B001EA051 /* ZobblePhysics */,
 				11A850862A13880900574368 /* LevelConverter */,
 				11A8509E2A13899100574368 /* Levels */,
+				11A5C8AE2A93C82400817D68 /* Blueprints */,
 				11D113A725D9A7B60063F332 /* Products */,
 				11C0A726292254AB00CA7954 /* Frameworks */,
 			);
@@ -871,7 +891,7 @@
 				1126C1A22773AFAF00C26BEC /* ZobbleBobble.app */,
 				11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */,
 				11A850852A13880900574368 /* LevelConverter */,
-				11A8509D2A13899100574368 /* Levels.framework */,
+				11A5C8AD2A93C82400817D68 /* Blueprints.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1080,11 +1100,11 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		11A850982A13899100574368 /* Headers */ = {
+		11A5C8A82A93C82400817D68 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11A850A02A13899100574368 /* Levels.h in Headers */,
+				11A5C8B02A93C82400817D68 /* Blueprints.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1174,11 +1194,30 @@
 			);
 			dependencies = (
 				11DFF3332927BB3B001EA051 /* PBXTargetDependency */,
+				11A5C8B22A93C82400817D68 /* PBXTargetDependency */,
 			);
 			name = ZobbleBobble;
 			productName = ZobbleBobble;
 			productReference = 1126C1A22773AFAF00C26BEC /* ZobbleBobble.app */;
 			productType = "com.apple.product-type.application";
+		};
+		11A5C8AC2A93C82400817D68 /* Blueprints */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11A5C8B72A93C82400817D68 /* Build configuration list for PBXNativeTarget "Blueprints" */;
+			buildPhases = (
+				11A5C8A82A93C82400817D68 /* Headers */,
+				11A5C8A92A93C82400817D68 /* Sources */,
+				11A5C8AA2A93C82400817D68 /* Frameworks */,
+				11A5C8AB2A93C82400817D68 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Blueprints;
+			productName = Blueprints;
+			productReference = 11A5C8AD2A93C82400817D68 /* Blueprints.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		11A850842A13880900574368 /* LevelConverter */ = {
 			isa = PBXNativeTarget;
@@ -1192,30 +1231,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				11C39E8A2A13AB23007B0371 /* PBXTargetDependency */,
+				11A5C8C92A93D00F00817D68 /* PBXTargetDependency */,
 			);
 			name = LevelConverter;
 			productName = LevelConverter;
 			productReference = 11A850852A13880900574368 /* LevelConverter */;
 			productType = "com.apple.product-type.tool";
-		};
-		11A8509C2A13899100574368 /* Levels */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 11A850A52A13899100574368 /* Build configuration list for PBXNativeTarget "Levels" */;
-			buildPhases = (
-				11A850982A13899100574368 /* Headers */,
-				11A850992A13899100574368 /* Sources */,
-				11A8509A2A13899100574368 /* Frameworks */,
-				11A8509B2A13899100574368 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Levels;
-			productName = Levels;
-			productReference = 11A8509D2A13899100574368 /* Levels.framework */;
-			productType = "com.apple.product-type.framework";
 		};
 		11DFF32D2927BB3B001EA051 /* ZobblePhysics */ = {
 			isa = PBXNativeTarget;
@@ -1247,10 +1268,11 @@
 					1126C1A12773AFAF00C26BEC = {
 						CreatedOnToolsVersion = 13.1;
 					};
-					11A850842A13880900574368 = {
-						CreatedOnToolsVersion = 14.3;
+					11A5C8AC2A93C82400817D68 = {
+						CreatedOnToolsVersion = 14.3.1;
+						LastSwiftMigration = 1430;
 					};
-					11A8509C2A13899100574368 = {
+					11A850842A13880900574368 = {
 						CreatedOnToolsVersion = 14.3;
 					};
 					11DFF32D2927BB3B001EA051 = {
@@ -1277,7 +1299,7 @@
 				1126C1A12773AFAF00C26BEC /* ZobbleBobble */,
 				11DFF32D2927BB3B001EA051 /* ZobblePhysics */,
 				11A850842A13880900574368 /* LevelConverter */,
-				11A8509C2A13899100574368 /* Levels */,
+				11A5C8AC2A93C82400817D68 /* Blueprints */,
 			);
 		};
 /* End PBXProject section */
@@ -1288,18 +1310,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				1126C1B22773AFB100C26BEC /* Assets.xcassets in Resources */,
-				117B3F462A93517C00C25EE7 /* Missles.json in Resources */,
-				117B3F392A93459900C25EE7 /* Planets.json in Resources */,
 				1126C1B52773AFB100C26BEC /* LaunchScreen.storyboard in Resources */,
+				117B3F4A2A93B0C800C25EE7 /* JSON in Resources */,
 				110DB25D2A8E22D7002DEEAD /* JoystixMonospace.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		11A8509B2A13899100574368 /* Resources */ = {
+		11A5C8AB2A93C82400817D68 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11C39E912A13AE85007B0371 /* Data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1321,6 +1341,7 @@
 				113228F82A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift in Sources */,
 				11889DF02A8CE8A600F8216B /* TransitionTarget.swift in Sources */,
 				11BDF3E92A91DAE0005F78E2 /* SceneRenderer.swift in Sources */,
+				11A5C8C12A93C8F500817D68 /* ParticleModel+Blueprints.swift in Sources */,
 				110DB2672A8FB956002DEEAD /* GunNode.swift in Sources */,
 				1190952829549010006EE970 /* CommonShaders.metal in Sources */,
 				11889DD82A8C87C100F8216B /* ControlCenterScene.swift in Sources */,
@@ -1370,6 +1391,7 @@
 				110DB2722A8FBF2D002DEEAD /* GUIRenderData.swift in Sources */,
 				1190953429574456006EE970 /* TextureMerge.metal in Sources */,
 				119B46CD29FFCC8600845D1B /* BufferProvider.swift in Sources */,
+				11A5C8BF2A93C8E500817D68 /* ChunkModel+Blueprints.swift in Sources */,
 				110DB2592A8D4D9B002DEEAD /* PlanetSelectionScene.swift in Sources */,
 				111E13792A7AB27600A786FD /* MissleBody.swift in Sources */,
 				11889DE82A8CDCEC00F8216B /* BlackMarketScene.swift in Sources */,
@@ -1391,9 +1413,21 @@
 				11B3FD0D298012330058FFEB /* Settings.swift in Sources */,
 				116D7D812A8681F0007ED1DD /* CRT.metal in Sources */,
 				1195528C2961D162000C7A95 /* Easing.swift in Sources */,
+				11A5C8C52A93CAB200817D68 /* MaterialModel+Blueprints.swift in Sources */,
 				117B3F352A9328C200C25EE7 /* PlanetService.swift in Sources */,
 				112CD1762A77DFA00098D324 /* LiquidNode.swift in Sources */,
 				11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11A5C8A92A93C82400817D68 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A5C8B92A93C85600817D68 /* Colors.swift in Sources */,
+				11A5C8BB2A93C86200817D68 /* ChunkBlueprintModel.swift in Sources */,
+				11A5C8C32A93C93300817D68 /* MaterialCategory.swift in Sources */,
+				11A5C8BD2A93C89500817D68 /* SIMD4+Colors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1406,23 +1440,6 @@
 				11A850962A1388F600574368 /* ImageSampler.swift in Sources */,
 				11A850882A13880900574368 /* main.swift in Sources */,
 				11A850972A1388F600574368 /* ImageSampling.metal in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		11A850992A13899100574368 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				11A850AD2A1389A400574368 /* LevelModel.swift in Sources */,
-				11AF7D992A1679B5000FB177 /* Colors.swift in Sources */,
-				11B643AB2A13A85800DCC56C /* Array+Duplicates.swift in Sources */,
-				11A850AA2A1389A400574368 /* PackModel.swift in Sources */,
-				11A850AB2A1389A400574368 /* ChunkModel.swift in Sources */,
-				11A850AC2A1389A400574368 /* ParticleModel.swift in Sources */,
-				11B643AA2A13A84500DCC56C /* DecodableFloatWrapper.swift in Sources */,
-				11A850A92A1389A400574368 /* LevelManager.swift in Sources */,
-				11A850A82A1389A400574368 /* MaterialModel.swift in Sources */,
-				11AF7D962A167792000FB177 /* SIMD4+Colors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1493,10 +1510,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		11C39E8A2A13AB23007B0371 /* PBXTargetDependency */ = {
+		11A5C8B22A93C82400817D68 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 11A8509C2A13899100574368 /* Levels */;
-			targetProxy = 11C39E892A13AB23007B0371 /* PBXContainerItemProxy */;
+			target = 11A5C8AC2A93C82400817D68 /* Blueprints */;
+			targetProxy = 11A5C8B12A93C82400817D68 /* PBXContainerItemProxy */;
+		};
+		11A5C8C92A93D00F00817D68 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 11A5C8AC2A93C82400817D68 /* Blueprints */;
+			targetProxy = 11A5C8C82A93D00F00817D68 /* PBXContainerItemProxy */;
 		};
 		11DFF3332927BB3B001EA051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1520,6 +1542,7 @@
 		1126C1B62773AFB100C26BEC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1561,6 +1584,7 @@
 		1126C1B72773AFB100C26BEC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1602,6 +1626,93 @@
 			};
 			name = Release;
 		};
+		11A5C8B52A93C82400817D68 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 4DZU58EZPK;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.Blueprints;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		11A5C8B62A93C82400817D68 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 4DZU58EZPK;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ozz.Blueprints;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		11A850892A13880900574368 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1623,91 +1734,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		11A850A62A13899100574368 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4DZU58EZPK;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.Levels;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		11A850A72A13899100574368 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4DZU58EZPK;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = ozz.rost.Levels;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -1922,20 +1948,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		11A5C8B72A93C82400817D68 /* Build configuration list for PBXNativeTarget "Blueprints" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11A5C8B52A93C82400817D68 /* Debug */,
+				11A5C8B62A93C82400817D68 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		11A8508B2A13880900574368 /* Build configuration list for PBXNativeTarget "LevelConverter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11A850892A13880900574368 /* Debug */,
 				11A8508A2A13880900574368 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		11A850A52A13899100574368 /* Build configuration list for PBXNativeTarget "Levels" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				11A850A62A13899100574368 /* Debug */,
-				11A850A72A13899100574368 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

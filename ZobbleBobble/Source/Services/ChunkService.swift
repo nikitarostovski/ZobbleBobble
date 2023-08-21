@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import Blueprints
 
 final class ChunkService {
-    private let preloadedChunks: [ChunkModel]
+    private let blueprints: [ChunkBlueprintModel]
     
     init?(_ file: String) {
-        if let levelDataPath = Bundle.main.path(forResource: file, ofType: "json") {
+        if let levelDataPath = Bundle.main.path(forResource: "JSON/\(file)", ofType: "json") {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: levelDataPath), options: .mappedIfSafe)
-                preloadedChunks = try JSONDecoder().decode(Array<ChunkModel>.self, from: data)
+                blueprints = try JSONDecoder().decode(Array<ChunkBlueprintModel>.self, from: data)
             } catch {
                 print(error)
                 return nil
@@ -22,10 +23,12 @@ final class ChunkService {
         } else {
             return nil
         }
-        print("\(preloadedChunks.count) chunks loaded from '\(file).json'")
+        print("\(blueprints.count) blueprints loaded from '\(file).json'")
     }
     
     func generateChunk() -> ChunkModel {
-        preloadedChunks.randomElement()!
+        let blueprint = blueprints.randomElement()!
+        let startImpulse = CGFloat.random(in: 1...3)
+        return ChunkModel(blueprint: blueprint, startImpulse: startImpulse)
     }
 }

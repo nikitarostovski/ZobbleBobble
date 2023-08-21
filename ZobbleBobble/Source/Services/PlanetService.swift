@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Blueprints
 
 final class PlanetService {
     private let chunkService = ChunkService("Planets")!

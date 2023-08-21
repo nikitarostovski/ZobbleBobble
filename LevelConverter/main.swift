@@ -6,116 +6,84 @@
 //
 
 import Foundation
-import Levels
+import Blueprints
 
-let inputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/LevelConverter")
-let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/Levels/Data")
-let runPath = URL(filePath: FileManager.default.currentDirectoryPath)
-
-let levelsFileName = "Levels"
-var levelPacks: [PackModel] = []
-
-do {
-    let levelData = try Data(contentsOf: inputPath.appending(path: "\(levelsFileName).json"))
-    levelPacks = try JSONDecoder().decode(Array<PackModel>.self, from: levelData)
-} catch {
-    throw error
-}
-
-var fileNames = [String]()
-levelPacks.forEach { pack in
-    pack.levels.forEach { level in
-        level.initialChunks.forEach { chunk in
-            if let source = chunk.source {
-                fileNames.append(source)
-            }
-        }
-        level.missleChunks.forEach { chunk in
-            if let source = chunk.source {
-                fileNames.append(source)
-            }
-        }
-    }
-}
+let inputPath = "/Users/rost/Dev/ZobbleBobble/LevelConverter/Images"
+let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
 let radius: CGFloat = 1.5
 let scale: CGFloat = 0.5
 
-fileNames = fileNames.removeDuplicates()
-
-let particles = fileNames.compactMap { (s: String) -> (String, [ParticleModel])? in
-    let url = inputPath.appending(path: "/Images/\(s).png")
-    guard let sampler = ImageSampler(file: url) else { return nil }
-    let particleStride: CGFloat = radius * 2 * 0.75
+for folder in ["Missles", "Planets"] {
+    let inputPath = inputPath.appending("/\(folder)")
     
-    let width = Int(CGFloat(sampler.width) * scale)
-    let height = Int(CGFloat(sampler.height) * scale)
-    let aabb = CGRect(x: 0, y: 0, width: width, height: height)
+    let files = (try? FileManager.default.contentsOfDirectory(atPath: inputPath)) ?? []
+    let fileNames: [String] = files.filter { $0.hasSuffix(".png") }
     
-    var points = [CGPoint]()
-    for y in stride(from: floor(aabb.minY / particleStride) * particleStride, to: aabb.maxY, by: particleStride) {
-        for x in stride(from: floor(aabb.minX / particleStride) * particleStride, to: aabb.maxX, by: particleStride) {
-            let point = CGPoint(x: x / aabb.width, y: y / aabb.height)
-            points.append(point)
-        }
-    }
-    let materials = sampler.getPixels(points)
-    guard !materials.isEmpty else {
-        return nil
-    }
-    var result = [ParticleModel]()
-    
-    var boundingRadius: CGFloat = 0
-    
-    var index = 0
-    for y in stride(from: floor(aabb.minY / particleStride) * particleStride, to: aabb.maxY, by: particleStride) {
-        for x in stride(from: floor(aabb.minX / particleStride) * particleStride, to: aabb.maxX, by: particleStride) {
-            if let material = materials[index] {
+    let chunks = fileNames.compactMap { (s: String) -> ChunkBlueprintModel? in
+        let url = URL(fileURLWithPath: "\(inputPath)/\(s)")
+        
+        guard let sampler = ImageSampler(file: url) else { return nil }
+        let particleStride: CGFloat = radius * 2 * 0.75
+        
+        let width = Int(CGFloat(sampler.width) * scale)
+        let height = Int(CGFloat(sampler.height) * scale)
+        let aabb = CGRect(x: 0, y: 0, width: width, height: height)
+        
+        var samplingPoints = [CGPoint]()
+        var boundingRadius: CGFloat = 0
+        
+        for y in stride(from: floor(aabb.minY / particleStride) * particleStride, to: aabb.maxY, by: particleStride) {
+            for x in stride(from: floor(aabb.minX / particleStride) * particleStride, to: aabb.maxX, by: particleStride) {
+                let samplingPoint = CGPoint(x: x / aabb.width, y: y / aabb.height)
+                samplingPoints.append(samplingPoint)
+                
                 let point = CGPoint(x: x - aabb.width / 2, y: y - aabb.height / 2)
                 let dist = sqrt(point.y * point.y + point.x * point.x)
                 boundingRadius = max(boundingRadius, dist)
-                let model = ParticleModel(position: point, material: material)
-                result.append(model)
             }
-            index += 1
         }
+        let getPointsByUniqueColors = sampler.getPointsByUniqueColors(samplingPoints)
+        let groups = getPointsByUniqueColors.compactMap { (color, samplintPoints) -> ChunkBlueprintModel.FuzzyParticleGroup? in
+            let possibleMaterials = MaterialCategory.possibleMaterialCategories(for: color)
+            guard !possibleMaterials.isEmpty else { return nil }
+            
+            let positions = samplintPoints.map {
+                let xConverted = (($0.x * aabb.width) - aabb.width / 2)
+                let yConverted = (($0.y * aabb.height) - aabb.height / 2)
+                return ParticleBlueprintModel(x: xConverted, y: yConverted)
+            }
+            return .init(positions: positions, possibleMaterials: possibleMaterials)
+        }
+        return ChunkBlueprintModel(particleGroups: groups, boundingRadius: boundingRadius)
     }
     
-    
-    result = result.sorted(by: {
-        let xp1 = $0.position.x / boundingRadius
-        let xp2 = $1.position.x / boundingRadius
-        return xp1 < xp2
-    })
-    
-    return (s, result)
-}
-
-levelPacks = levelPacks.map { pack in
-    var pack = pack
-    pack.particleRadius = radius
-    pack.levels = pack.levels.map { level in
-        var level = level
-        level.initialChunks = level.initialChunks.map { chunk in
-            var chunk = chunk
-            if let particles = particles.first(where: { $0.0 == chunk.source })?.1 {
-                chunk.setParticles(particles)
-            }
-            return chunk
-        }
-        level.missleChunks = level.missleChunks.map { chunk in
-            var chunk = chunk
-            if let particles = particles.first(where: { $0.0 == chunk.source })?.1 {
-                chunk.setParticles(particles)
-            }
-            return chunk
-        }
-        return level
+    if let outputData: Data = try? JSONEncoder().encode(chunks) {
+        let path = outputPath.appending(path: "\(folder).json")
+        try outputData.write(to: path)
     }
-    return pack
 }
 
-if let outputData = try? JSONEncoder().encode(levelPacks) {
-    try outputData.write(to: outputPath.appending(path: "\(levelsFileName).json"))
+extension MaterialCategory {
+    private static var colorDiffThreshold: Float { 0.5 }
+    
+    /// Returns material categories available for use in procedural generation for passed color
+    public static func possibleMaterialCategories(for color: SIMD4<UInt8>) -> [MaterialCategory] {
+        guard color.w > 0 else { return [] }
+        
+        let total: Float = sqrt(255 * 255 * 3)
+        
+        let materialsDiff: [(Float, MaterialCategory)] = MaterialCategory.allCases.compactMap {
+            let rdiff = Int($0.color.x) - Int(color.x)
+            let gdiff = Int($0.color.y) - Int(color.y)
+            let bdiff = Int($0.color.z) - Int(color.z)
+            
+            let d = sqrt(Float(rdiff * rdiff + gdiff * gdiff + bdiff * bdiff))
+            let p = d / total
+            
+            guard p < Self.colorDiffThreshold else { return nil }
+            return (p, $0)
+        }
+        return materialsDiff.map { $0.1 }
+    }
 }
-

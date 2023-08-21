@@ -61,25 +61,25 @@ final class ImageSampler {
         self.linearSampler = device.makeSamplerState(descriptor: s)
     }
     
-    /// Returns material type for passed coordinate
-    /// - Parameter point: point in 0...1 range both for x and y values
-    /// - Returns: type of material to spawn or nothing
-    func getPixels(_ points: [CGPoint]) -> [MaterialType?] {
+    /// Returns points grouped by unique colors found among passed points
+    /// - Parameter points: array of points in 0...1 range both for x and y values
+    /// - Returns: dictionary with unique colors (found sampling with `points`) as keys and points as values
+    func getPointsByUniqueColors(_ points: [CGPoint]) -> [SIMD4<UInt8>: [CGPoint]] {
         guard points.count <= maxPointCount,
               let commandBuffer = commandQueue.makeCommandBuffer(),
               let encoder = commandBuffer.makeComputeCommandEncoder(),
               let computeSamplePipelineState = computeSamplePipelineState
         else {
-            return []
+            return [:]
         }
         
-        var points = points.map { SIMD2<Float>(Float($0.x), Float($0.y)) }
+        var simdPoints = points.map { SIMD2<Float>(Float($0.x), Float($0.y)) }
         
         _ = positionBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let positionBuffer = positionBufferProvider.nextUniformsBuffer(data: &points, length: MemoryLayout<SIMD2<Float>>.stride * points.count)
+        let positionBuffer = positionBufferProvider.nextUniformsBuffer(data: &simdPoints, length: MemoryLayout<SIMD2<Float>>.stride * points.count)
         
         _ = resultBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let resultBuffer = resultBufferProvider.nextUniformsBuffer(data: &points, length: MemoryLayout<SIMD2<Float>>.stride * points.count)
+        let resultBuffer = resultBufferProvider.nextUniformsBuffer(data: &simdPoints, length: MemoryLayout<SIMD2<Float>>.stride * points.count)
         
         encoder.setComputePipelineState(computeSamplePipelineState)
         encoder.setBuffer(positionBuffer, offset: 0, index: 0)
@@ -87,7 +87,7 @@ final class ImageSampler {
         encoder.setSamplerState(linearSampler, index: 0)
         encoder.setTexture(texture, index: 0)
         
-        ThreadHelper.dispatchAuto(device: device, encoder: encoder, state: computeSamplePipelineState, width: points.count, height: 1)
+        ThreadHelper.dispatchAuto(device: device, encoder: encoder, state: computeSamplePipelineState, width: simdPoints.count, height: 1)
         encoder.endEncoding()
 
         commandBuffer.commit()
@@ -96,22 +96,20 @@ final class ImageSampler {
         positionBufferProvider.avaliableResourcesSemaphore.signal()
         resultBufferProvider.avaliableResourcesSemaphore.signal()
         
-        
-        
         let typedResultPointer = resultBuffer.contents().bindMemory(to: SIMD4<Float>.self, capacity: maxPointCount)
-        let bufferedResultPointer = UnsafeBufferPointer(start: typedResultPointer, count: points.count)
+        let bufferedResultPointer = UnsafeBufferPointer(start: typedResultPointer, count: simdPoints.count)
         
-        
-        var result = [MaterialType?]()
-        for i in 0..<points.count {
-            let color = bufferedResultPointer[i]
-            let colorConverted = SIMD4<UInt8>(UInt8(color.x * 255.0),
-                                              UInt8(color.y * 255.0),
-                                              UInt8(color.z * 255.0),
-                                              UInt8(color.w * 255.0))
-            let material = MaterialType.parseColor(colorConverted)
-            result.append(material)
+        var pointsByColors = [SIMD4<UInt8>: [CGPoint]]()
+        for i in points.indices {
+            let color = SIMD4<UInt8>(UInt8(bufferedResultPointer[i].x * 255.0),
+                                     UInt8(bufferedResultPointer[i].y * 255.0),
+                                     UInt8(bufferedResultPointer[i].z * 255.0),
+                                     UInt8(bufferedResultPointer[i].w * 255.0))
+            
+            var currentPoints = pointsByColors[color] ?? []
+            currentPoints.append(points[i])
+            pointsByColors[color] = currentPoints
         }
-        return result
+        return pointsByColors
     }
 }
