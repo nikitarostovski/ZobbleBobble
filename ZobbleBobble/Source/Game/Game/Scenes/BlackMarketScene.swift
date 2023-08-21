@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class BlackMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .blackMarket }

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 class GunBody: Body {
     struct State {
@@ -19,12 +18,13 @@ class GunBody: Body {
     var userInteractive: Bool = false
     var renderData: StarRenderData?
     
-    var player: PlayerModel
+    weak var player: PlayerModel?
+    
     var state = State()
     
     private let initialMaterials: [MaterialRenderData]
     
-    var selectedContainer: ContainerModel? { player.selectedContainer }
+    var selectedContainer: ContainerModel? { player?.selectedContainer }
     
     var selectedMissle: ChunkModel? {
         let index = Int(state.currentMissleIndex)
@@ -47,7 +47,7 @@ class GunBody: Body {
         self.missleRadius = 0
         
         var materials = [MaterialRenderData]()
-        for (i, c) in player.ship.containers.enumerated() {
+        for (i, c) in player.containers.enumerated() {
             for (j, m) in c.missles.enumerated() {
                 let number = CGFloat(i) + CGFloat(j) / CGFloat(c.missles.count)
                 let next = number + CGFloat(1) / CGFloat(c.missles.count)// - 0.01//CGFloat.leastNonzeroMagnitude
@@ -63,11 +63,12 @@ class GunBody: Body {
     }
     
     func getWorldVisibleMissles(misslesFired: CGFloat) -> ClosedRange<CGFloat> {
-        guard let containerIndex = player.ship.loadedContainerIndex,
-              0..<player.ship.containers.count ~= containerIndex
+        guard let player = player,
+              let containerIndex = player.selectedContainerIndex,
+              0..<player.containers.count ~= containerIndex
         else { return 0...0 }
         
-        let container = player.ship.containers[containerIndex]
+        let container = player.containers[containerIndex]
         let missleWeight = CGFloat(1) / CGFloat(container.missles.count)
         
         let lo = CGFloat(containerIndex) + misslesFired * missleWeight
@@ -81,7 +82,7 @@ class GunBody: Body {
     func getMissleRadius(levelToPackProgress: CGFloat, containerIndex: Int, missleIndexFloating: CGFloat) -> Float {
         let missleIndexFloating = missleIndexFloating - 1
         let missleIndex = max(0, Int(missleIndexFloating))
-        let container = player.ship.containers[containerIndex]
+        let container = player!.containers[containerIndex]
         
         var currentRadius: CGFloat = 0
         var nextRadius: CGFloat = 0
@@ -117,12 +118,11 @@ class GunBody: Body {
     }
     
     func updateAppearance(levelToPackProgress: CGFloat, visibleMissleRange: ClosedRange<CGFloat>) {
-        let containerIndex = CGFloat(player.ship.loadedContainerIndex ?? 0)
+        guard let containerIndex = player?.selectedContainerIndex, let container = player?.selectedContainer else { return }
         
         self.state.visibleMissleRange = visibleMissleRange
-        self.state.currentContainerIndex = containerIndex
+        self.state.currentContainerIndex = CGFloat(containerIndex)
         
-        let container = player.ship.containers[Int(containerIndex)]
         let missleIndex = CGFloat(container.missles.count) * (visibleMissleRange.lowerBound - CGFloat(Int(containerIndex)))
         self.missleRadius = getMissleRadius(levelToPackProgress: levelToPackProgress,
                                             containerIndex: Int(containerIndex),

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 class GUIButton: GUIView<GUIRenderData.ButtonModel> {
     private var normalBackgroundColor: SIMD4<UInt8>

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class UtilizationPlantScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .utilizationPlant }

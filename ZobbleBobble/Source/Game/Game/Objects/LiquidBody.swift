@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 class LiquidBody: Body {
     var userInteractive: Bool = false

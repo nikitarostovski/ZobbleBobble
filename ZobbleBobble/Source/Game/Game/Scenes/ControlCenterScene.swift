@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class ControlCenterScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .controlCenter }

@@ -20,9 +20,3 @@ extension DecodableFloat: Codable {
         wrappedValue = try container.decode(CGFloat.self)
     }
 }
-
-extension KeyedDecodingContainer {
-    func decode(_ type: DecodableFloat.Type, forKey key: Key) throws -> DecodableFloat {
-        try decodeIfPresent(type, forKey: key) ?? .init()
-    }
-}

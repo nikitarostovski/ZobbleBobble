@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 protocol MissleHolder: AnyObject {
     func getMissleCenter() -> SIMD2<Float32>
@@ -115,7 +114,7 @@ class MissleBody: LiquidBody {
         colors.copyMemory(from: &self.colors,
                           byteCount: MemoryLayout<SIMD4<UInt8>>.stride * self.colors.count)
         
-        self.renderData = .init(particleRadius: Float(1.5),
+        self.renderData = .init(particleRadius: Float(Settings.Physics.particleRadius),
                                 liquidFadeModifier: liquidFadeMultiplier,
                                 scale: 1,
                                 liquidCount: self.positions.count,

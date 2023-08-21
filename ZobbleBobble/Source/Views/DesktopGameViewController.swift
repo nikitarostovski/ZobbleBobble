@@ -26,7 +26,7 @@ import MetalKit
 //let abc = Abc()
 
 final class GameViewController: NSViewController {
-    private var game: Game?
+    private var game: MainGame?
     
     lazy var renderView: MetalRenderView = {
         let view = MetalRenderView()
@@ -65,7 +65,7 @@ final class GameViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self, scrollHolder: self)
+        self.game = MainGame(scrollHolder: self)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -137,10 +137,6 @@ extension GameViewController: RenderDelegate {
         guard let game = game else { return }
         game.update(time)
     }
-}
-
-extension GameViewController: GameDelegate {
-    func gameDidChangeState(_ game: Game) { }
 }
 
 extension GameViewController: ScrollHolder {

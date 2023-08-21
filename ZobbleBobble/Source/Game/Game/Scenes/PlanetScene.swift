@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class PlanetScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planet }
@@ -21,7 +20,6 @@ final class PlanetScene: Scene {
     private lazy var exitButton: GUIButton = GUIButton(title: "Exit", tapAction: goToControlCenter)
     private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults)
     
-    private var planet: PlanetModel
     private let physicsWorld: PhysicsWorld
     private let terrainBody: TerrainBody?
     private var gun: GunBody
@@ -31,18 +29,12 @@ final class PlanetScene: Scene {
     var isPaused: Bool = true { didSet { onStateUpdate() } }
     
     override var visibleBodies: [any Body] {
-        var result = super.visibleBodies
-        
-        if let terrainBody = terrainBody { result.append(terrainBody) }
-        if let missle = missle { result.append(missle) }
-        result.append(gun)
-        
-        return result
+        let result: [(any Body)?] = [gui, terrainBody, missle, gun]
+        return result.compactMap { $0 }
     }
     
-    override init(game: GameInteractive?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
-        guard let player = game?.player else { fatalError() }
-        self.planet = player.selectedPlanet
+    override init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
+        guard let player = game?.player, let planet = player.selectedPlanet else { fatalError() }
         
         let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
                                    rotationStep: planet.speed.radians / 60.0,
@@ -183,7 +175,14 @@ final class PlanetScene: Scene {
 
     private func spawnNextMissle(animated: Bool = true) {
         guard let selectedMissle = gun.selectedMissle else {
-            game?.containerFinished()
+            if let game = game {
+                if let index = game.player.selectedContainerIndex {
+                    game.removeContainer(index)
+                }
+                if !game.selectContainer(0) {
+                    game.clearSelectedContainer()
+                }
+            }
             isGameOver = true
             userInteractionEnabled = true
             missle = nil

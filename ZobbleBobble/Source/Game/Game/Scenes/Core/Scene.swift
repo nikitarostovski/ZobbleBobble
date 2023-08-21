@@ -7,17 +7,6 @@
 
 import Foundation
 
-protocol GameInteractive: AnyObject {
-    var player: PlayerModel { get }
-    
-//    func addPlanet(_ planet: PlanetModel)
-//    func addContainer(_ container: ContainerModel)
-//    func removeContainer(_ index: Int?)
-//    func loadContainer(_ index: Int)
-    
-    func containerFinished()
-}
-
 protocol TransitionableSceneDelegate: AnyObject {
     func onTransitionableSceneAppendRequest(sender: Scene, becomesActive: Bool)
     func onTransitionableSceneRemovalRequest(sender: Scene)
@@ -30,7 +19,7 @@ class Scene {
     }
     
     weak var transitionDelegate: TransitionableSceneDelegate?
-    weak var game: GameInteractive?
+    weak var game: Game?
     var gui: GUIBody?
     
     private(set) var size: CGSize
@@ -69,7 +58,7 @@ class Scene {
         self.init(game: scene.game, size: scene.size, safeArea: scene.safeArea, screenScale: scene.screenScale)
     }
     
-    init(game: GameInteractive?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
+    init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         self.game = game
         self.size = size
         self.safeArea = safeArea

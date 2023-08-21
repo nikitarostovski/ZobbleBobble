@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class GarbageMarketScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .garbageMarket }

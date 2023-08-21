@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 class TerrainBody: LiquidBody {
     let liquidFadeModifier: Float

@@ -8,7 +8,6 @@
 import Foundation
 import MetalKit
 import MetalPerformanceShaders
-import Levels
 
 class SceneRenderer {
     weak var scene: Scene?
@@ -51,11 +50,12 @@ class SceneRenderer {
         self.gameTextureSize = gameTextureSize
 
         setupPipeline()
-        updateNodesIfNeeded()
     }
     
     func render(_ commandBuffer: MTLCommandBuffer) -> MTLTexture? {
         guard let scene = scene else { return nil }
+        
+        updateNodesIfNeeded()
         
         let allTextures = [finalTexture] + allNodes.map { $0.render(commandBuffer: commandBuffer, cameraScale: scene.cameraScale, camera: scene.camera) }
         var textureCount = allTextures.count
@@ -101,11 +101,13 @@ class SceneRenderer {
         computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: upscalePipelineState, width: finalTexture.width, height: finalTexture.height)
         
-        computeEncoder.setComputePipelineState(alphaMultiplyPipelineState)
-        computeEncoder.setTexture(finalTexture, index: 0)
-        computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setBuffer(alphaBuffer, offset: 0, index: 0)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: alphaMultiplyPipelineState, width: finalTexture.width, height: finalTexture.height)
+        if scene.opacity < 1 {
+            computeEncoder.setComputePipelineState(alphaMultiplyPipelineState)
+            computeEncoder.setTexture(finalTexture, index: 0)
+            computeEncoder.setTexture(finalTexture, index: 1)
+            computeEncoder.setBuffer(alphaBuffer, offset: 0, index: 0)
+            ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: alphaMultiplyPipelineState, width: finalTexture.width, height: finalTexture.height)
+        }
         
         computeEncoder.endEncoding()
         

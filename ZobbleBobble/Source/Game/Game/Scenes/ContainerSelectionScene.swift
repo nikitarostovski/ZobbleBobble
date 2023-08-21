@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class ContainerSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .containerSelection }

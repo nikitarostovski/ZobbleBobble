@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 class GUILabel: GUIView<GUIRenderData.LabelModel> {
     var textColor: SIMD4<UInt8> {

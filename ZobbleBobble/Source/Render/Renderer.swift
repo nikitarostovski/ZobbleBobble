@@ -8,7 +8,6 @@
 import Foundation
 import MetalKit
 import MetalPerformanceShaders
-import Levels
 
 protocol RenderDataSource: AnyObject {
     var visibleScenes: [Scene] { get }

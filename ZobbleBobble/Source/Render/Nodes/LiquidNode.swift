@@ -7,7 +7,6 @@
 
 import MetalKit
 import MetalPerformanceShaders
-import Levels
 
 class LiquidNode: BaseNode<LiquidBody> {
     struct Uniforms {
@@ -41,7 +40,6 @@ class LiquidNode: BaseNode<LiquidBody> {
         renderPipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
         renderPipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .one
         renderPipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .one
-        renderPipelineDescriptor.sampleCount = 1;
         
         return try? device.makeRenderPipelineState(descriptor: renderPipelineDescriptor)
     }()

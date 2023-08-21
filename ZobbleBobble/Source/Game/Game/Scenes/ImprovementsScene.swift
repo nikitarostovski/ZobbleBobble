@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 final class ImprovementsScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .improvements }

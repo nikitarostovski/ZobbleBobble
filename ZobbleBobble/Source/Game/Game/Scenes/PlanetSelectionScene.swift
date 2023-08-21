@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Levels
 
 struct PlanetSelectionState {
     /// progress from level state to menuPacks state [1...3] (1 is level state, 2 is level selection, 3 is pack selection)
