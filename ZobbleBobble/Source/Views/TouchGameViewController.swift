@@ -8,7 +8,7 @@
 import UIKit
 
 final class GameViewController: UIViewController {
-    private var game: Game?
+    private var game: MainGame?
     
     lazy var renderView: MetalRenderView = {
         let view = MetalRenderView()
@@ -41,7 +41,7 @@ final class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = Game(delegate: self, scrollHolder: self)
+        self.game = MainGame(scrollHolder: self)
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -113,7 +113,7 @@ final class GameViewController: UIViewController {
     }
 }
 
-extension GameViewController: RenderViewDelegate {
+extension GameViewController: RenderDelegate {
     func rendererSizeDidChange(size: CGSize) {
         updateGameSizeData(newSize: size)
     }
@@ -122,10 +122,6 @@ extension GameViewController: RenderViewDelegate {
         guard let game = game else { return }
         game.update(time)
     }
-}
-
-extension GameViewController: GameDelegate {
-    func gameDidChangeState(_ game: Game) { }
 }
 
 extension GameViewController: ScrollHolder {
