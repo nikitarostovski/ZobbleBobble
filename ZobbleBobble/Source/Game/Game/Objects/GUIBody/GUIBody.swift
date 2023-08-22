@@ -70,6 +70,10 @@ class GUIBody: Body {
         textTextureData = newTextTextureData
     }
     
+    func layout() {
+        views.forEach { $0.layout() }
+    }
+    
     func hitTest(pos: CGPoint) -> Bool {
         views.filter { $0.isInteractive }.first(where: { $0.frame.contains(pos) }) != nil
     }

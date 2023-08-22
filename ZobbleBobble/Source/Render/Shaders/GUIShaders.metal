@@ -89,7 +89,7 @@ float4 text_color(GUIText text, uint2 gid, texture2d<float, access::write> textu
         
         if (textTextureColor.a > 0) {
             result.rgb = float3(text.textColor.rgb) / 255;
-            result.a = 1;
+            result.a = textTextureColor.a;
         } else {
             result = backgroundColor;
         }
@@ -111,13 +111,13 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
         return;
     }
     
+    int blendMode = 0;
     float4 resultColor = float4(0);
     
     for (int i = 0; i < rectCount; i++) {
         float4 color = rect_color(rects[i], gid, output);
         if (color.a > 0) {
-            resultColor = color;
-            break;
+            resultColor = blend(blendMode, resultColor, color);
         }
     }
     
@@ -127,8 +127,7 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
         
         float4 color = text_color(texts[i], gid, output, textTexture, sampler);
         if (color.a > 0) {
-            resultColor = color;
-            break;
+            resultColor = blend(blendMode, resultColor, color);
         }
     }
     

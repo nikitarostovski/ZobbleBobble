@@ -26,10 +26,10 @@ class GUILabel: GUIView {
     
     private var labelRenderData: GUIRenderData.LabelModel?
 
-    init(frame: CGRect = .zero, style: Style = .header, text: String? = nil) {
+    init(frame: CGRect = .zero, style: Style = .header, text: String? = nil, onLayout: LayoutClosure? = nil) {
         self.text = text
         self.textColor = style.textColor
-        super.init(backgroundColor: style.backgroundColor, frame: frame)
+        super.init(backgroundColor: style.backgroundColor, frame: frame, onLayout: onLayout)
     }
 
     override func makeRenderData() -> RenderData {

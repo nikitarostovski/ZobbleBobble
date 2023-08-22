@@ -27,7 +27,6 @@ class LiquidFunWorld: PhysicsWorld {
         
         def.destroyByAge = false
         def.ejectionStrength = 8
-        
         def.powderStrength = 2
         
         self.world = ZPWorld(worldDef: def)

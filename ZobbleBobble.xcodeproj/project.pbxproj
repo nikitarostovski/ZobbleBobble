@@ -35,6 +35,7 @@
 		113228F82A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113228F72A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift */; };
 		1133D44C2949A568009C8DBC /* TouchGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* TouchGameViewController.swift */; platformFilter = ios; };
 		1133D454294DAFA6009C8DBC /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF77292B8A5600AFD08C /* Constants.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */; };
 		1160EF552928E14400AFD08C /* ZPWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 11DFF68B2927C32B001EA051 /* ZPWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1160EF592928E83900AFD08C /* ZPBody.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1160EF582928E83900AFD08C /* ZPBody.mm */; };
 		1160EF5B2928FE7900AFD08C /* ZPBody.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF5A2928E84100AFD08C /* ZPBody.h */; };
@@ -327,6 +328,7 @@
 		1130A4A6292FB2FE004898D9 /* ZobbleBobble.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZobbleBobble.entitlements; sourceTree = "<group>"; };
 		113228F52A8252A600CA8F49 /* MTLDevice+MTLTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLDevice+MTLTexture.swift"; sourceTree = "<group>"; };
 		113228F72A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLDevice+MTLSamplerState.swift"; sourceTree = "<group>"; };
+		113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticTerrainBody.swift; sourceTree = "<group>"; };
 		1160EF582928E83900AFD08C /* ZPBody.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPBody.mm; sourceTree = "<group>"; };
 		1160EF5A2928E84100AFD08C /* ZPBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPBody.h; sourceTree = "<group>"; };
 		1160EF77292B8A5600AFD08C /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -669,6 +671,7 @@
 				111E137A2A7AC90000A786FD /* LiquidBody.swift */,
 				112CD16C2A77D5360098D324 /* TerrainBody.swift */,
 				111E13782A7AB27600A786FD /* MissleBody.swift */,
+				113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -1382,6 +1385,7 @@
 				116D7D812A8681F0007ED1DD /* CRT.metal in Sources */,
 				1195528C2961D162000C7A95 /* Easing.swift in Sources */,
 				11A5C8C52A93CAB200817D68 /* MaterialModel+Blueprints.swift in Sources */,
+				113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */,
 				117B3F352A9328C200C25EE7 /* PlanetService.swift in Sources */,
 				112CD1762A77DFA00098D324 /* LiquidNode.swift in Sources */,
 				11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */,

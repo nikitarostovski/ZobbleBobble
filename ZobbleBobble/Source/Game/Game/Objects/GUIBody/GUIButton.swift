@@ -47,7 +47,7 @@ class GUIButton: GUIView {
     
     private var labelRenderData: GUIRenderData.LabelModel?
     
-    init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil, textInsets: CGSize = .zero) {
+    init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil, textInsets: CGSize = .zero, onLayout: LayoutClosure? = nil) {
         self.tapAction = tapAction
         self.textInsets = textInsets
         self.text = title
@@ -58,7 +58,7 @@ class GUIButton: GUIView {
         self.normalBackgroundColor = style.backgroundColorNormal
         self.highlightedBackgroundColor = style.backgroundColorHighlighted
         
-        super.init(backgroundColor: style.backgroundColorNormal, frame: frame)
+        super.init(backgroundColor: style.backgroundColorNormal, frame: frame, onLayout: onLayout)
         
         isInteractive = true
     }

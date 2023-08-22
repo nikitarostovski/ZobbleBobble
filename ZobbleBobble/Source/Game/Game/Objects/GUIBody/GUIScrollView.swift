@@ -8,9 +8,22 @@
 import Foundation
 
 class GUIScrollView: GUIView {
+    typealias ScrollClosure = (GUIScrollView) -> Void
+    
+    var onScroll: ScrollClosure? {
+        didSet { onScroll?(self) }
+    }
+    
     private var startPoint: CGPoint?
     private var startShift: CGPoint?
-    private var currentShift: CGPoint = .zero
+    private var currentShift: CGPoint = .zero { didSet { onScroll?(self) } }
+    
+    var contentOffset: CGPoint { currentShift }
+    
+    override func layout() {
+        super.layout()
+        onScroll?(self)
+    }
     
     override func onTouchDown(pos: CGPoint) -> Bool {
         startPoint = pos

@@ -72,7 +72,12 @@ class Scene {
     
     func setupLayout() { }
     
-    func updateLayout() { }
+    func updateLayout() {
+        // TODO: fix layout calls
+        gui?.layout()
+        gui?.layout()
+        gui?.layout()
+    }
     
     func onSizeChanged(_ newSize: CGSize, newSafeArea: CGRect, newScreenScale: CGFloat) {
         var needsLayout = false
@@ -231,5 +236,7 @@ extension Scene {
         
         static let paddingHorizontal: CGFloat = 32
         static let paddingVertical: CGFloat = 16
+        
+        static let planetHeight: CGFloat = 100
     }
 }

@@ -7,197 +7,161 @@
 
 import Foundation
 
-struct PlanetSelectionState {
-    /// progress from level state to menuPacks state [1...3] (1 is level state, 2 is level selection, 3 is pack selection)
-    var levelToPackProgress: CGFloat
-    /// horizontal scroll position of level in index values (1.5 equals exact middle between indices 1 and 2)
-    var currentLevelPagePosition: CGFloat
-    /// horizontal scroll position of pack in index values (1.5 equals exact middle between indices 1 and 2)
-    var currentPackPagePosition: CGFloat
-}
-
 final class PlanetSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planetSelection }
     
-    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet selection")
-    private lazy var blackMarketButton: GUIButton = GUIButton(style: .secondary, title: "Black market", tapAction: goToBlackMarket)
-    private lazy var planetButton: GUIButton = GUIButton(title: "To Planet", tapAction: goToPlanet)
-    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection)
+    private let maxPlanetScale: CGFloat = 4
     
-    private lazy var scrollView: GUIScrollView = {
-        let view = GUIScrollView(subviews: planetCardViews)
-        view.backgroundColor = .init(rgb: 0x0000FF, a: 100)
-        return view
-    }()
+    private var planetBody: StaticTerrainBody?
+    
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet selection") { [weak self] _ in
+        guard let self = self else { return .zero }
+        return CGRect(x: safeArea.minX + paddingHorizontal,
+                      y: safeArea.minY + paddingVertical,
+                      width: safeArea.width - 2 * paddingHorizontal,
+                      height: titleHeight)
+    }
+    
+    private lazy var blackMarketButton: GUIButton = GUIButton(style: .secondary, title: "Black market", tapAction: goToBlackMarket) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - 4 * (buttonHeight + paddingVertical),
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
+    
+    private lazy var planetButton: GUIButton = GUIButton(title: "To Planet", tapAction: goToPlanet) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - 2 * (buttonHeight + paddingVertical),
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
+    
+    private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - buttonHeight - paddingVertical,
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
     
     private lazy var planetCardViews: [GUIView] = {
         let planets = game?.player.planets ?? []
+        
         return planets.enumerated().map { i, planet in
-            let container = GUIView(backgroundColor: Colors.GUI.Button.backgroundUtilityNormal)
+            let container = GUIView()
             container.backgroundColor = .init(rgb: 0x00FF00, a: 100)
+            container.onLayout = { [weak self] _ in
+                guard let self = self else { return .zero }
+                return CGRect(x: CGFloat(i) + paddingHorizontal,
+                              y: paddingVertical,
+                              width: 1 - 2 * paddingHorizontal,
+                              height: scrollView.frame.height - 2 * paddingVertical)
+            }
             
             let label = GUILabel(text: "Planet \(i + 1)")
-            label.backgroundColor = .init(rgb: 0xFF0000, a: 100)
+            label.backgroundColor = .init(rgb: 0xFFFFFF, a: 100)
+            label.onLayout = { [weak self, weak container] _ in
+                guard let self = self, let container = container else { return .zero }
+                return CGRect(x: paddingHorizontal,
+                              y: paddingVertical,
+                              width: container.frame.width - 2 * paddingHorizontal,
+                              height: titleHeight)
+            }
             container.subviews.append(label)
             
             return container
         }
     }()
     
-    private var starCenterLevelMode: CGPoint = .zero
-    private var starCenterMenuLevelMode: CGPoint = .zero
-    private var starCenterMenuPackMode: CGPoint = .zero
-
-    private var planetCenterLevelMode: CGPoint = .zero
-    private var planetCenterMenuLevelMode: CGPoint = .zero
-    private var planetCenterMenuPackMode: CGPoint = .zero
-
-    private var starRadiusScale: CGFloat = 0
-    private var planetRadiusScale: CGFloat = 0
-
-    private var starCenterPoint: CGPoint = .zero
-    private var planetCenterPoint: CGPoint = .zero
-
-    private var starAngleBetweenPositions: CGFloat = 0
-    private var planetAngleBetweenPositions: CGFloat = 0
-
-    private var starRadius: CGFloat = 0
-    private var starAnchor: CGPoint = .zero
-
-    private var planetRadius: CGFloat = 0
-    private var planetAnchor: CGPoint = .zero
-
-    private var starCenterAngle: CGFloat = 0
-    private var planetCenterAngle: CGFloat = 0
-    
-    private var lastUpdateGameSize: CGSize = .zero
-    private var lastUpdateLevelToPackProgress: CGFloat = -1
-    private var lastUpdateCurrentPackPagePosition: CGFloat = -1
-    private var lastUpdateCurrentLevelPagePosition: CGFloat = -1
-
-    private(set) var visibleLevelIndices: ClosedRange<Int> = 0...0
-
-    private weak var terrainBody: TerrainBody?
-    
-    convenience init(_ scene: Scene,
-         from: CGFloat = Settings.Camera.levelsMenuCameraScale,
-         to: CGFloat = Settings.Camera.levelsMenuCameraScale) {
+    private lazy var scrollView: GUIScrollView = {
+        let view = GUIScrollView(subviews: planetCardViews)
+        view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
+        let scale = size.height / (Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale)
         
-        self.init(scene)
+        view.onLayout = { [weak self] _ in
+            guard let self = self else { return .zero }
+            let top = titleLabel.frame.maxY + paddingVertical
+            let bottom = blackMarketButton.frame.minY - paddingVertical
+            let height =  bottom - top
+            return CGRect(x: 0, y: top, width: 1, height: height)
+        }
+        view.onScroll = { [weak self] view in
+            guard let self = self,
+                  let planetBody = self.planetBody
+            else { return }
+            
+            planetBody.offset.x = view.contentOffset.x / scale * size.width
+            planetBody.offset.y = Settings.Camera.sceneHeight * (planetBackgroundView.frame.midY - 0.5)
+        }
+        return view
+    }()
+    
+    private lazy var planetBackgroundView: GUIView = {
+        let view = GUIView()
+        view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
+        let gameTextureHeight = Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale
+        let scale = size.height / gameTextureHeight
         
-//        self.state = PlanetSelectionState(levelToPackProgress: from, currentLevelPagePosition: 0, currentPackPagePosition: 0)
-//
-//        self.stars = levelManager.allLevelPacks.map { pack in
-//            StarBody(pack: pack)
-//        }
-//
-//        let terrainBody = TerrainBody(physicsWorld: nil, uniqueMaterials: Array(Set(visibleLevels.flatMap { $0.allMaterials })))
-//        self.terrainBody = terrainBody
-//
-//        if (to == from) {
-//            updateScroll()
-//            updateRenderData()
-//            return
-//        }
-//        switch to {
-//        case Settings.Camera.levelCameraScale:
-//            transitionToLevel()
-//        case Settings.Camera.levelsMenuCameraScale:
-//            transitionToLevelSelection()
-//        case Settings.Camera.packsMenuCameraScale:
-//            transitionToPackSelection()
-//        default:
-//            break
-//        }
+        view.onLayout = { [weak self] view in
+            guard let self = self else { return .zero }
+            
+            let height = scrollView.frame.height - titleHeight - 3 * paddingVertical
+            let width = height / size.width * size.height
+            
+            let x = (size.width / 2 + scrollView.contentOffset.x) / size.width - width / 2
+            let y = scrollView.frame.maxY - height - paddingVertical
+            
+            return CGRect(x: x, y: y, width: width, height: height)
+        }
+        return view
+    }()
+    
+    private var planetVisibilityRadius: CGFloat {
+        // by furthest chunk
+        game?.player.selectedPlanet?.chunks.map { $0.boundingRadius }.max() ?? 1
+        // by gravity radius
+//        planet.gravityRadius
+    }
+    
+    override var visibleBodies: [any Body] {
+        var visibleBodies = [any Body]()
+        if let gui = gui {
+            visibleBodies.append(gui)
+        }
+        if let planetBody = planetBody {
+            visibleBodies.append(planetBody)
+        }
+        return visibleBodies
     }
     
     override func setupLayout() {
-        gui = GUIBody(views: [titleLabel, scrollView, blackMarketButton, planetButton, backButton], backgroundColor: Colors.GUI.Background.light)
+        gui = GUIBody(views: [titleLabel, scrollView, blackMarketButton, planetButton, backButton, planetBackgroundView])
+        
+        if let planet = game?.player.selectedPlanet {
+            planetBody = StaticTerrainBody(chunks: planet.chunks)
+        } else {
+            planetBody = nil
+        }
     }
     
     override func updateLayout() {
-        let vp = paddingVertical
-        let hp = paddingHorizontal
+        super.updateLayout()
         
-        let buttonWidth = safeArea.width - 2 * hp
-        let buttonHeight = buttonHeight
-        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        let guiHeight = planetBackgroundView.frame.height
+        let gameHeight = (2 * planetVisibilityRadius) / Settings.Camera.sceneHeight
         
-        let labelHeight = titleHeight
-        
-        titleLabel.frame = CGRect(x: safeArea.minX + hp,
-                                  y: safeArea.minY + vp,
-                                  width: safeArea.width - 2 * hp,
-                                  height: labelHeight)
-        
-        blackMarketButton.frame = CGRect(x: buttonX,
-                                         y: safeArea.maxY - 4 * (buttonHeight + vp),
-                                         width: buttonWidth,
-                                         height: buttonHeight)
-        
-        planetButton.frame = CGRect(x: buttonX,
-                                    y: safeArea.maxY - 2 * (buttonHeight + vp),
-                                    width: buttonWidth,
-                                    height: buttonHeight)
-        
-        backButton.frame = CGRect(x: buttonX,
-                                  y: safeArea.maxY - buttonHeight - vp,
-                                  width: buttonWidth,
-                                  height: buttonHeight)
-        
-        scrollView.frame = CGRect(x: 0, y: safeArea.minY + 2 * vp + labelHeight, width: 1, height: 0.5)
-        
-        planetCardViews.enumerated().forEach { i, card in
-            var frame = card.frame
-            frame.origin.x = CGFloat(i) + paddingHorizontal
-            frame.origin.y = paddingVertical
-            frame.size = CGSize(width: 1 - 2 * paddingHorizontal, height: 0.4)
-            card.frame = frame
-            
-            if let label = card.subviews.first as? GUILabel {
-                var frame = CGRect(origin: label.frame.origin, size: card.frame.size)
-                frame.size.height = labelHeight
-                label.frame = frame
-            }
-        }
+        let scale = min(maxPlanetScale, guiHeight / gameHeight)
+        planetBody?.scale = scale
     }
 }
-
-//extension PlanetSelectionScene {
-//    private func convertStarPosition(_ index: Int) -> CGPoint? {
-//        var distToCenter: CGFloat = 0
-//        if state.levelToPackProgress > 2 {
-//            distToCenter = CGFloat(index) - state.currentPackPagePosition
-//        } else {
-//            distToCenter = CGFloat(index) - CGFloat(game!.state.packIndex)
-//        }
-//        let targetAngle = starCenterAngle + distToCenter * starAngleBetweenPositions
-//        let x = starAnchor.x - starRadius * cos(targetAngle)
-//        let y = starAnchor.y - starRadius * sin(targetAngle)
-//        return CGPoint(x: x, y: y)
-//    }
-//
-//    private func convertStarRadius(_ radius: CGFloat) -> CGFloat? {
-//        radius * starRadiusScale
-//    }
-//
-//    private func convertPlanetPosition(_ index: Int) -> CGPoint? {
-//        var distToCenter: CGFloat = 0
-//        if state.levelToPackProgress > 1, state.levelToPackProgress < 3 {
-//            distToCenter = CGFloat(index) - state.currentLevelPagePosition
-//        }
-//        let targetAngle = planetCenterAngle + distToCenter * planetAngleBetweenPositions
-//        let x = planetAnchor.x - planetRadius * cos(targetAngle)
-//        let y = planetAnchor.y - planetRadius * sin(targetAngle)
-//        return CGPoint(x: x, y: y)
-//    }
-//
-//    private func convertPlanetRadius(_ radius: CGFloat) -> CGFloat? {
-//        radius * planetRadiusScale
-//    }
-//
-//    private func convertPlanetChunkPosition(_ levelIndex: Int, position: CGPoint) -> CGPoint {
-//        let levelPosition = convertPlanetPosition(levelIndex) ?? .zero
-//        return CGPoint(x: levelPosition.x + position.x * planetRadiusScale, y: levelPosition.y + position.y * planetRadiusScale)
-//    }
-//}

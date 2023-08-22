@@ -35,7 +35,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         rect.size = .init(width: width, height: height)
         let frame = window.frameRect(forContentRect: rect)
         window.setFrame(frame, display: false)
-        window.center()
         
         window.makeKey()
         window.orderFrontRegardless()
