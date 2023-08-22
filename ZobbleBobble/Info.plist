@@ -6,5 +6,7 @@
 	<array>
 		<string>JoystixMonospace.otf</string>
 	</array>
+    <key>ATSApplicationFontsPath</key>
+    <string></string>
 </dict>
 </plist>
