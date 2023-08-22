@@ -45,7 +45,6 @@ class GUIBody: Body {
     }
     
     private func updatePointersIfNeeded() {
-        // Set texture index here
         var newTextTextureData = [GUIRenderData.TextRenderData]()
         
         var rects = [GUIRenderData.RectModel]()
@@ -53,6 +52,7 @@ class GUIBody: Body {
         
         let allRenderData = views.map { $0.makeRenderData() }
         
+        // Set text texture index here
         allRenderData.forEach { rectsRenderData, labelsRenderData in
             rects.append(contentsOf: rectsRenderData)
             for (labelRenderData, texture) in labelsRenderData {

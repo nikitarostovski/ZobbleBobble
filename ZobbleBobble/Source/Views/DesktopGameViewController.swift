@@ -65,7 +65,7 @@ final class GameViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = MainGame(scrollHolder: self)
+        game = MainGame()
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -74,14 +74,6 @@ final class GameViewController: NSViewController {
             NSLayoutConstraint(item: renderView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: renderView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
         ])
-        
-//        view.addSubview(swipeControl)
-//        NSLayoutConstraint.activate([
-//            NSLayoutConstraint(item: swipeControl, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
-//        ])
     }
     
     override func viewDidLayout() {
@@ -97,7 +89,7 @@ final class GameViewController: NSViewController {
         game?.onTouchDown(pos: pos)
     }
     
-    override func mouseMoved(with event: NSEvent) {
+    override func mouseDragged(with event: NSEvent) {
         var pos = event.locationInWindow
         pos.y = view.bounds.height - pos.y
         pos.x *= NSScreen.main?.backingScaleFactor ?? 1
@@ -137,8 +129,4 @@ extension GameViewController: RenderDelegate {
         guard let game = game else { return }
         game.update(time)
     }
-}
-
-extension GameViewController: ScrollHolder {
-    func updateScrollPosition(pageCount: Int, selectedPage: Int) { }
 }

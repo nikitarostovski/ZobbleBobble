@@ -16,11 +16,13 @@ final class GameViewController: UIViewController {
         return view
     }()
     
-    lazy var swipeControl: SwipeView = {
-        let view = SwipeView(delegate: self)
-//        view.backgroundColor = .red.withAlphaComponent(0.4)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var tapGesture: UILongPressGestureRecognizer = {
+        let g = UILongPressGestureRecognizer(target: self, action: #selector(onTap))
+        g.minimumPressDuration = 0
+        g.requiresExclusiveTouchType = false
+        g.delaysTouchesBegan = false
+        g.delaysTouchesEnded = false
+        return g
     }()
     
     private var isConfigured = false
@@ -41,7 +43,7 @@ final class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.game = MainGame(scrollHolder: self)
+        game = MainGame()
         
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
@@ -50,14 +52,7 @@ final class GameViewController: UIViewController {
             NSLayoutConstraint(item: renderView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: renderView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
         ])
-        
-//        view.addSubview(swipeControl)
-//        NSLayoutConstraint.activate([
-//            NSLayoutConstraint(item: swipeControl, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0),
-//            NSLayoutConstraint(item: swipeControl, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
-//        ])
+        view.addGestureRecognizer(tapGesture)
     }
     
     override func viewDidLayoutSubviews() {
@@ -65,37 +60,22 @@ final class GameViewController: UIViewController {
         updateGameSizeData()
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        guard let touch = touches.first else { return }
-        var pos = touch.location(in: touch.view)
+    @objc
+    func onTap(_ sender: UILongPressGestureRecognizer) {
+        var pos = sender.location(in: sender.view)
         pos.x *= UIScreen.main.scale
         pos.y *= UIScreen.main.scale
-        game?.onTouchDown(pos: pos)
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        guard let touch = touches.first else { return }
-        var pos = touch.location(in: touch.view)
-        pos.x *= UIScreen.main.scale
-        pos.y *= UIScreen.main.scale
-        game?.onTouchMove(pos: pos)
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        guard let touch = touches.first else { return }
-        var pos = touch.location(in: touch.view)
-        pos.x *= UIScreen.main.scale
-        pos.y *= UIScreen.main.scale
-        game?.onTouchUp(pos: pos)
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-        let pos = CGPoint(x: CGFloat.greatestFiniteMagnitude, y: CGFloat.greatestFiniteMagnitude)
-        game?.onTouchUp(pos: pos)
+        
+        switch sender.state {
+        case .began:
+            game?.onTouchDown(pos: pos)
+        case .changed:
+            game?.onTouchMove(pos: pos)
+        case .ended:
+            game?.onTouchUp(pos: pos)
+        default:
+            break
+        }
     }
     
     private func updateGameSizeData(newSize: CGSize? = nil) {
@@ -123,32 +103,3 @@ extension GameViewController: RenderDelegate {
         game.update(time)
     }
 }
-
-extension GameViewController: ScrollHolder {
-    func updateScrollPosition(pageCount: Int, selectedPage: Int) {
-        swipeControl.pageSize = renderView.bounds.width
-        swipeControl.maxSize = swipeControl.pageSize * CGFloat(pageCount)
-        swipeControl.scrollView.setContentOffset(CGPoint(x: CGFloat(selectedPage) * swipeControl.pageSize, y: 0), animated: false)
-    }
-}
-
-extension GameViewController: SwipeViewDelegate {
-    func swipeViewDidSwipe(_ swipeView: SwipeView, totalOffset: CGPoint) {
-        game?.onSwipe(totalOffset)
-    }
-}
-
-extension GameViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        true
-    }
-    
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        true
-    }
-    
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        true
-    }
-}
-

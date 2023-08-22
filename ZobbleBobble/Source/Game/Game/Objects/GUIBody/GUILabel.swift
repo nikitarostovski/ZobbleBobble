@@ -33,6 +33,9 @@ class GUILabel: GUIView {
     }
 
     override func makeRenderData() -> RenderData {
+        var result = super.makeRenderData()
+        defer { needsDisplay = false }
+        
         if needsDisplay {
             labelRenderData = GUIRenderData.LabelModel(backgroundColor: backgroundColor,
                                                        textColor: textColor,
@@ -41,12 +44,12 @@ class GUILabel: GUIView {
                                                        size: SIMD2<Float>(Float(frame.size.width),
                                                                           Float(frame.size.height)))
         }
-        needsDisplay = false
         var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
         if let labelRenderData = labelRenderData, let textData = makeTextData() {
             labels.append((labelRenderData, textData))
         }
-        return ([], labels)
+        result.1.append(contentsOf: labels)
+        return result
     }
     
     func makeTextData() -> GUIRenderData.TextRenderData? {

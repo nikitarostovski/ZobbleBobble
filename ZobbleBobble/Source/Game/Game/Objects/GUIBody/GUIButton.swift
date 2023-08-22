@@ -45,7 +45,6 @@ class GUIButton: GUIView {
         }
     }
     
-    private var rectRenderData: GUIRenderData.RectModel?
     private var labelRenderData: GUIRenderData.LabelModel?
     
     init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil, textInsets: CGSize = .zero) {
@@ -65,27 +64,27 @@ class GUIButton: GUIView {
     }
     
     override func makeRenderData() -> RenderData {
+        var result = super.makeRenderData()
+        defer { needsDisplay = false }
+        
         if needsDisplay {
-            let origin = SIMD2<Float>(Float(frame.origin.x), Float(frame.origin.y))
-            let size = SIMD2<Float>(Float(frame.size.width), Float(frame.size.height))
-            
-            var textOrigin = origin
+            var textOrigin = SIMD2<Float>(Float(frame.origin.x), Float(frame.origin.y))
             textOrigin.x += Float(textInsets.width)
             textOrigin.y += Float(textInsets.height)
-            var textSize = size
+            var textSize = SIMD2<Float>(Float(frame.size.width), Float(frame.size.height))
             textSize.x -= 2 * Float(textInsets.width)
             textSize.y -= 2 * Float(textInsets.height)
             
-            rectRenderData = .init(backgroundColor: backgroundColor, origin: origin,  size: size)
             labelRenderData = .init(backgroundColor: .zero, textColor: textColor, origin: textOrigin, size: textSize)
         }
-        needsDisplay = false
         
         var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
         if let labelRenderData = labelRenderData, let textData = makeTextData() {
             labels.append((labelRenderData, textData))
         }
-        return ([rectRenderData].compactMap { $0 }, labels)
+        
+        result.1.append(contentsOf: labels)
+        return result
     }
     
     func makeTextData() -> GUIRenderData.TextRenderData? {

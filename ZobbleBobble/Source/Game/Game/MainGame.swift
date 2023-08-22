@@ -7,13 +7,7 @@
 
 import Foundation
 
-protocol ScrollHolder: AnyObject {
-    func updateScrollPosition(pageCount: Int, selectedPage: Int)
-}
-
 final class MainGame: RenderDataSource {
-    weak var scrollHolder: ScrollHolder?
-    
     private(set) var safeArea: CGRect = .zero
     private(set) var screenSize: CGSize = .zero
     private(set) var screenScale: CGFloat = 1
@@ -26,8 +20,7 @@ final class MainGame: RenderDataSource {
     
     // MARK: - Methods
     
-    init?(scrollHolder: ScrollHolder?) {
-        self.scrollHolder = scrollHolder
+    init() {
         self.player = PlayerModel()
         self.visibleScenes = []
         self.planetService = PlanetService()
@@ -35,6 +28,7 @@ final class MainGame: RenderDataSource {
         
         configurePlayer()
         
+//        let rootScene = PlanetSelectionScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
         let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
 //        let rootScene = PlanetScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
         rootScene.transitionDelegate = self
@@ -156,15 +150,6 @@ extension MainGame {
                 $0.onTouchUp(pos: posNorm)
             }
         }
-    }
-    
-    func onSwipe(_ position: CGPoint) {
-//        switch state.state {
-//        case .level:
-//            scene?.onSwipe(position.x)
-//        case .menu:
-//            menu?.onSwipe(position.x)
-//        }
     }
 }
 

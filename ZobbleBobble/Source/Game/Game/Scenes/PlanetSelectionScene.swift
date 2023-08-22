@@ -24,6 +24,25 @@ final class PlanetSelectionScene: Scene {
     private lazy var planetButton: GUIButton = GUIButton(title: "To Planet", tapAction: goToPlanet)
     private lazy var backButton: GUIButton = GUIButton(style: .utility, title: "Back", tapAction: goToContainerSelection)
     
+    private lazy var scrollView: GUIScrollView = {
+        let view = GUIScrollView(subviews: planetCardViews)
+        view.backgroundColor = .init(rgb: 0x0000FF, a: 100)
+        return view
+    }()
+    
+    private lazy var planetCardViews: [GUIView] = {
+        let planets = game?.player.planets ?? []
+        return planets.enumerated().map { i, planet in
+            let container = GUIView(backgroundColor: Colors.GUI.Button.backgroundUtilityNormal)
+            container.backgroundColor = .init(rgb: 0x00FF00, a: 100)
+            
+            let label = GUILabel(text: "Planet \(i + 1)")
+            label.backgroundColor = .init(rgb: 0xFF0000, a: 100)
+            container.subviews.append(label)
+            
+            return container
+        }
+    }()
     
     private var starCenterLevelMode: CGPoint = .zero
     private var starCenterMenuLevelMode: CGPoint = .zero
@@ -58,15 +77,7 @@ final class PlanetSelectionScene: Scene {
 
     private(set) var visibleLevelIndices: ClosedRange<Int> = 0...0
 
-//    private(set) var state: PlanetSelectionState
-    
     private weak var terrainBody: TerrainBody?
-    
-//    private let levelManager: LevelManager
-
-//    private var visibleLevels: [LevelModel] {
-//        Array(currentPack!.levels[visibleLevelIndices])
-//    }
     
     convenience init(_ scene: Scene,
          from: CGFloat = Settings.Camera.levelsMenuCameraScale,
@@ -101,7 +112,7 @@ final class PlanetSelectionScene: Scene {
     }
     
     override func setupLayout() {
-        gui = GUIBody(views: [titleLabel, blackMarketButton, planetButton, backButton], backgroundColor: Colors.GUI.Background.light)
+        gui = GUIBody(views: [titleLabel, scrollView, blackMarketButton, planetButton, backButton], backgroundColor: Colors.GUI.Background.light)
     }
     
     override func updateLayout() {
@@ -133,6 +144,22 @@ final class PlanetSelectionScene: Scene {
                                   y: safeArea.maxY - buttonHeight - vp,
                                   width: buttonWidth,
                                   height: buttonHeight)
+        
+        scrollView.frame = CGRect(x: 0, y: safeArea.minY + 2 * vp + labelHeight, width: 1, height: 0.5)
+        
+        planetCardViews.enumerated().forEach { i, card in
+            var frame = card.frame
+            frame.origin.x = CGFloat(i) + paddingHorizontal
+            frame.origin.y = paddingVertical
+            frame.size = CGSize(width: 1 - 2 * paddingHorizontal, height: 0.4)
+            card.frame = frame
+            
+            if let label = card.subviews.first as? GUILabel {
+                var frame = CGRect(origin: label.frame.origin, size: card.frame.size)
+                frame.size.height = labelHeight
+                label.frame = frame
+            }
+        }
     }
 }
 
