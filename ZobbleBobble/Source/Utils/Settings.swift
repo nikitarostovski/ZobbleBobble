@@ -8,6 +8,12 @@
 import Foundation
 
 enum Settings {
+#if DEBUG
+    static let isDebug = true
+#else
+    static let isDebug = false
+#endif
+    
     // TODO: Rename to `Scene`
     enum Camera {
         static let sceneHeight: CGFloat = 960 / Graphics.resolutionDownscale
@@ -79,7 +85,7 @@ enum Settings {
         
         static let inflightBufferCount = 3
         
-        static let postprocessingEnabled = false
+        static let postprocessingEnabled = !Settings.isDebug
         static let dotMaskType: DotMask.MaskType = .trisectedShifted
     }
 }

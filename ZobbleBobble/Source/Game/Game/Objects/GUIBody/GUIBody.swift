@@ -17,6 +17,8 @@ class GUIBody: Body {
     var alpha: Float = 1
     var views: [GUIView] { didSet { updatePointersIfNeeded() } }
     
+    private var needsDisplay = true
+    
     private var rectsPointer: UnsafeMutableRawPointer?
     private var rectCount: Int = 0
     private var labelsPointer: UnsafeMutableRawPointer?
@@ -45,6 +47,9 @@ class GUIBody: Body {
     }
     
     private func updatePointersIfNeeded() {
+        needsDisplay = needsDisplay || views.reduce(into: false, { $0 = $0 || $1.needsDisplay })
+        guard needsDisplay else { return }
+        
         var newTextTextureData = [GUIRenderData.TextRenderData]()
         
         var rects = [GUIRenderData.RectModel]()

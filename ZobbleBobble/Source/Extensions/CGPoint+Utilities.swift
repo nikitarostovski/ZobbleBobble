@@ -8,11 +8,6 @@
 import CoreGraphics
 
 public extension CGPoint {
-    func distance(to: CGPoint) -> CGFloat {
-        let d = (self.x - to.x) * (self.x - to.x) + (self.y - to.y) * (self.y - to.y)
-        return sqrt(d)
-    }
-    
     func angle(to comparisonPoint: CGPoint) -> CGFloat {
         let originX = comparisonPoint.x - x
         let originY = comparisonPoint.y - y
@@ -40,29 +35,13 @@ public extension CGPoint {
         let y = origin.y + radius * sin(newAzimuth)
         return CGPoint(x: x, y: y)
     }
-    
-    static func - (left:CGPoint,right:CGPoint) -> CGPoint {
-        return CGPoint(x: left.x-right.x,y: left.y-right.y)
-    }
 
     static func -= (left:inout CGPoint,right:CGPoint) {
         left = CGPoint(x: left.x-right.x,y: left.y-right.y)
     }
 
-    static func + (left:CGPoint,right:CGPoint) -> CGPoint {
-        return CGPoint(x: left.x+right.x,y: left.y+right.y)
-    }
-
     static func += (left:inout CGPoint,right:CGPoint) {
         left = CGPoint(x: left.x+right.x,y: left.y+right.y)
-    }
-
-    static func * (left:CGPoint,right:CGFloat) -> CGPoint {
-        return CGPoint(x: left.x*right,y: left.y*right)
-    }
-
-    static func / (left:CGPoint,right:CGFloat) -> CGPoint {
-        return CGPoint(x: left.x/right,y: left.y/right)
     }
 }
 

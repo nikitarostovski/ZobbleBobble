@@ -12,7 +12,7 @@ final class PlanetService {
     private let chunkService = ChunkService("Planets")!
     
     func getAvaialablePlanets(for player: PlayerModel) -> [PlanetModel] {
-        [generatePlanet(for: player)]
+        [generatePlanet(for: player), generatePlanet(for: player), generatePlanet(for: player), generatePlanet(for: player)]
     }
     
     private func generatePlanet(for player: PlayerModel) -> PlanetModel {
@@ -25,8 +25,10 @@ final class PlanetService {
                                       outerSpaceLimit: .init(value: .init(), fine: 1))
         
         let chunks = [chunkService.generateChunk()]
+        let number = UInt8.random(in: UInt8.min...UInt8.max)
         
-        let planet = PlanetModel(price: 125,
+        let planet = PlanetModel(name: "Planet #\(number)",
+                                 price: 125,
                                  speed: 60,
                                  chunks: chunks,
                                  limits: limits,

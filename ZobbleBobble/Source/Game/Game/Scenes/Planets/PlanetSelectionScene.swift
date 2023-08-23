@@ -10,11 +10,15 @@ import Foundation
 final class PlanetSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planetSelection }
     
-    private let maxPlanetScale: CGFloat = 4
+    private let maxPlanetScale: CGFloat = 3
     
-    private var planetBody: StaticTerrainBody?
+    private lazy var selectedPlanetIndex: Int = {
+        return game?.player.selectedPlanetIndex ?? 0
+    }()
     
-    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet selection") { [weak self] _ in
+    private var planetBodies = [StaticTerrainBody]()
+    
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Select planet") { [weak self] _ in
         guard let self = self else { return .zero }
         return CGRect(x: safeArea.minX + paddingHorizontal,
                       y: safeArea.minY + paddingVertical,
@@ -28,7 +32,7 @@ final class PlanetSelectionScene: Scene {
         let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
         
         return CGRect(x: buttonX,
-                      y: safeArea.maxY - 4 * (buttonHeight + paddingVertical),
+                      y: safeArea.minY + titleHeight + 2 * paddingVertical,
                       width: buttonWidth,
                       height: buttonHeight)
     }
@@ -69,7 +73,7 @@ final class PlanetSelectionScene: Scene {
                               height: scrollView.frame.height - 2 * paddingVertical)
             }
             
-            let label = GUILabel(text: "Planet \(i + 1)")
+            let label = GUILabel(text: planet.name)
             label.backgroundColor = .init(rgb: 0xFFFFFF, a: 100)
             label.onLayout = { [weak self, weak container] _ in
                 guard let self = self, let container = container else { return .zero }
@@ -86,23 +90,30 @@ final class PlanetSelectionScene: Scene {
     
     private lazy var scrollView: GUIScrollView = {
         let view = GUIScrollView(subviews: planetCardViews)
+        view.contentSize.width = CGFloat(view.subviews.count)
         view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
         let scale = size.height / (Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale)
         
         view.onLayout = { [weak self] _ in
             guard let self = self else { return .zero }
-            let top = titleLabel.frame.maxY + paddingVertical
-            let bottom = blackMarketButton.frame.minY - paddingVertical
+            let top = blackMarketButton.frame.maxY + paddingVertical
+            let bottom = planetButton.frame.minY - paddingVertical
             let height =  bottom - top
             return CGRect(x: 0, y: top, width: 1, height: height)
         }
         view.onScroll = { [weak self] view in
-            guard let self = self,
-                  let planetBody = self.planetBody
-            else { return }
+            guard let self = self else { return }
             
-            planetBody.offset.x = view.contentOffset.x / scale * size.width
-            planetBody.offset.y = Settings.Camera.sceneHeight * (planetBackgroundView.frame.midY - 0.5)
+            let planetIndex = Int(view.contentOffset.x + 0.5)
+            if selectedPlanetIndex != planetIndex {
+                selectedPlanetIndex = planetIndex
+                game?.selectPlanet(planetIndex)
+            }
+            
+            planetBodies.enumerated().forEach { i, planetBody in
+                planetBody.offset.x = (CGFloat(i) - view.contentOffset.x) / scale * self.size.width
+                planetBody.offset.y = Settings.Camera.sceneHeight * (self.planetBackgroundView.frame.midY - 0.5)
+            }
         }
         return view
     }()
@@ -119,7 +130,7 @@ final class PlanetSelectionScene: Scene {
             let height = scrollView.frame.height - titleHeight - 3 * paddingVertical
             let width = height / size.width * size.height
             
-            let x = (size.width / 2 + scrollView.contentOffset.x) / size.width - width / 2
+            let x = (size.width / 2 - scrollView.contentOffset.x) / size.width - width / 2
             let y = scrollView.frame.maxY - height - paddingVertical
             
             return CGRect(x: x, y: y, width: width, height: height)
@@ -139,20 +150,21 @@ final class PlanetSelectionScene: Scene {
         if let gui = gui {
             visibleBodies.append(gui)
         }
-        if let planetBody = planetBody {
-            visibleBodies.append(planetBody)
-        }
+        visibleBodies.append(contentsOf: planetBodies)
         return visibleBodies
     }
     
     override func setupLayout() {
         gui = GUIBody(views: [titleLabel, scrollView, blackMarketButton, planetButton, backButton, planetBackgroundView])
         
-        if let planet = game?.player.selectedPlanet {
-            planetBody = StaticTerrainBody(chunks: planet.chunks)
-        } else {
-            planetBody = nil
+        (game?.player.selectedPlanetIndex).map {
+            self.selectedPlanetIndex = $0
+            self.scrollView.contentOffset.x = CGFloat($0)
         }
+        
+        planetBodies = game?.player.planets.map {
+            StaticTerrainBody(chunks: $0.chunks)
+        } ?? []
     }
     
     override func updateLayout() {
@@ -162,6 +174,7 @@ final class PlanetSelectionScene: Scene {
         let gameHeight = (2 * planetVisibilityRadius) / Settings.Camera.sceneHeight
         
         let scale = min(maxPlanetScale, guiHeight / gameHeight)
-        planetBody?.scale = scale
+        
+        planetBodies.forEach { $0.scale = scale }
     }
 }

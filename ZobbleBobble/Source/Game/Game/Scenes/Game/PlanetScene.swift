@@ -119,6 +119,7 @@ final class PlanetScene: Scene {
     private func updateGUI() {
         guard let gui = gui else { return }
         
+        titleLabel.text = game?.player.selectedPlanet?.name
         var visible: [GUIView] = [titleLabel]
         
         switch (isGameOver, isPaused) {

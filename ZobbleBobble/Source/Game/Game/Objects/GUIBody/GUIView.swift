@@ -40,6 +40,10 @@ class GUIView {
         }
     }
     
+    var bounds: CGRect {
+        CGRect(origin: .zero, size: frame.size)
+    }
+    
     /// Render data for background color rect
     private var rectRenderData: GUIRenderData.RectModel?
     
@@ -86,6 +90,7 @@ class GUIView {
         }
         var result = makeSubviewsRenderData()
         result.0 += [rectRenderData].compactMap { $0 }
+        needsDisplay = false
         return result
     }
     

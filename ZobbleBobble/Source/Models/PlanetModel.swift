@@ -29,6 +29,7 @@ struct LimitationsModel: Codable {
 }
 
 class PlanetModel: Codable {
+    let name: String
     /// Amount of credits to unlock this planet
     let price: UInt64
     /// Rotation speed, degrees per second
@@ -41,12 +42,13 @@ class PlanetModel: Codable {
     var gravityStrength: CGFloat
     /// Particle radius
     let particleRadius: CGFloat
-    
+    /// Unique materials that present in planet's initial chunks
     let uniqueMaterials: [MaterialType]
     /// Object describing conditions and restrictions
     var limits: LimitationsModel?
     
     enum CodingKeys: String, CodingKey {
+        case name
         case price
         case speed
         case chunks
@@ -56,7 +58,8 @@ class PlanetModel: Codable {
         case limits
     }
     
-    init(price: UInt64, speed: CGFloat, chunks: [ChunkModel], limits: LimitationsModel?, gravityRadius: CGFloat, gravityStrength: CGFloat, particleRadius: CGFloat) {
+    init(name: String, price: UInt64, speed: CGFloat, chunks: [ChunkModel], limits: LimitationsModel?, gravityRadius: CGFloat, gravityStrength: CGFloat, particleRadius: CGFloat) {
+        self.name = name
         self.price = price
         self.speed = speed
         self.chunks = chunks
@@ -70,6 +73,7 @@ class PlanetModel: Codable {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
         self.price = try container.decode(UInt64.self, forKey: .price)
         self.speed = try container.decode(CGFloat.self, forKey: .speed)
         self.chunks = try container.decode([ChunkModel].self, forKey: .chunks)

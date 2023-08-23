@@ -64,9 +64,6 @@ class GUIButton: GUIView {
     }
     
     override func makeRenderData() -> RenderData {
-        var result = super.makeRenderData()
-        defer { needsDisplay = false }
-        
         if needsDisplay {
             var textOrigin = SIMD2<Float>(Float(frame.origin.x), Float(frame.origin.y))
             textOrigin.x += Float(textInsets.width)
@@ -77,12 +74,11 @@ class GUIButton: GUIView {
             
             labelRenderData = .init(backgroundColor: .zero, textColor: textColor, origin: textOrigin, size: textSize)
         }
-        
+        var result = super.makeRenderData()
         var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
         if let labelRenderData = labelRenderData, let textData = makeTextData() {
             labels.append((labelRenderData, textData))
         }
-        
         result.1.append(contentsOf: labels)
         return result
     }
