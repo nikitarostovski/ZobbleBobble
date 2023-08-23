@@ -649,15 +649,10 @@
 			isa = PBXGroup;
 			children = (
 				11889DDF2A8C953F00F8216B /* Core */,
-				11889DD72A8C87C100F8216B /* ControlCenterScene.swift */,
-				11889DE32A8CDCD300F8216B /* ImprovementsScene.swift */,
-				11889DE12A8CDCC400F8216B /* ContainerSelectionScene.swift */,
-				11889DE52A8CDCE200F8216B /* GarbageMarketScene.swift */,
-				11889DE92A8CDCFA00F8216B /* UtilizationPlantScene.swift */,
-				110DB2582A8D4D9B002DEEAD /* PlanetSelectionScene.swift */,
-				11889DE72A8CDCEC00F8216B /* BlackMarketScene.swift */,
-				11889DEB2A8CDD0500F8216B /* PlanetScene.swift */,
-				11889DED2A8CDD1600F8216B /* GameResultsScene.swift */,
+				115BAEE32A95E78C0069A5B0 /* Home */,
+				115BAEE42A95E7980069A5B0 /* Containers */,
+				115BAEE52A95E7A40069A5B0 /* Planets */,
+				115BAEE62A95E7AA0069A5B0 /* Game */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -686,6 +681,43 @@
 				11889DF32A8CF47C00F8216B /* GUINode.swift */,
 			);
 			path = Nodes;
+			sourceTree = "<group>";
+		};
+		115BAEE32A95E78C0069A5B0 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				11889DD72A8C87C100F8216B /* ControlCenterScene.swift */,
+				11889DE32A8CDCD300F8216B /* ImprovementsScene.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		115BAEE42A95E7980069A5B0 /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				11889DE12A8CDCC400F8216B /* ContainerSelectionScene.swift */,
+				11889DE52A8CDCE200F8216B /* GarbageMarketScene.swift */,
+				11889DE92A8CDCFA00F8216B /* UtilizationPlantScene.swift */,
+			);
+			path = Containers;
+			sourceTree = "<group>";
+		};
+		115BAEE52A95E7A40069A5B0 /* Planets */ = {
+			isa = PBXGroup;
+			children = (
+				110DB2582A8D4D9B002DEEAD /* PlanetSelectionScene.swift */,
+				11889DE72A8CDCEC00F8216B /* BlackMarketScene.swift */,
+			);
+			path = Planets;
+			sourceTree = "<group>";
+		};
+		115BAEE62A95E7AA0069A5B0 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				11889DEB2A8CDD0500F8216B /* PlanetScene.swift */,
+				11889DED2A8CDD1600F8216B /* GameResultsScene.swift */,
+			);
+			path = Game;
 			sourceTree = "<group>";
 		};
 		117B3F2D2A931F4700C25EE7 /* Services */ = {
