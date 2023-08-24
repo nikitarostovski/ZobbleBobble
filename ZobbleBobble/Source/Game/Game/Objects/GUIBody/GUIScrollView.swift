@@ -36,11 +36,10 @@ class GUIScrollView: GUIView {
     private var state: State = .default
     private var contentOffsetAnimation: TimerAnimation?
     private var offset: CGPoint = .zero { didSet { needsDisplay = true; onScroll?(self) } }
+    private var subviewRenderDataCahce: RenderData?
     
     var onScroll: ScrollClosure?
     var contentSize = CGSize(width: 1, height: 1) { didSet { needsDisplay = true; onScroll?(self) } }
-    
-    private var subviewRenderDataCahce: RenderData?
     
     var contentOffset: CGPoint {
         get { CGPoint(x: -offset.x, y: offset.y) }
@@ -220,9 +219,8 @@ class GUIScrollView: GUIView {
         
         let displacement = offset - restOffset
         let threshold: CGFloat = 0.5 / Settings.Camera.sceneHeight / 2
-        let spring = Spring.default
         
-        let parameters = SpringTimingParameters(spring: spring,
+        let parameters = SpringTimingParameters(spring: .default,
                                                 displacement: displacement,
                                                 initialVelocity: velocity,
                                                 threshold: threshold)
@@ -231,6 +229,8 @@ class GUIScrollView: GUIView {
             duration: parameters.duration,
             animations: { [weak self] _, time in
                 self?.offset = restOffset + parameters.value(at: time)
+            }, completion: { [weak self] _ in
+                self?.stopOffsetAnimation()
             })
     }
     

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ScrollMechanics
 
 enum TransitionError: Error {
     case unavailable
@@ -14,31 +15,33 @@ enum TransitionError: Error {
 
 class SceneTransition {
     let duration: TimeInterval
-    let curve: Curve
-    let from: Scene
-    let to: Scene
+    weak var from: Scene?
+    weak var to: Scene?
     
-    init(from: Scene, to: Scene, duration: TimeInterval, curve: Curve) {
+    private var animation: TimerAnimation?
+    
+    init(from: Scene, to: Scene, duration: TimeInterval) {
         self.from = from
         self.to = to
         self.duration = duration
-        self.curve = curve
     }
     
     func start() {
-        Animator.animate(duraion: duration, easing: curve, step: { [weak self] percentage in
+        animation = TimerAnimation(duration: duration, animations: { [weak self] progress, time in
             guard let self = self else { return }
             
-            let newFrom = Float(1 - percentage)
-            let newTo = Float(percentage)
+            let newFrom = Float(1 - progress)
+            let newTo = Float(progress)
             
-            self.from.onTransitionProgressChange(newFrom)
-            self.to.onTransitionProgressChange(newTo)
+            from?.onTransitionProgressChange(newFrom)
+            to?.onTransitionProgressChange(newTo)
+        }, completion: { [weak self] f in
             
-        }, completion: { [weak self] in
             guard let self = self else { return }
-            self.from.onTransitionProgressChange(0, isFinished: true)
-            self.to.onTransitionProgressChange(1, isFinished: true)
+            from?.onTransitionProgressChange(0, isFinished: true)
+            to?.onTransitionProgressChange(1, isFinished: true)
+            animation?.invalidate()
+            animation = nil
         })
     }
     
@@ -47,17 +50,20 @@ class SceneTransition {
     func stop(shouldReset: Bool = false) {
         let newFrom: Float
         let newTo: Float
-        
+
         if shouldReset {
             // rewind back to `from` scene
             newFrom = 1
             newTo = 0
         } else {
             // finish transition immediately
-            newFrom = from.opacity
-            newTo = to.opacity
+            newFrom = from?.opacity ?? 1
+            newTo = to?.opacity ?? 0
         }
-        from.onTransitionProgressChange(newFrom, isFinished: true)
-        to.onTransitionProgressChange(newTo, isFinished: true)
+        from?.onTransitionProgressChange(newFrom, isFinished: true)
+        to?.onTransitionProgressChange(newTo, isFinished: true)
+
+        animation?.invalidate()
+        animation = nil
     }
 }

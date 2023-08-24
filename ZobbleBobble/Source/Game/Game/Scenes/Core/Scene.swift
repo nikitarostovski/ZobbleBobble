@@ -40,18 +40,20 @@ class Scene {
     var activeTransitionTarget: TransitionTarget? {
         guard let transition = activeTransition else { return nil }
         if activeTransitionType == .toMe {
-            return transition.from.transitionTargetCategory
+            return transition.from?.transitionTargetCategory
         } else {
-            return transition.to.transitionTargetCategory
+            return transition.to?.transitionTargetCategory
         }
     }
     
     private var activeTransitionType: TransitionType? {
-        activeTransition.map { $0.from === self ? .fromMe : .toMe }
+        guard let activeTransition = activeTransition else { return nil }
+        return activeTransition.from === self ? .fromMe : .toMe
     }
     
     private var activeTransitionScene: Scene? {
-        activeTransition.map { $0.from === self ? $0.to : $0.from }
+        guard let activeTransition = activeTransition else { return nil }
+        return activeTransition.from === self ? activeTransition.to : activeTransition.from
     }
     
     convenience init(_ scene: Scene) {
@@ -135,8 +137,7 @@ class Scene {
         
         let transition = SceneTransition(from: self,
                                          to: scene,
-                                         duration: Settings.Camera.sceneTransitionDuration,
-                                         curve: Settings.Camera.sceneTransitionEasing)
+                                         duration: Settings.Camera.sceneTransitionDuration)
         
         self.activeTransition = transition
         scene.activeTransition = transition

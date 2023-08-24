@@ -25,6 +25,8 @@ final class PlanetScene: Scene {
     private var gun: GunBody
     private var missle: MissleBody?
     
+    private var animation: TimerAnimation?
+    
     var isGameOver: Bool = false { didSet { onStateUpdate() } }
     var isPaused: Bool = true { didSet { onStateUpdate() } }
     
@@ -200,20 +202,23 @@ final class PlanetScene: Scene {
         let startMissleCount = gun.state.currentMissleIndex
         let endMissleCount = gun.state.currentMissleIndex + 1
 
-        let animation = { [weak self] (percentage: CGFloat) in
+        let animations = { [weak self] (progress: Double, _: TimeInterval) in
             guard let self = self else { return }
             
-            let starPercentage = min(1, percentage * Settings.Camera.missleParticleMaxSpeedModifier)
+            let starPercentage = min(1, progress * Settings.Camera.missleParticleMaxSpeedModifier)
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * starPercentage
             
             let missleRange = gun.getWorldVisibleMissles(misslesFired: misslesFired)
             self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
             
-            self.missle?.updateMisslePosition(percentage)
+            self.missle?.updateMisslePosition(progress)
         }
         
-        let completion = { [weak self] in
+        let completion = { [weak self] (_ : Bool) in
             guard let self = self else { return }
+            
+            self.animation?.invalidate()
+            self.animation = nil
             
             let missleRange = gun.getWorldVisibleMissles(misslesFired: endMissleCount)
             self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
@@ -224,9 +229,9 @@ final class PlanetScene: Scene {
         }
 
         if animated {
-            Animator.animate(duraion: Settings.Camera.shotAnimationDuration, easing: Settings.Camera.shotAnimationEasing, step: animation, completion: completion)
+            animation = TimerAnimation(duration: Settings.Camera.shotAnimationDuration, animations: animations, completion: completion)
         } else {
-            completion()
+            completion(true)
         }
     }
 

@@ -38,7 +38,6 @@
 		113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */; };
 		115BAEF92A95F8D90069A5B0 /* RubberBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEED2A95F8D80069A5B0 /* RubberBand.swift */; };
 		115BAEFA2A95F8D90069A5B0 /* CGPoint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */; };
-		115BAEFB2A95F8D90069A5B0 /* UISpringTimingParameters+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF02A95F8D80069A5B0 /* UISpringTimingParameters+Utils.swift */; };
 		115BAEFC2A95F8D90069A5B0 /* GeometryUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */; };
 		115BAEFD2A95F8D90069A5B0 /* Comparable+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF22A95F8D80069A5B0 /* Comparable+Utils.swift */; };
 		115BAEFE2A95F8D90069A5B0 /* CASpringAnimation+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF32A95F8D80069A5B0 /* CASpringAnimation+Utils.swift */; };
@@ -89,8 +88,6 @@
 		1194330829892CD300AE56CA /* CGRect+Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194330729892CD300AE56CA /* CGRect+Colors.swift */; };
 		1194C9BE29910E9500ACAF97 /* ZPWorldDef.h in Headers */ = {isa = PBXBuildFile; fileRef = 1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1194C9BF29910E9500ACAF97 /* ZPWorldDef.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */; };
-		1195528A2961CE85000C7A95 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119552892961CE85000C7A95 /* Animator.swift */; };
-		1195528C2961D162000C7A95 /* Easing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1195528B2961D162000C7A95 /* Easing.swift */; };
 		119B46CD29FFCC8600845D1B /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119B46CC29FFCC8600845D1B /* BufferProvider.swift */; };
 		119E35532A9111F200A16F00 /* DesktopGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35522A9111F200A16F00 /* DesktopGameViewController.swift */; platformFilters = (macos, ); };
 		119E35552A91158700A16F00 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119E35542A91158700A16F00 /* main.swift */; platformFilters = (macos, ); };
@@ -353,7 +350,6 @@
 		113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticTerrainBody.swift; sourceTree = "<group>"; };
 		115BAEED2A95F8D80069A5B0 /* RubberBand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RubberBand.swift; sourceTree = "<group>"; };
 		115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
-		115BAEF02A95F8D80069A5B0 /* UISpringTimingParameters+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UISpringTimingParameters+Utils.swift"; sourceTree = "<group>"; };
 		115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryUtils.swift; sourceTree = "<group>"; };
 		115BAEF22A95F8D80069A5B0 /* Comparable+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Comparable+Utils.swift"; sourceTree = "<group>"; };
 		115BAEF32A95F8D80069A5B0 /* CASpringAnimation+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CASpringAnimation+Utils.swift"; sourceTree = "<group>"; };
@@ -403,8 +399,6 @@
 		1194330729892CD300AE56CA /* CGRect+Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Colors.swift"; sourceTree = "<group>"; };
 		1194C9BC29910E9500ACAF97 /* ZPWorldDef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZPWorldDef.h; sourceTree = "<group>"; };
 		1194C9BD29910E9500ACAF97 /* ZPWorldDef.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZPWorldDef.mm; sourceTree = "<group>"; };
-		119552892961CE85000C7A95 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
-		1195528B2961D162000C7A95 /* Easing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Easing.swift; sourceTree = "<group>"; };
 		1198B9FB298D0BA100142DFD /* SIMDColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIMDColor+Hex.swift"; sourceTree = "<group>"; };
 		119B46CC29FFCC8600845D1B /* BufferProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
 		119E35522A9111F200A16F00 /* DesktopGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopGameViewController.swift; sourceTree = "<group>"; };
@@ -779,7 +773,6 @@
 			isa = PBXGroup;
 			children = (
 				115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */,
-				115BAEF02A95F8D80069A5B0 /* UISpringTimingParameters+Utils.swift */,
 				115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */,
 				115BAEF22A95F8D80069A5B0 /* Comparable+Utils.swift */,
 				115BAEF32A95F8D80069A5B0 /* CASpringAnimation+Utils.swift */,
@@ -920,8 +913,6 @@
 			children = (
 				11B3FD0C298012330058FFEB /* Settings.swift */,
 				117B3F402A934A9A00C25EE7 /* Colors.swift */,
-				119552892961CE85000C7A95 /* Animator.swift */,
-				1195528B2961D162000C7A95 /* Easing.swift */,
 				11EC8C062A10DCDD000F322C /* ThreadHelper.swift */,
 				119B46CC29FFCC8600845D1B /* BufferProvider.swift */,
 				116D7D872A89E707007ED1DD /* DotMask.swift */,
@@ -1473,7 +1464,6 @@
 				11889DD82A8C87C100F8216B /* ControlCenterScene.swift in Sources */,
 				11889DDC2A8C931100F8216B /* SceneTransition.swift in Sources */,
 				11B321712965CCA3000F4180 /* BaseNode.swift in Sources */,
-				115BAEFB2A95F8D90069A5B0 /* UISpringTimingParameters+Utils.swift in Sources */,
 				11EC8BEF2A10AD80000F322C /* SIMDColor+Hex.swift in Sources */,
 				11889DE62A8CDCE200F8216B /* GarbageMarketScene.swift in Sources */,
 				115BAEFF2A95F8D90069A5B0 /* TimerAnimation.swift in Sources */,
@@ -1505,7 +1495,6 @@
 				110DB2632A8FA824002DEEAD /* PlanetModel.swift in Sources */,
 				119E35532A9111F200A16F00 /* DesktopGameViewController.swift in Sources */,
 				110DB2692A8FB97F002DEEAD /* GunShaders.metal in Sources */,
-				1195528A2961CE85000C7A95 /* Animator.swift in Sources */,
 				115BAEFD2A95F8D90069A5B0 /* Comparable+Utils.swift in Sources */,
 				11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */,
 				110DB26C2A8FBF04002DEEAD /* StarRenderData.swift in Sources */,
@@ -1544,7 +1533,6 @@
 				110DB25F2A8E28BF002DEEAD /* GUILabel.swift in Sources */,
 				11B3FD0D298012330058FFEB /* Settings.swift in Sources */,
 				116D7D812A8681F0007ED1DD /* CRT.metal in Sources */,
-				1195528C2961D162000C7A95 /* Easing.swift in Sources */,
 				11A5C8C52A93CAB200817D68 /* MaterialModel+Blueprints.swift in Sources */,
 				113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */,
 				117B3F352A9328C200C25EE7 /* PlanetService.swift in Sources */,

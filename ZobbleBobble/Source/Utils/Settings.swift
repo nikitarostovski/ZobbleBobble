@@ -52,10 +52,7 @@ enum Settings {
 //        static let planetPackMenuAngle: CGFloat = CGFloat(90).radians
         
         static let sceneTransitionDuration: Double = 0.15
-        static let sceneTransitionEasing: Curve = .sine
-        
         static let shotAnimationDuration: Double = 0.4
-        static let shotAnimationEasing: Curve = .sine
     }
     
     enum Physics {
