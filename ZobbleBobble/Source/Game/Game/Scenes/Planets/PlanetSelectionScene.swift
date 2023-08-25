@@ -18,7 +18,7 @@ final class PlanetSelectionScene: Scene {
     
     private var planetBodies = [StaticTerrainBody]()
     
-    private lazy var titleLabel: GUILabel = GUILabel(text: "Select planet") { [weak self] _ in
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Select a planet") { [weak self] _ in
         guard let self = self else { return .zero }
         return CGRect(x: safeArea.minX + paddingHorizontal,
                       y: safeArea.minY + paddingVertical,
@@ -37,7 +37,7 @@ final class PlanetSelectionScene: Scene {
                       height: buttonHeight)
     }
     
-    private lazy var planetButton: GUIButton = GUIButton(title: "To Planet", tapAction: goToPlanet) { [weak self] _ in
+    private lazy var planetButton: GUIButton = GUIButton(title: "Select", tapAction: goToPlanet) { [weak self] _ in
         guard let self = self else { return .zero }
         let buttonWidth = safeArea.width - 2 * paddingHorizontal
         let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2

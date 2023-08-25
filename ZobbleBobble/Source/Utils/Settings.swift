@@ -23,7 +23,7 @@ enum Settings {
         static let packsMenuCameraScale: CGFloat = 3
         
         static let levelCenterOffset: CGFloat = -120 / Graphics.resolutionDownscale
-        static let gunCenterOffset: CGFloat = 560 / Graphics.resolutionDownscale
+        static let gunCenterOffset: CGFloat = 450 / Graphics.resolutionDownscale
         
         static let gunRadius: CGFloat = 100 / Graphics.resolutionDownscale
         static let gunMissleCenterOffset: CGFloat = 10 / Graphics.resolutionDownscale

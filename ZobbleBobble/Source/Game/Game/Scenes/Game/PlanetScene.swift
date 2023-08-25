@@ -8,35 +8,80 @@
 import Foundation
 
 final class PlanetScene: Scene {
+    enum GameState {
+        case normal
+        case paused
+        case gameOver
+    }
+    
     override var transitionTargetCategory: TransitionTarget { .planet }
     override var background: SIMD4<UInt8> { get { Colors.Background.defaultPack } set { } }
     
     private let levelCenterPoint = CGPoint(x: 0, y: Settings.Camera.levelCenterOffset)
     private var gunCenterPoint: CGPoint { CGPoint(x: 0, y: levelCenterPoint.y + Settings.Camera.gunCenterOffset) }
     
-    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet")
-    private lazy var pauseButton: GUIButton = GUIButton(style: .utility,title: "||", tapAction: onPauseTap)
-    private lazy var backToGameButton: GUIButton = GUIButton(style: .utility,title: "Cancel", tapAction: onBackToGameTap)
-    private lazy var exitButton: GUIButton = GUIButton(title: "Exit", tapAction: goToControlCenter)
-    private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults)
+    private var gameState: GameState { didSet { onStateUpdate() } }
+    
+    private lazy var titleLabel: GUILabel = GUILabel(text: "Planet") { [weak self] _ in
+        guard let self = self else { return .zero }
+        let t = CGRect(x: safeArea.minX + paddingHorizontal,
+                      y: safeArea.minY + paddingVertical,
+                      width: safeArea.width - 2 * paddingHorizontal,
+                      height: titleHeight)
+        return t
+        
+    }
+    private lazy var pauseButton: GUIButton = GUIButton(style: .utility, title: "||", tapAction: onPauseTap) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let squareButtonWidth = Constants.buttonHeight * horizontalScale
+        return CGRect(x: safeArea.maxX - paddingHorizontal - squareButtonWidth,
+                      y: safeArea.minY + paddingVertical,
+                      width: squareButtonWidth,
+                      height: buttonHeight)
+    }
+    private lazy var backToGameButton: GUIButton = GUIButton(style: .utility, title: "Cancel", tapAction: onBackToGameTap) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - (buttonHeight + paddingVertical),
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
+    private lazy var exitButton: GUIButton = GUIButton(title: "Exit", tapAction: goToControlCenter) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - 2 * (buttonHeight + paddingVertical),
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
+    private lazy var resultsButton: GUIButton = GUIButton(title: "Game results", tapAction: goToGameResults) { [weak self] _ in
+        guard let self = self else { return .zero }
+        let buttonWidth = safeArea.width - 2 * paddingHorizontal
+        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
+        return CGRect(x: buttonX,
+                      y: safeArea.maxY - 2 * (buttonHeight + paddingVertical),
+                      width: buttonWidth,
+                      height: buttonHeight)
+    }
     
     private let physicsWorld: PhysicsWorld
-    private let terrainBody: TerrainBody?
+    private let terrain: TerrainBody?
     private var gun: GunBody
+    private var container: ContainerBody
     private var missle: MissleBody?
     
     private var animation: TimerAnimation?
     
-    var isGameOver: Bool = false { didSet { onStateUpdate() } }
-    var isPaused: Bool = true { didSet { onStateUpdate() } }
-    
     override var visibleBodies: [any Body] {
-        let result: [(any Body)?] = [gui, terrainBody, missle, gun]
+        let result: [(any Body)?] = [gui, gun, terrain, missle, container]
         return result.compactMap { $0 }
     }
     
     override init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
-        guard let player = game?.player, let planet = player.selectedPlanet else { fatalError() }
+        guard let player = game?.player, let planet = player.selectedPlanet, let container = player.selectedContainer else { fatalError() }
         
         let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
                                    rotationStep: planet.speed.radians / 60.0,
@@ -48,13 +93,13 @@ final class PlanetScene: Scene {
         let containerMaterials = player.selectedContainer?.uniqueMaterials ?? []
         let uniqueMaterials = Array(Set(planetMaterials + containerMaterials))
         
-        self.terrainBody = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
-        self.gun = GunBody(player: player)
+        let containerBody = ContainerBody(container: container, frame: .zero)
+        self.container = containerBody
+        self.terrain = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
+        self.gun = GunBody(player: player, container: containerBody, frame: .zero)
+        self.gameState = .normal
         
         super.init(game: game, size: size, safeArea: safeArea, screenScale: screenScale, opacity: opacity)
-        
-        gui = GUIBody(views: [titleLabel])
-        updateGUI()
         
         planet.chunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
@@ -63,91 +108,62 @@ final class PlanetScene: Scene {
     }
     
     override func setupLayout() {
+        super.setupLayout()
+        
+        gun.size = .init(width: Settings.Camera.gunRadius, height: 2 * Settings.Camera.gunRadius)
+        gun.center = gunCenterPoint
+        
+        let height: CGFloat = gun.size.height * 0.7
+        let width = height / ContainerBody.aspectRatio
+        
+        container.size = .init(width: width, height: height)
+        container.center = gun.center
+        container.origin.y = gun.origin.y
+        
         updateGUI()
-        
-        let missleRange = gun.getWorldVisibleMissles(misslesFired: 0)
-        
-        gun.position = SIMD2<Float>(Float(gunCenterPoint.x), Float(gunCenterPoint.y))
-        gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
-        
-        isPaused = false
-    }
-    
-    override func updateLayout() {
-        let vp = paddingVertical
-        let hp = paddingHorizontal
-        
-        let buttonWidth = safeArea.width - 2 * hp
-        let buttonHeight = buttonHeight
-        let buttonX = safeArea.minX + (safeArea.width - buttonWidth) / 2
-        
-        let labelHeight = titleHeight
-        let squareButtonWidth = Constants.buttonHeight * horizontalScale
-        
-        titleLabel.frame = CGRect(x: safeArea.minX + hp,
-                                  y: safeArea.minY + vp,
-                                  width: safeArea.width - 2 * hp,
-                                  height: labelHeight)
-        
-        resultsButton.frame = CGRect(x: buttonX,
-                                     y: safeArea.maxY - 2 * (buttonHeight + vp),
-                                     width: buttonWidth,
-                                     height: buttonHeight)
-        
-        exitButton.frame = CGRect(x: buttonX,
-                                  y: safeArea.maxY - 2 * (buttonHeight + vp),
-                                  width: buttonWidth,
-                                  height: buttonHeight)
-        
-        backToGameButton.frame = CGRect(x: buttonX,
-                                     y: safeArea.maxY - (buttonHeight + vp),
-                                     width: buttonWidth,
-                                     height: buttonHeight)
-        
-        pauseButton.frame = CGRect(x: safeArea.maxX - hp - squareButtonWidth,
-                                   y: safeArea.minY + vp,
-                                   width: squareButtonWidth,
-                                   height: buttonHeight)
     }
     
     private func onPauseTap() {
-        isPaused = true
+        gameState = .paused
     }
     
     private func onBackToGameTap() {
-        isPaused = false
+        gameState = .normal
     }
     
     private func updateGUI() {
-        guard let gui = gui else { return }
-        
         titleLabel.text = game?.player.selectedPlanet?.name
         var visible: [GUIView] = [titleLabel]
         
-        switch (isGameOver, isPaused) {
-        case (true, _):
+        switch gameState {
+        case .normal:
+            visible.append(pauseButton)
+        case .gameOver:
             visible.append(resultsButton)
-        case (false, true):
+        case .paused:
             visible.append(backToGameButton)
             visible.append(exitButton)
-        case (false, false):
-            visible.append(pauseButton)
         }
-        gui.views = visible
+        if let gui = gui {
+            gui.views = visible
+        } else {
+            self.gui = GUIBody(views: visible)
+        }
     }
     
     private func onStateUpdate() {
         updateGUI()
+        updateLayout()
     }
     
     override func update(_ time: CFTimeInterval) {
-        if !isPaused {
+        if gameState != .paused  {
             physicsWorld.update(time)
         }
     }
     
     override func onTouchUp(pos: CGPoint) -> Bool {
-        guard userInteractionEnabled, !super.onTouchUp(pos: pos), !isPaused, !isGameOver else { return false }
+        guard userInteractionEnabled, !super.onTouchUp(pos: pos), gameState == .normal else { return false }
         
         launchCurrentMissle(to: pos)
         spawnNextMissle()
@@ -190,39 +206,33 @@ final class PlanetScene: Scene {
                     game.clearSelectedContainer()
                 }
             }
-            isGameOver = true
+            gameState = .gameOver
             userInteractionEnabled = true
             missle = nil
-            gun.missleRadius = 0
             return
         }
-        
+
         self.missle = MissleBody(missleModel: selectedMissle, parent: gun)
-        
-        let startMissleCount = gun.state.currentMissleIndex
-        let endMissleCount = gun.state.currentMissleIndex + 1
+
+        let startMissleCount = gun.currentMissleIndex
+        let endMissleCount = gun.currentMissleIndex + 1
 
         let animations = { [weak self] (progress: Double, _: TimeInterval) in
             guard let self = self else { return }
-            
+
             let starPercentage = min(1, progress * Settings.Camera.missleParticleMaxSpeedModifier)
             let misslesFired = startMissleCount + (endMissleCount - startMissleCount) * starPercentage
-            
-            let missleRange = gun.getWorldVisibleMissles(misslesFired: misslesFired)
-            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
-            
-            self.missle?.updateMisslePosition(progress)
+
+            gun.currentMissleIndex = misslesFired
+            missle?.updateMisslePosition(progress)
         }
-        
+
         let completion = { [weak self] (_ : Bool) in
             guard let self = self else { return }
-            
+
             self.animation?.invalidate()
             self.animation = nil
-            
-            let missleRange = gun.getWorldVisibleMissles(misslesFired: endMissleCount)
-            self.gun.updateAppearance(levelToPackProgress: Settings.Camera.levelCameraScale, visibleMissleRange: missleRange)
-            self.gun.state.currentMissleIndex += 1
+            self.gun.currentMissleIndex = endMissleCount
             self.userInteractionEnabled = true
 
             self.missle?.updateMisslePosition(1)

@@ -14,12 +14,12 @@ public final class TimerAnimation {
         self.startDate = Date()
         
 #if os(iOS)
-        let displayLink = CADisplayLink(target: self, selector: #selector(handleFrame(_:)))
+        let displayLink = CADisplayLink(target: self, selector: #selector(handleFrame))
         displayLink.add(to: .main, forMode: RunLoop.Mode.common)
         self.displayLink = displayLink
 #else
         let timer = Timer(timeInterval: Self.interval, target: self, selector: #selector(handleFrame), userInfo: nil, repeats: true)
-        RunLoop.current.add(timer, forMode: .default)
+        RunLoop.main.add(timer, forMode: .default)
         self.timer = timer
 #endif
     }
@@ -34,6 +34,7 @@ public final class TimerAnimation {
         completion?(false)
 #if os(iOS)
         displayLink?.invalidate()
+        displayLink = nil
 #else
         timer?.invalidate()
         timer = nil

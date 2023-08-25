@@ -13,6 +13,8 @@ class GUIButton: GUIView {
     private var normalTextColor: SIMD4<UInt8>
     private var highlightedTextColor: SIMD4<UInt8>
     
+    private var isTouchResponder = false
+    
     var tapAction: (() -> Void)?
     
     var textInsets: CGSize {
@@ -93,6 +95,7 @@ class GUIButton: GUIView {
             isHighlighted = false
             return false
         }
+        isTouchResponder = true
         isHighlighted = true
         return true
     }
@@ -108,6 +111,9 @@ class GUIButton: GUIView {
     
     override func onTouchUp(pos: CGPoint) -> Bool {
         isHighlighted = false
+        guard isTouchResponder else { return false }
+        
+        isTouchResponder = false
         if frame.contains(pos) {
             tapAction?()
         }

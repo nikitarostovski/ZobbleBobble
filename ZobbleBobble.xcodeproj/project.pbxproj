@@ -11,11 +11,9 @@
 		110DB25D2A8E22D7002DEEAD /* JoystixMonospace.otf in Resources */ = {isa = PBXBuildFile; fileRef = 110DB25B2A8E21D3002DEEAD /* JoystixMonospace.otf */; };
 		110DB25F2A8E28BF002DEEAD /* GUILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB25E2A8E28BF002DEEAD /* GUILabel.swift */; };
 		110DB2632A8FA824002DEEAD /* PlanetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2622A8FA824002DEEAD /* PlanetModel.swift */; };
-		110DB2652A8FB730002DEEAD /* GunBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2642A8FB730002DEEAD /* GunBody.swift */; };
-		110DB2672A8FB956002DEEAD /* GunNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2662A8FB956002DEEAD /* GunNode.swift */; };
+		110DB2672A8FB956002DEEAD /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2662A8FB956002DEEAD /* ContainerNode.swift */; };
 		110DB2692A8FB97F002DEEAD /* GunShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2682A8FB97F002DEEAD /* GunShaders.metal */; };
-		110DB26C2A8FBF04002DEEAD /* StarRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB26B2A8FBF04002DEEAD /* StarRenderData.swift */; };
-		110DB26E2A8FBF11002DEEAD /* GunRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB26D2A8FBF11002DEEAD /* GunRenderData.swift */; };
+		110DB26E2A8FBF11002DEEAD /* ContainerRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB26D2A8FBF11002DEEAD /* ContainerRenderData.swift */; };
 		110DB2702A8FBF1F002DEEAD /* LiquidRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB26F2A8FBF1F002DEEAD /* LiquidRenderData.swift */; };
 		110DB2722A8FBF2D002DEEAD /* GUIRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2712A8FBF2D002DEEAD /* GUIRenderData.swift */; };
 		110DB2742A8FBF75002DEEAD /* MaterialRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110DB2732A8FBF75002DEEAD /* MaterialRenderData.swift */; };
@@ -36,6 +34,11 @@
 		1133D44C2949A568009C8DBC /* TouchGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C22F277A205600C26BEC /* TouchGameViewController.swift */; platformFilter = ios; };
 		1133D454294DAFA6009C8DBC /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 1160EF77292B8A5600AFD08C /* Constants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */; };
+		114D427C2A971D9C00D0D153 /* ContainerBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D427B2A971D9C00D0D153 /* ContainerBody.swift */; };
+		114D427E2A974EAB00D0D153 /* GunBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D427D2A974EAB00D0D153 /* GunBody.swift */; };
+		114D42802A974F9E00D0D153 /* ContainerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 114D427F2A974F9E00D0D153 /* ContainerShaders.metal */; };
+		114D42822A977B0A00D0D153 /* GunRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42812A977B0A00D0D153 /* GunRenderData.swift */; };
+		114D42842A977B2E00D0D153 /* GunNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42832A977B2E00D0D153 /* GunNode.swift */; };
 		115BAEF92A95F8D90069A5B0 /* RubberBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEED2A95F8D80069A5B0 /* RubberBand.swift */; };
 		115BAEFA2A95F8D90069A5B0 /* CGPoint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */; };
 		115BAEFC2A95F8D90069A5B0 /* GeometryUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */; };
@@ -319,11 +322,9 @@
 		110DB25C2A8E222A002DEEAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		110DB25E2A8E28BF002DEEAD /* GUILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUILabel.swift; sourceTree = "<group>"; };
 		110DB2622A8FA824002DEEAD /* PlanetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetModel.swift; sourceTree = "<group>"; };
-		110DB2642A8FB730002DEEAD /* GunBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunBody.swift; sourceTree = "<group>"; };
-		110DB2662A8FB956002DEEAD /* GunNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunNode.swift; sourceTree = "<group>"; };
+		110DB2662A8FB956002DEEAD /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		110DB2682A8FB97F002DEEAD /* GunShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GunShaders.metal; sourceTree = "<group>"; };
-		110DB26B2A8FBF04002DEEAD /* StarRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRenderData.swift; sourceTree = "<group>"; };
-		110DB26D2A8FBF11002DEEAD /* GunRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunRenderData.swift; sourceTree = "<group>"; };
+		110DB26D2A8FBF11002DEEAD /* ContainerRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerRenderData.swift; sourceTree = "<group>"; };
 		110DB26F2A8FBF1F002DEEAD /* LiquidRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidRenderData.swift; sourceTree = "<group>"; };
 		110DB2712A8FBF2D002DEEAD /* GUIRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUIRenderData.swift; sourceTree = "<group>"; };
 		110DB2732A8FBF75002DEEAD /* MaterialRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialRenderData.swift; sourceTree = "<group>"; };
@@ -348,6 +349,11 @@
 		113228F52A8252A600CA8F49 /* MTLDevice+MTLTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLDevice+MTLTexture.swift"; sourceTree = "<group>"; };
 		113228F72A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLDevice+MTLSamplerState.swift"; sourceTree = "<group>"; };
 		113E8B982A94B3E0002EBC60 /* StaticTerrainBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticTerrainBody.swift; sourceTree = "<group>"; };
+		114D427B2A971D9C00D0D153 /* ContainerBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerBody.swift; sourceTree = "<group>"; };
+		114D427D2A974EAB00D0D153 /* GunBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunBody.swift; sourceTree = "<group>"; };
+		114D427F2A974F9E00D0D153 /* ContainerShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ContainerShaders.metal; sourceTree = "<group>"; };
+		114D42812A977B0A00D0D153 /* GunRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunRenderData.swift; sourceTree = "<group>"; };
+		114D42832A977B2E00D0D153 /* GunNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunNode.swift; sourceTree = "<group>"; };
 		115BAEED2A95F8D80069A5B0 /* RubberBand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RubberBand.swift; sourceTree = "<group>"; };
 		115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
 		115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryUtils.swift; sourceTree = "<group>"; };
@@ -610,8 +616,8 @@
 			isa = PBXGroup;
 			children = (
 				110DB2732A8FBF75002DEEAD /* MaterialRenderData.swift */,
-				110DB26B2A8FBF04002DEEAD /* StarRenderData.swift */,
-				110DB26D2A8FBF11002DEEAD /* GunRenderData.swift */,
+				110DB26D2A8FBF11002DEEAD /* ContainerRenderData.swift */,
+				114D42812A977B0A00D0D153 /* GunRenderData.swift */,
 				110DB26F2A8FBF1F002DEEAD /* LiquidRenderData.swift */,
 				110DB2712A8FBF2D002DEEAD /* GUIRenderData.swift */,
 			);
@@ -699,7 +705,8 @@
 			children = (
 				112CD16A2A77D4EA0098D324 /* Body.swift */,
 				11A5C8CE2A9495AA00817D68 /* GUIBody */,
-				110DB2642A8FB730002DEEAD /* GunBody.swift */,
+				114D427B2A971D9C00D0D153 /* ContainerBody.swift */,
+				114D427D2A974EAB00D0D153 /* GunBody.swift */,
 				111E137A2A7AC90000A786FD /* LiquidBody.swift */,
 				112CD16C2A77D5360098D324 /* TerrainBody.swift */,
 				111E13782A7AB27600A786FD /* MissleBody.swift */,
@@ -713,7 +720,8 @@
 			children = (
 				112CD17A2A7919010098D324 /* Node.swift */,
 				11B321702965CCA3000F4180 /* BaseNode.swift */,
-				110DB2662A8FB956002DEEAD /* GunNode.swift */,
+				110DB2662A8FB956002DEEAD /* ContainerNode.swift */,
+				114D42832A977B2E00D0D153 /* GunNode.swift */,
 				112CD1752A77DFA00098D324 /* LiquidNode.swift */,
 				11889DF32A8CF47C00F8216B /* GUINode.swift */,
 			);
@@ -875,6 +883,7 @@
 				1190952729549010006EE970 /* CommonShaders.metal */,
 				11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */,
 				110DB2682A8FB97F002DEEAD /* GunShaders.metal */,
+				114D427F2A974F9E00D0D153 /* ContainerShaders.metal */,
 				11889DF72A8CF55300F8216B /* GUIShaders.metal */,
 				1190953229573D61006EE970 /* TextureMerge.metal */,
 				116D7D802A8681F0007ED1DD /* CRT.metal */,
@@ -1458,18 +1467,22 @@
 				11889DF02A8CE8A600F8216B /* TransitionTarget.swift in Sources */,
 				115BAEF92A95F8D90069A5B0 /* RubberBand.swift in Sources */,
 				11BDF3E92A91DAE0005F78E2 /* SceneRenderer.swift in Sources */,
+				114D427E2A974EAB00D0D153 /* GunBody.swift in Sources */,
 				11A5C8C12A93C8F500817D68 /* ParticleModel+Blueprints.swift in Sources */,
-				110DB2672A8FB956002DEEAD /* GunNode.swift in Sources */,
+				110DB2672A8FB956002DEEAD /* ContainerNode.swift in Sources */,
 				1190952829549010006EE970 /* CommonShaders.metal in Sources */,
 				11889DD82A8C87C100F8216B /* ControlCenterScene.swift in Sources */,
 				11889DDC2A8C931100F8216B /* SceneTransition.swift in Sources */,
 				11B321712965CCA3000F4180 /* BaseNode.swift in Sources */,
 				11EC8BEF2A10AD80000F322C /* SIMDColor+Hex.swift in Sources */,
 				11889DE62A8CDCE200F8216B /* GarbageMarketScene.swift in Sources */,
+				114D42802A974F9E00D0D153 /* ContainerShaders.metal in Sources */,
+				114D42822A977B0A00D0D153 /* GunRenderData.swift in Sources */,
 				115BAEFF2A95F8D90069A5B0 /* TimerAnimation.swift in Sources */,
-				110DB26E2A8FBF11002DEEAD /* GunRenderData.swift in Sources */,
+				110DB26E2A8FBF11002DEEAD /* ContainerRenderData.swift in Sources */,
 				119E35552A91158700A16F00 /* main.swift in Sources */,
 				11EC8BF12A10AD80000F322C /* CGPoint+Utilities.swift in Sources */,
+				114D42842A977B2E00D0D153 /* GunNode.swift in Sources */,
 				11889DEC2A8CDD0500F8216B /* PlanetScene.swift in Sources */,
 				112CD17B2A7919010098D324 /* Node.swift in Sources */,
 				11BD1CC529EFF8500005DC7C /* CGFloat+Formatting.swift in Sources */,
@@ -1481,7 +1494,7 @@
 				11889DE42A8CDCD300F8216B /* ImprovementsScene.swift in Sources */,
 				110DB2742A8FBF75002DEEAD /* MaterialRenderData.swift in Sources */,
 				11EC8BF02A10AD80000F322C /* CGFloat+Utils.swift in Sources */,
-				110DB2652A8FB730002DEEAD /* GunBody.swift in Sources */,
+				114D427C2A971D9C00D0D153 /* ContainerBody.swift in Sources */,
 				116D7D792A861D38007ED1DD /* MTLTexture+Utils.swift in Sources */,
 				117B3F3B2A93463700C25EE7 /* ChunkModel.swift in Sources */,
 				115BAF022A95F8D90069A5B0 /* DecelerationTimingParameters.swift in Sources */,
@@ -1497,7 +1510,6 @@
 				110DB2692A8FB97F002DEEAD /* GunShaders.metal in Sources */,
 				115BAEFD2A95F8D90069A5B0 /* Comparable+Utils.swift in Sources */,
 				11CB5AD22A8D33F000043A06 /* GUIView.swift in Sources */,
-				110DB26C2A8FBF04002DEEAD /* StarRenderData.swift in Sources */,
 				11889DEA2A8CDCFA00F8216B /* UtilizationPlantScene.swift in Sources */,
 				11889DF82A8CF55300F8216B /* GUIShaders.metal in Sources */,
 				1193428B29FE3721001707B4 /* SIMD+Extensions.swift in Sources */,

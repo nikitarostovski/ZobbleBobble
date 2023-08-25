@@ -36,11 +36,12 @@ class SceneRenderer {
     private var gameTextureSize: CGSize
     
     private var liquidNodes = [LiquidNode]()
+    private var containerNodes = [ContainerNode]()
     private var gunNodes = [GunNode]()
     private var guiNodes = [GUINode]()
     
     private var allNodes: [Node] {
-        liquidNodes + gunNodes + guiNodes
+        liquidNodes + gunNodes + containerNodes + guiNodes
     }
     
     init(scene: Scene?, device: MTLDevice, renderSize: CGSize, gameTextureSize: CGSize) {
@@ -172,12 +173,16 @@ class SceneRenderer {
                 liquidNodes.removeAll(where: { $0 === node })
                 guiNodes.removeAll(where: { $0 === node })
                 gunNodes.removeAll(where: { $0 === node })
+                containerNodes.removeAll(where: { $0 === node })
             }
         }
     }
     
     private func addNode(for body: any Body) {
         switch body {
+        case is ContainerBody:
+            let node = ContainerNode(device, renderSize: gameTextureSize, body: body as? ContainerBody)
+            containerNodes.append(node)
         case is GunBody:
             let node = GunNode(device, renderSize: gameTextureSize, body: body as? GunBody)
             gunNodes.append(node)

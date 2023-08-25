@@ -47,8 +47,9 @@ class GUIBody: Body {
     }
     
     private func updatePointersIfNeeded() {
-        needsDisplay = needsDisplay || views.reduce(into: false, { $0 = $0 || $1.needsDisplay })
+        let needsDisplay = needsDisplay || views.reduce(into: false, { $0 = $0 || $1.needsDisplay })
         guard needsDisplay else { return }
+        defer { self.needsDisplay = false }
         
         var newTextTextureData = [GUIRenderData.TextRenderData]()
         
