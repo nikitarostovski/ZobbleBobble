@@ -8,18 +8,16 @@
 import Foundation
 
 struct GUIRenderData {
-    struct RectModel {
+    struct ViewModel {
+        static let viewTypeRect: Int32 = 0
+        static let viewTypeText: Int32 = 1
+        
+        var viewType: Int32
         var backgroundColor: SIMD4<UInt8>
+        var textColor: SIMD4<UInt8>?
         var origin: SIMD2<Float>
         var size: SIMD2<Float>
-    }
-    
-    struct LabelModel {
-        var backgroundColor: SIMD4<UInt8>
-        var textColor: SIMD4<UInt8>
-        var origin: SIMD2<Float>
-        var size: SIMD2<Float>
-        var textTextureIndex: Int32 = 0
+        var textTextureIndex: Int32? = nil
     }
     
     struct TextRenderData: Hashable {
@@ -38,9 +36,6 @@ struct GUIRenderData {
     
     var textTexturesData: [TextRenderData?]
     
-    let rectCount: Int
-    let rects: UnsafeMutableRawPointer?
-    
-    let labelCount: Int
-    let labels: UnsafeMutableRawPointer?
+    let viewCount: Int
+    let views: UnsafeMutableRawPointer?
 }

@@ -9,8 +9,7 @@ import Foundation
 import MetalKit
 
 class GUIBody: Body {
-    static let maxRectCount = 32
-    static let maxLabelCount = 32
+    static let maxViewCount = 96
     
     var userInteractive = true
     var backgroundColor: SIMD4<UInt8> = .zero
@@ -19,10 +18,8 @@ class GUIBody: Body {
     
     private var needsDisplay = true
     
-    private var rectsPointer: UnsafeMutableRawPointer?
-    private var rectCount: Int = 0
-    private var labelsPointer: UnsafeMutableRawPointer?
-    private var labelCount: Int = 0
+    private var viewsPointer: UnsafeMutableRawPointer?
+    private var viewCount: Int = 0
     
     private var textTextureData = [GUIRenderData.TextRenderData?]()
     
@@ -31,19 +28,15 @@ class GUIBody: Body {
         
         return GUIRenderData(alpha: alpha,
                              textTexturesData: textTextureData,
-                             rectCount: rectCount,
-                             rects: rectsPointer,
-                             labelCount: labelCount,
-                             labels: labelsPointer)
+                             viewCount: viewCount,
+                             views: viewsPointer)
     }
     
     init(views: [GUIView] = [], backgroundColor: SIMD4<UInt8> = .init(1, 1, 1, 0)) {
         self.backgroundColor = backgroundColor
         self.views = views
-        self.rectsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.RectModel>.stride * Self.maxRectCount,
-                                                               alignment: MemoryLayout<GUIRenderData.RectModel>.alignment)
-        self.labelsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * Self.maxLabelCount,
-                                                              alignment: MemoryLayout<GUIRenderData.LabelModel>.alignment)
+        self.viewsPointer = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<GUIRenderData.ViewModel>.stride * Self.maxViewCount,
+                                                               alignment: MemoryLayout<GUIRenderData.ViewModel>.alignment)
     }
     
     private func updatePointersIfNeeded() {
@@ -52,27 +45,24 @@ class GUIBody: Body {
         defer { self.needsDisplay = false }
         
         var newTextTextureData = [GUIRenderData.TextRenderData]()
-        
-        var rects = [GUIRenderData.RectModel]()
-        var labels = [GUIRenderData.LabelModel]()
+        var newViewRenderData = [GUIRenderData.ViewModel]()
         
         let allRenderData = views.map { $0.makeRenderData() }
         
         // Set text texture index here
-        allRenderData.forEach { rectsRenderData, labelsRenderData in
-            rects.append(contentsOf: rectsRenderData)
-            for (labelRenderData, texture) in labelsRenderData {
-                var labelRenderData = labelRenderData
-                labelRenderData.textTextureIndex = Int32(newTextTextureData.count)
-                labels.append(labelRenderData)
-                newTextTextureData.append(texture)
+        allRenderData.forEach { renderData in
+            for (viewData, texture) in renderData {
+                var viewData = viewData
+                if let texture = texture {
+                    viewData.textTextureIndex = Int32(newTextTextureData.count)
+                    newTextTextureData.append(texture)
+                }
+                newViewRenderData.append(viewData)
             }
         }
         
-        rectsPointer?.copyMemory(from: &rects, byteCount: MemoryLayout<GUIRenderData.RectModel>.stride * rects.count)
-        labelsPointer?.copyMemory(from: &labels, byteCount: MemoryLayout<GUIRenderData.LabelModel>.stride * labels.count)
-        rectCount = rects.count
-        labelCount = labels.count
+        viewsPointer?.copyMemory(from: &newViewRenderData, byteCount: MemoryLayout<GUIRenderData.ViewModel>.stride * newViewRenderData.count)
+        viewCount = newViewRenderData.count
         textTextureData = newTextTextureData
     }
     

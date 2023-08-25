@@ -24,10 +24,8 @@ class GUINode: BaseNode<GUIBody> {
     private let ciContext = CIContext()
     
     private let uniformsBufferProvider: BufferProvider
-    private let rectsBufferProvider: BufferProvider
-    private let rectCountBufferProvider: BufferProvider
-    private let labelsBufferProvider: BufferProvider
-    private let labelCountBufferProvider: BufferProvider
+    private let viewsBufferProvider: BufferProvider
+    private let viewCountBufferProvider: BufferProvider
     
     private var sampler: MTLSamplerState?
     private var finalTexture: MTLTexture?
@@ -37,18 +35,12 @@ class GUINode: BaseNode<GUIBody> {
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
-        self.rectsBufferProvider = BufferProvider(device: device,
-                                                    inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                    bufferSize: MemoryLayout<GUIRenderData.RectModel>.stride * GUIBody.maxRectCount)
-        self.rectCountBufferProvider = BufferProvider(device: device,
-                                                        inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                        bufferSize: MemoryLayout<Int32>.stride)
-        self.labelsBufferProvider = BufferProvider(device: device,
-                                                   inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                   bufferSize: MemoryLayout<GUIRenderData.LabelModel>.stride * GUIBody.maxLabelCount)
-        self.labelCountBufferProvider = BufferProvider(device: device,
-                                                       inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                       bufferSize: MemoryLayout<Int32>.stride)
+        self.viewsBufferProvider = BufferProvider(device: device,
+                                                  inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                  bufferSize: MemoryLayout<GUIRenderData.ViewModel>.stride * GUIBody.maxViewCount)
+        self.viewCountBufferProvider = BufferProvider(device: device,
+                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
+                                                      bufferSize: MemoryLayout<Int32>.stride)
         
         super.init()
         
@@ -62,8 +54,7 @@ class GUINode: BaseNode<GUIBody> {
         let allTextTextures = buildTextTextures(body?.renderData?.textTexturesData, commandBuffer: commandBuffer)
         
         guard let body = body,
-              var rectCount = body.renderData?.rectCount,
-              var labelCount = body.renderData?.labelCount,
+              var viewCount = body.renderData?.viewCount,
               let drawGUIPipelineState = drawGUIPipelineState,
               let finalTexture = finalTexture,
               let computeEncoder = commandBuffer.makeComputeCommandEncoder()
@@ -76,24 +67,16 @@ class GUINode: BaseNode<GUIBody> {
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
         
-        _ = rectsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let rectsBuffer = rectsBufferProvider.nextUniformsBuffer(data: body.renderData?.rects, length: MemoryLayout<GUIRenderData.RectModel>.stride * rectCount)
+        _ = viewsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let viewsBuffer = viewsBufferProvider.nextUniformsBuffer(data: body.renderData?.views, length: MemoryLayout<GUIRenderData.ViewModel>.stride * viewCount)
         
-        _ = rectCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let rectCountBuffer = rectCountBufferProvider.nextUniformsBuffer(data: &rectCount, length: MemoryLayout<Int32>.stride)
-        
-        _ = labelsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let labelsBuffer = labelsBufferProvider.nextUniformsBuffer(data: body.renderData?.labels, length: MemoryLayout<GUIRenderData.LabelModel>.stride * labelCount)
-        
-        _ = labelCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let labelCountBuffer = labelCountBufferProvider.nextUniformsBuffer(data: &labelCount, length: MemoryLayout<Int32>.stride)
+        _ = viewCountBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let viewCountBuffer = viewCountBufferProvider.nextUniformsBuffer(data: &viewCount, length: MemoryLayout<Int32>.stride)
         
         commandBuffer.addCompletedHandler { _ in
             self.uniformsBufferProvider.avaliableResourcesSemaphore.signal()
-            self.rectsBufferProvider.avaliableResourcesSemaphore.signal()
-            self.rectCountBufferProvider.avaliableResourcesSemaphore.signal()
-            self.labelsBufferProvider.avaliableResourcesSemaphore.signal()
-            self.labelCountBufferProvider.avaliableResourcesSemaphore.signal()
+            self.viewsBufferProvider.avaliableResourcesSemaphore.signal()
+            self.viewCountBufferProvider.avaliableResourcesSemaphore.signal()
         }
         
         computeEncoder.setComputePipelineState(drawGUIPipelineState)
@@ -102,10 +85,8 @@ class GUINode: BaseNode<GUIBody> {
             computeEncoder.setTextures(allTextTextures, range: 1..<(allTextTextures.count + 1))
         }
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(rectsBuffer, offset: 0, index: 1)
-        computeEncoder.setBuffer(rectCountBuffer, offset: 0, index: 2)
-        computeEncoder.setBuffer(labelsBuffer, offset: 0, index: 3)
-        computeEncoder.setBuffer(labelCountBuffer, offset: 0, index: 4)
+        computeEncoder.setBuffer(viewsBuffer, offset: 0, index: 1)
+        computeEncoder.setBuffer(viewCountBuffer, offset: 0, index: 2)
         computeEncoder.setSamplerState(sampler, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: drawGUIPipelineState, width: finalTexture.width, height: finalTexture.height)
         

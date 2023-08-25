@@ -121,64 +121,34 @@ class GUIScrollView: GUIView {
     override func makeSubviewsRenderData() -> RenderData {
         guard needsDisplay else { return subviewRenderDataCahce ?? super.makeSubviewsRenderData() }
         
-        var result = RenderData([], [])
-        
-        var rects = [GUIRenderData.RectModel]()
-        var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
-        
+        var result = RenderData()
         let allRenderData = subviews.map { $0.makeRenderData() }
         
-        allRenderData.forEach { rectsRenderData, labelsRenderData in
-            let shift = Float(offset.x)
-            let rectsRenderData = rectsRenderData.compactMap {
-                var data = $0;
-                data.origin.x += Float(frame.origin.x)
-                data.origin.y += Float(frame.origin.y)
-                data.origin.x += shift;
-                
-                let left = CGFloat(data.origin.x)
-                let right = left + CGFloat(data.size.x)
-                
-                let top = CGFloat(data.origin.y)
-                let bottom = top + CGFloat(data.size.y)
-                
-                if bounds.contains(CGPoint(x: left, y: top)) ||
-                    bounds.contains(CGPoint(x: right, y: top)) ||
-                    bounds.contains(CGPoint(x: right, y: bottom)) ||
-                    bounds.contains(CGPoint(x: left, y: bottom)) {
-                    return data
-                } else {
-                    return nil
-                }
-            }
-            let labelsRenderData = labelsRenderData.compactMap {
-                var data = $0;
-                data.0.origin.x += Float(frame.origin.x)
-                data.0.origin.y += Float(frame.origin.y)
-                data.0.origin.x += shift;
-                
-                let left = CGFloat(data.0.origin.x)
-                let right = left + CGFloat(data.0.size.x)
-                
-                let top = CGFloat(data.0.origin.y)
-                let bottom = top + CGFloat(data.0.size.y)
-                
-                if bounds.contains(CGPoint(x: left, y: top)) ||
-                    bounds.contains(CGPoint(x: right, y: top)) ||
-                    bounds.contains(CGPoint(x: right, y: bottom)) ||
-                    bounds.contains(CGPoint(x: left, y: bottom)) {
-                    return data
-                } else {
-                    return nil
-                }
-            }
-            
-            rects.append(contentsOf: rectsRenderData)
-            labels.append(contentsOf: labelsRenderData)
-        }
+        let shift = Float(offset.x)
         
-        result.0.append(contentsOf: rects)
-        result.1.append(contentsOf: labels)
+        allRenderData.forEach { renderData in
+            for (viewData, texture) in renderData {
+                var viewData = viewData
+                
+                viewData.origin.x += Float(frame.origin.x)
+                viewData.origin.y += Float(frame.origin.y)
+                viewData.origin.x += shift;
+                
+                let left = CGFloat(viewData.origin.x)
+                let right = left + CGFloat(viewData.size.x)
+                
+                let top = CGFloat(viewData.origin.y)
+                let bottom = top + CGFloat(viewData.size.y)
+                
+                if bounds.contains(CGPoint(x: left, y: top)) ||
+                    bounds.contains(CGPoint(x: right, y: top)) ||
+                    bounds.contains(CGPoint(x: right, y: bottom)) ||
+                    bounds.contains(CGPoint(x: left, y: bottom)) {
+                    
+                    result.append((viewData, texture))
+                }
+            }
+        }
         subviewRenderDataCahce = result
         return result
     }

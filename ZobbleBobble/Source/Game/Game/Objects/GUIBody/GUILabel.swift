@@ -24,7 +24,7 @@ class GUILabel: GUIView {
         }
     }
     
-    private var labelRenderData: GUIRenderData.LabelModel?
+    private var labelRenderData: GUIRenderData.ViewModel?
 
     init(frame: CGRect = .zero, style: Style = .header, text: String? = nil, onLayout: LayoutClosure? = nil) {
         self.text = text
@@ -34,19 +34,20 @@ class GUILabel: GUIView {
 
     override func makeRenderData() -> RenderData {
         if needsDisplay {
-            labelRenderData = GUIRenderData.LabelModel(backgroundColor: backgroundColor,
-                                                       textColor: textColor,
-                                                       origin: SIMD2<Float>(Float(frame.origin.x),
-                                                                            Float(frame.origin.y)),
-                                                       size: SIMD2<Float>(Float(frame.size.width),
-                                                                          Float(frame.size.height)))
+            labelRenderData = GUIRenderData.ViewModel(viewType: 1,
+                                                      backgroundColor: backgroundColor,
+                                                      textColor: textColor,
+                                                      origin: SIMD2<Float>(Float(frame.origin.x),
+                                                                           Float(frame.origin.y)),
+                                                      size: SIMD2<Float>(Float(frame.size.width),
+                                                                         Float(frame.size.height)))
         }
         var result = super.makeRenderData()
-        var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
+        var labels = RenderData()
         if let labelRenderData = labelRenderData, let textData = makeTextData() {
             labels.append((labelRenderData, textData))
         }
-        result.1.append(contentsOf: labels)
+        result.append(contentsOf: labels)
         return result
     }
     

@@ -14,13 +14,8 @@ struct GUIUniforms {
     uchar4 backgroundColor;
 };
 
-struct GUIRect {
-    uchar4 backgroundColor;
-    float2 origin;
-    float2 size;
-};
-
-struct GUIText {
+struct GUIView {
+    int viewType;
     uchar4 backgroundColor;
     uchar4 textColor;
     float2 origin;
@@ -50,7 +45,7 @@ float2 text_texture_coordinates(float2 uv, float2 origin, float2 size, float2 ou
     return coords;
 }
 
-float4 rect_color(GUIRect rect, uint2 gid, texture2d<float, access::write> texture) {
+float4 rect_color(GUIView rect, uint2 gid, texture2d<float, access::write> texture) {
     float4 result = float4(0);
     
     float x = float(gid.x) / float(texture.get_width());
@@ -67,7 +62,7 @@ float4 rect_color(GUIRect rect, uint2 gid, texture2d<float, access::write> textu
     return result;
 }
 
-float4 text_color(GUIText text, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::sample> textTexture, sampler sampler) {
+float4 text_color(GUIView text, uint2 gid, texture2d<float, access::write> texture, texture2d<float, access::sample> textTexture, sampler sampler) {
     float4 result = float4(0);
     
     float x = float(gid.x) / float(texture.get_width());
@@ -98,10 +93,8 @@ float4 text_color(GUIText text, uint2 gid, texture2d<float, access::write> textu
 }
 
 kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
-                     device GUIRect *rects [[buffer(1)]],
-                     device int &rectCount [[buffer(2)]],
-                     device GUIText *texts [[buffer(3)]],
-                     device int &textCount [[buffer(4)]],
+                     device GUIView *views [[buffer(1)]],
+                     device int &viewCount [[buffer(2)]],
                      texture2d<float, access::write> output [[texture(0)]],
                      array<texture2d<float, access::sample>, (MAX_TEXTURES - 1)> textTextures [[texture(1)]],
                      sampler sampler [[sampler(0)]],
@@ -111,23 +104,29 @@ kernel void draw_gui(device GUIUniforms &uniforms [[buffer(0)]],
         return;
     }
     
-    int blendMode = 0;
+    int blendMode = 1;
     float4 resultColor = float4(0);
     
-    for (int i = 0; i < rectCount; i++) {
-        float4 color = rect_color(rects[i], gid, output);
-        if (color.a > 0) {
-            resultColor = blend(blendMode, resultColor, color);
-        }
-    }
-    
-    for (int i = 0; i < textCount; i++) {
-        int ti = texts[i].textureIndex;
-        auto textTexture = textTextures[ti];
-        
-        float4 color = text_color(texts[i], gid, output, textTexture, sampler);
-        if (color.a > 0) {
-            resultColor = blend(blendMode, resultColor, color);
+    for (int i = 0; i < viewCount; i++) {
+        auto view = views[i];
+        switch (view.viewType) {
+            case 0: {
+                float4 color = rect_color(views[i], gid, output);
+                if (color.a > 0) {
+                    resultColor = blend(blendMode, resultColor, color);
+                }
+                break;
+            }
+            case 1: {
+                int ti = views[i].textureIndex;
+                auto textTexture = textTextures[ti];
+                
+                float4 color = text_color(views[i], gid, output, textTexture, sampler);
+                if (color.a > 0) {
+                    resultColor = blend(blendMode, resultColor, color);
+                }
+                break;
+            }
         }
     }
     

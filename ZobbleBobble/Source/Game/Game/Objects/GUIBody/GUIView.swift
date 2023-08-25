@@ -8,7 +8,7 @@
 import Foundation
 
 class GUIView {
-    typealias RenderData = ([GUIRenderData.RectModel], [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)])
+    typealias RenderData = [(GUIRenderData.ViewModel, GUIRenderData.TextRenderData?)]
     typealias LayoutClosure = (GUIView) -> CGRect
     
     var isInteractive = false
@@ -45,7 +45,7 @@ class GUIView {
     }
     
     /// Render data for background color rect
-    private var rectRenderData: GUIRenderData.RectModel?
+    private var rectRenderData: GUIRenderData.ViewModel?
     
     init(backgroundColor: SIMD4<UInt8> = .zero, frame: CGRect = .zero, subviews: [GUIView] = [], onLayout: LayoutClosure? = nil) {
         self.backgroundColor = backgroundColor
@@ -60,25 +60,15 @@ class GUIView {
     }
     
     func makeSubviewsRenderData() -> RenderData {
-        return subviews.reduce(RenderData([], []), {
-            var renderData = $1.makeRenderData()
-            
-            let rectsRenderData = renderData.0.map {
-                var data = $0;
-                data.origin.x += Float(frame.origin.x)
-                data.origin.y += Float(frame.origin.y)
-                return data;
-            }
-            let labelsRenderData = renderData.1.map {
+        return subviews.reduce(RenderData([]), {
+            let renderData = $1.makeRenderData()
+            let correctedData = renderData.map {
                 var data = $0;
                 data.0.origin.x += Float(frame.origin.x)
                 data.0.origin.y += Float(frame.origin.y)
                 return data;
             }
-            renderData.0 = rectsRenderData
-            renderData.1 = labelsRenderData
-            
-            return RenderData($0.0 + rectsRenderData, $0.1 + labelsRenderData)
+            return $0 + correctedData
         })
     }
     
@@ -86,10 +76,14 @@ class GUIView {
         if needsDisplay, backgroundColor.w > 0 {
             let origin = SIMD2<Float>(Float(frame.origin.x), Float(frame.origin.y))
             let size = SIMD2<Float>(Float(frame.size.width), Float(frame.size.height))
-            rectRenderData = .init(backgroundColor: backgroundColor, origin: origin, size: size)
+            rectRenderData = .init(viewType: 0,
+                                   backgroundColor: backgroundColor,
+                                   textColor: nil,
+                                   origin: origin,
+                                   size: size)
         }
         var result = makeSubviewsRenderData()
-        result.0 += [rectRenderData].compactMap { $0 }
+        result += [rectRenderData].compactMap { $0.map { ($0, nil) } }
         needsDisplay = false
         return result
     }

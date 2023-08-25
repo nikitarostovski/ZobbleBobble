@@ -47,7 +47,7 @@ class GUIButton: GUIView {
         }
     }
     
-    private var labelRenderData: GUIRenderData.LabelModel?
+    private var labelRenderData: GUIRenderData.ViewModel?
     
     init(frame: CGRect = .zero, style: Style = .primary, title: String?, tapAction: (() -> Void)? = nil, textInsets: CGSize = .zero, onLayout: LayoutClosure? = nil) {
         self.tapAction = tapAction
@@ -74,15 +74,15 @@ class GUIButton: GUIView {
             textSize.x -= 2 * Float(textInsets.width)
             textSize.y -= 2 * Float(textInsets.height)
             
-            labelRenderData = .init(backgroundColor: .zero, textColor: textColor, origin: textOrigin, size: textSize)
+            labelRenderData = .init(viewType: GUIRenderData.ViewModel.viewTypeText, backgroundColor: .zero, textColor: textColor, origin: textOrigin, size: textSize)
         }
         var result = super.makeRenderData()
-        var labels = [(GUIRenderData.LabelModel, GUIRenderData.TextRenderData)]()
+        var labels = RenderData()
         if let labelRenderData = labelRenderData, let textData = makeTextData() {
             labels.append((labelRenderData, textData))
         }
-        result.1.append(contentsOf: labels)
-        return result
+        result.append(contentsOf: labels)
+        return result.reversed()
     }
     
     func makeTextData() -> GUIRenderData.TextRenderData? {
