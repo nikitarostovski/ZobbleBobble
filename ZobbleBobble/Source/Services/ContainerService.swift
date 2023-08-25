@@ -20,7 +20,7 @@ final class ContainerService {
     private func generateContainer(for player: PlayerModel, containerIndex: Int, containerTotalCount: Int) -> ContainerModel {
         let progress = CGFloat(containerIndex) / CGFloat(containerTotalCount)
         
-        let count = containerIndex + 3
+        let count = containerIndex + 10
         let chunks = (0..<count).map { _ in self.chunkService.generateChunk() }
         
         let container = ContainerModel(missles: chunks, reward: max(100, UInt64(650 * progress)))

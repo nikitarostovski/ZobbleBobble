@@ -12,9 +12,10 @@ let inputPath = "/Users/rost/Dev/ZobbleBobble/LevelConverter/Images"
 let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
 let radius: CGFloat = 1.5
-let scale: CGFloat = 0.5
+let planetScale: CGFloat = 1.5
+let missleScale: CGFloat = 0.5
 
-for folder in ["Missles", "Planets"] {
+for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
     let inputPath = inputPath.appending("/\(folder)")
     
     let files = (try? FileManager.default.contentsOfDirectory(atPath: inputPath)) ?? []

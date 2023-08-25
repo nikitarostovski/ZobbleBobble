@@ -21,6 +21,7 @@ class MissleBody: LiquidBody {
     var positions: [SIMD2<Float32>] = []
     var colors: [SIMD4<UInt8>] = []
     var velocities: [SIMD2<Float32>] = []
+    var scale: Float
     
     /// per-particle positions when missle starts to appear
     private var idlePositions: [SIMD2<Float32>] = []
@@ -29,7 +30,8 @@ class MissleBody: LiquidBody {
     
     private var speedModifiers: [CGFloat] = []
     
-    init(missleModel: ChunkModel, parent: MissleHolder) {
+    init(missleModel: ChunkModel, scale: Float = 1, parent: MissleHolder) {
+        self.scale = scale
         self.missleModel = missleModel
         self.parent = parent
         
@@ -47,8 +49,8 @@ class MissleBody: LiquidBody {
         
         // fill ready positions
         readyPositions = missleModel.particles.map { particle in
-            SIMD2<Float32>(x: Float32(particle.position.x) + missleCenter.x,
-                           y: Float32(particle.position.y) + missleCenter.y)
+            SIMD2<Float32>(x: Float32(particle.position.x) * scale + missleCenter.x,
+                           y: Float32(particle.position.y) * scale + missleCenter.y)
         }
         
         // fill speed
@@ -114,7 +116,7 @@ class MissleBody: LiquidBody {
         colors.copyMemory(from: &self.colors,
                           byteCount: MemoryLayout<SIMD4<UInt8>>.stride * self.colors.count)
         
-        self.renderData = .init(particleRadius: Float(Settings.Physics.particleRadius),
+        self.renderData = .init(particleRadius: Float(Settings.Physics.particleRadius) * scale,
                                 liquidFadeModifier: liquidFadeMultiplier,
                                 scale: 1,
                                 liquidCount: self.positions.count,

@@ -22,7 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func buildWindow() {
-        let height = Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale
+        let height = Settings.Camera.sceneHeight
         let width = height * 0.7
         
         let controller = GameViewController()

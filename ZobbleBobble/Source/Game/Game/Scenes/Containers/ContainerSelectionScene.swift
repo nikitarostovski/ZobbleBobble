@@ -87,7 +87,6 @@ final class ContainerSelectionScene: Scene {
         let view = GUIScrollView(subviews: containerCardViews)
         view.contentSize.width = CGFloat(view.subviews.count)
         view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
-        let scale = size.height / (Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale)
         
         view.onLayout = { [weak self] _ in
             guard let self = self else { return .zero }
@@ -161,7 +160,7 @@ final class ContainerSelectionScene: Scene {
     }
     
     private func updateContainerFrames() {
-        let gameTextureHeight = Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale
+        let gameTextureHeight = Settings.Camera.sceneHeight
         let scale = size.height / gameTextureHeight
         let height = containerBackgroundView.frame.height * 0.8 * gameTextureHeight
         let width = height / ContainerBody.aspectRatio

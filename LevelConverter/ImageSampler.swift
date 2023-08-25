@@ -7,7 +7,6 @@
 
 import Foundation
 import MetalKit
-import Levels
 
 final class ImageSampler {
     private let maxPointCount = 100_000_00
@@ -57,7 +56,6 @@ final class ImageSampler {
         let s = MTLSamplerDescriptor()
         s.magFilter = .nearest
         s.minFilter = .nearest
-//        s.normalizedCoordinates = true
         self.linearSampler = device.makeSamplerState(descriptor: s)
     }
     

@@ -10,7 +10,7 @@ import Foundation
 final class PlanetSelectionScene: Scene {
     override var transitionTargetCategory: TransitionTarget { .planetSelection }
     
-    private let maxPlanetScale: CGFloat = 3
+    private let maxPlanetScale: CGFloat = 4
     
     private lazy var selectedPlanetIndex: Int = {
         return game?.player.selectedPlanetIndex ?? 0
@@ -92,7 +92,7 @@ final class PlanetSelectionScene: Scene {
         let view = GUIScrollView(subviews: planetCardViews)
         view.contentSize.width = CGFloat(view.subviews.count)
         view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
-        let scale = size.height / (Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale)
+        let scale = size.height / Settings.Camera.sceneHeight
         
         view.onLayout = { [weak self] _ in
             guard let self = self else { return .zero }
@@ -121,9 +121,6 @@ final class PlanetSelectionScene: Scene {
     private lazy var planetBackgroundView: GUIView = {
         let view = GUIView()
         view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
-        let gameTextureHeight = Settings.Camera.sceneHeight * Settings.Graphics.resolutionDownscale
-        let scale = size.height / gameTextureHeight
-        
         view.onLayout = { [weak self] view in
             guard let self = self else { return .zero }
             
@@ -140,7 +137,7 @@ final class PlanetSelectionScene: Scene {
     
     private var planetVisibilityRadius: CGFloat {
         // by furthest chunk
-        game?.player.selectedPlanet?.chunks.map { $0.boundingRadius }.max() ?? 1
+        (game?.player.selectedPlanet?.chunks.map { $0.boundingRadius }.max() ?? 0)
         // by gravity radius
 //        planet.gravityRadius
     }
@@ -170,7 +167,7 @@ final class PlanetSelectionScene: Scene {
     override func updateLayout() {
         super.updateLayout()
         
-        let guiHeight = planetBackgroundView.frame.height
+        let guiHeight = planetBackgroundView.frame.height * 0.7
         let gameHeight = (2 * planetVisibilityRadius) / Settings.Camera.sceneHeight
         
         let scale = min(maxPlanetScale, guiHeight / gameHeight)
