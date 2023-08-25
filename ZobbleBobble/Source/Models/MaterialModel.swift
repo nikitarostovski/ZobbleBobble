@@ -53,6 +53,11 @@ public enum MaterialType: String, Codable, CaseIterable {
         }
     }
     
+    /// Is solid material if false
+    public var isLiquid: Bool {
+        [.oil, .water].contains(self)
+    }
+    
     /// velocity threshold for liquid particle to become static
     public var freezeVelocityThreshold: CGFloat {
         switch self {

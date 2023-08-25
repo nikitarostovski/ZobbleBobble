@@ -9,6 +9,11 @@ import Foundation
 import Blueprints
 
 final class ChunkService {
+    enum GenerationOption {
+        case liquidOnly
+        case solidOnly
+    }
+    
     private let blueprints: [ChunkBlueprintModel]
     
     init?(_ file: String) {
@@ -26,9 +31,22 @@ final class ChunkService {
         print("\(blueprints.count) blueprints loaded from '\(file).json'")
     }
     
-    func generateChunk() -> ChunkModel {
+    func generateChunk(options: [GenerationOption] = []) -> ChunkModel {
         let blueprint = blueprints.randomElement()!
         let startImpulse = CGFloat.random(in: 1...3)
-        return ChunkModel(blueprint: blueprint, startImpulse: startImpulse)
+        return ChunkModel(blueprint: blueprint,
+                          startImpulse: startImpulse,
+                          materialChoice: .custom( { materials in
+            var materials = materials
+            for option in options {
+                switch option {
+                case .liquidOnly:
+                    materials = materials.filter { $0.isLiquid }
+                case .solidOnly:
+                    materials = materials.filter { !$0.isLiquid }
+                }
+            }
+            return materials.randomElement()!
+        }))
     }
 }

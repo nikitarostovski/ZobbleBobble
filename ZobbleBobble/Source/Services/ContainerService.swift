@@ -13,17 +13,15 @@ final class ContainerService {
     func getAvaialableContainers(for player: PlayerModel) -> [ContainerModel] {
         let count = 5
         return (0..<count).map {
-            generateContainer(for: player, containerIndex: $0, containerTotalCount: count)
+            generateContainer(for: player, options: [$0 == (count - 1) ? .liquidOnly : .solidOnly])
         }
     }
     
-    private func generateContainer(for player: PlayerModel, containerIndex: Int, containerTotalCount: Int) -> ContainerModel {
-        let progress = CGFloat(containerIndex) / CGFloat(containerTotalCount)
+    private func generateContainer(for player: PlayerModel, options: [ChunkService.GenerationOption]) -> ContainerModel {
+        let count = 12
+        let chunks = (0..<count).map { _ in self.chunkService.generateChunk(options: options) }
         
-        let count = containerIndex + 10
-        let chunks = (0..<count).map { _ in self.chunkService.generateChunk() }
-        
-        let container = ContainerModel(missles: chunks, reward: max(100, UInt64(650 * progress)))
+        let container = ContainerModel(missles: chunks, reward: 640)
         return container
     }
 }
