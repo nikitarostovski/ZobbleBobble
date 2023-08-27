@@ -11,7 +11,7 @@ import Blueprints
 let inputPath = "/Users/rost/Dev/ZobbleBobble/LevelConverter/Images"
 let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
-let radius: CGFloat = 1.5
+let radius: CGFloat = 1
 let planetScale: CGFloat = 1.5
 let missleScale: CGFloat = 0.5
 

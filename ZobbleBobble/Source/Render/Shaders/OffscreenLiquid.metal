@@ -24,6 +24,7 @@ struct LiquidUniforms {
 struct MetaballVertexOutput {
     float4 position [[position]];
     float3 color;
+    float velocity;
     float radius [[point_size]];
 };
 
@@ -83,10 +84,11 @@ vertex MetaballVertexOutput metaballs_vertex(device LiquidUniforms const &unifor
     pos.y *= -1;
     float radius = getRadius(uniforms, true) * VIEWPORT_SIZE;
     
-//    float velocity = length(velocities[vertexID]);
-//    float3 resultColor = float4(colors[vertexID]).rgb / 255.0 + velocity / 500.0;
+    float3 resultColor = float3(color.rgb) / 255.0;
+    float velocity = length(velocities[vertexID]);
 
-    r.color = float3(color.rgb) / 255.0;
+    r.color = resultColor;
+    r.velocity = velocity;
     r.position = float4(pos, 0, 1);
     r.radius = radius * uniforms.alphaTextureRadiusModifier;
     return r;

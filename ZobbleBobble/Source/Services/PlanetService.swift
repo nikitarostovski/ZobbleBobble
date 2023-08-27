@@ -22,7 +22,7 @@ final class PlanetService {
         
         let limits = LimitationsModel(radiusLimit: .init(value: Float(gravityRadius * 0.5), fine: 1),
                                       sectorLimit: .init(value: [.init(startAngle: 0, sectorSize: 10)], fine: 2),
-                                      materialWhitelist: .init(value: [.soil, .rock], fine: 4),
+                                      materialWhitelist: .init(value: [.organic, .rock], fine: 4),
                                       totalParticleAmountLimit: .init(value: 2000, fine: 1),
                                       outerSpaceLimit: .init(value: .init(), fine: 1))
         

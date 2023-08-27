@@ -11,11 +11,12 @@ import Blueprints
 extension MaterialType {
     public var categoryMask: MaterialCategory {
         switch self {
-        case .soil: return [.solid]
-        case .sand: return [.solid, .dust]
-        case .rock: return [.solid]
-        case .water: return [.liquid]
-        case .oil: return [.liquid]
+        case .organic, .rock, .metal, .magma:
+            return [.solid]
+        case .acid, .water, .oil:
+            return [.liquid]
+        case .sand, .dust:
+            return [.solid, .dust]
         }
     }
     

@@ -39,7 +39,7 @@ enum Settings {
     
     enum Physics {
         static let scale: CGFloat = 100_000
-        static let particleRadius: CGFloat = 1.5
+        static let particleRadius: CGFloat = 1
         
         static let maxParticleCount = 10_000
         static let maxMaterialCount = 50

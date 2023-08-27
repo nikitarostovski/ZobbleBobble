@@ -39,6 +39,8 @@
 		114D42802A974F9E00D0D153 /* ContainerShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 114D427F2A974F9E00D0D153 /* ContainerShaders.metal */; };
 		114D42822A977B0A00D0D153 /* GunRenderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42812A977B0A00D0D153 /* GunRenderData.swift */; };
 		114D42842A977B2E00D0D153 /* GunNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42832A977B2E00D0D153 /* GunNode.swift */; };
+		114D42862A9B1BC200D0D153 /* MaterialModel+Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42852A9B1BC200D0D153 /* MaterialModel+Physics.swift */; };
+		114D42882A9B1C1700D0D153 /* MaterialModel+Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114D42872A9B1C1700D0D153 /* MaterialModel+Rendering.swift */; };
 		115BAEF92A95F8D90069A5B0 /* RubberBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEED2A95F8D80069A5B0 /* RubberBand.swift */; };
 		115BAEFA2A95F8D90069A5B0 /* CGPoint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */; };
 		115BAEFC2A95F8D90069A5B0 /* GeometryUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */; };
@@ -354,6 +356,8 @@
 		114D427F2A974F9E00D0D153 /* ContainerShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ContainerShaders.metal; sourceTree = "<group>"; };
 		114D42812A977B0A00D0D153 /* GunRenderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunRenderData.swift; sourceTree = "<group>"; };
 		114D42832A977B2E00D0D153 /* GunNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GunNode.swift; sourceTree = "<group>"; };
+		114D42852A9B1BC200D0D153 /* MaterialModel+Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MaterialModel+Physics.swift"; sourceTree = "<group>"; };
+		114D42872A9B1C1700D0D153 /* MaterialModel+Rendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MaterialModel+Rendering.swift"; sourceTree = "<group>"; };
 		115BAEED2A95F8D80069A5B0 /* RubberBand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RubberBand.swift; sourceTree = "<group>"; };
 		115BAEEF2A95F8D80069A5B0 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
 		115BAEF12A95F8D80069A5B0 /* GeometryUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryUtils.swift; sourceTree = "<group>"; };
@@ -941,6 +945,8 @@
 				11A5C8C02A93C8F500817D68 /* ParticleModel+Blueprints.swift */,
 				117B3F3E2A93469500C25EE7 /* MaterialModel.swift */,
 				11A5C8C42A93CAB200817D68 /* MaterialModel+Blueprints.swift */,
+				114D42852A9B1BC200D0D153 /* MaterialModel+Physics.swift */,
+				114D42872A9B1C1700D0D153 /* MaterialModel+Rendering.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1490,6 +1496,7 @@
 				1126C1A52773AFAF00C26BEC /* AppDelegate.swift in Sources */,
 				11889DE22A8CDCC400F8216B /* ContainerSelectionScene.swift in Sources */,
 				112CD1712A77DEC60098D324 /* Renderer.swift in Sources */,
+				114D42882A9B1C1700D0D153 /* MaterialModel+Rendering.swift in Sources */,
 				112CD16D2A77D5360098D324 /* TerrainBody.swift in Sources */,
 				11889DE42A8CDCD300F8216B /* ImprovementsScene.swift in Sources */,
 				110DB2742A8FBF75002DEEAD /* MaterialRenderData.swift in Sources */,
@@ -1497,6 +1504,7 @@
 				114D427C2A971D9C00D0D153 /* ContainerBody.swift in Sources */,
 				116D7D792A861D38007ED1DD /* MTLTexture+Utils.swift in Sources */,
 				117B3F3B2A93463700C25EE7 /* ChunkModel.swift in Sources */,
+				114D42862A9B1BC200D0D153 /* MaterialModel+Physics.swift in Sources */,
 				115BAF022A95F8D90069A5B0 /* DecelerationTimingParameters.swift in Sources */,
 				1194330829892CD300AE56CA /* CGRect+Colors.swift in Sources */,
 				11889DEE2A8CDD1600F8216B /* GameResultsScene.swift in Sources */,

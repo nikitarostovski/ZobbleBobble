@@ -41,9 +41,9 @@ final class ChunkService {
             for option in options {
                 switch option {
                 case .liquidOnly:
-                    materials = materials.filter { $0.isLiquid }
+                    materials = materials.filter { $0.categoryMask.contains(.liquid) }
                 case .solidOnly:
-                    materials = materials.filter { !$0.isLiquid }
+                    materials = materials.filter { $0.categoryMask.contains(.solid) }
                 }
             }
             return materials.randomElement()!
