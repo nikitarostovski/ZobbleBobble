@@ -64,7 +64,7 @@ final class PlanetSelectionScene: Scene {
         
         return planets.enumerated().map { i, planet in
             let container = GUIView()
-            container.backgroundColor = .init(rgb: 0x00FF00, a: 100)
+//            container.backgroundColor = .init(rgb: 0x00FF00, a: 100)
             container.onLayout = { [weak self] _ in
                 guard let self = self else { return .zero }
                 return CGRect(x: CGFloat(i) + paddingHorizontal,
@@ -91,7 +91,7 @@ final class PlanetSelectionScene: Scene {
     private lazy var scrollView: GUIScrollView = {
         let view = GUIScrollView(subviews: planetCardViews)
         view.contentSize.width = CGFloat(view.subviews.count)
-        view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
+//        view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
         let scale = size.height / Settings.Camera.sceneHeight
         
         view.onLayout = { [weak self] _ in
@@ -120,7 +120,7 @@ final class PlanetSelectionScene: Scene {
     
     private lazy var planetBackgroundView: GUIView = {
         let view = GUIView()
-        view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
+//        view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
         view.onLayout = { [weak self] view in
             guard let self = self else { return .zero }
             

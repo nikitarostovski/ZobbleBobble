@@ -57,10 +57,12 @@ kernel void fade_out(texture2d<float, access::read> input [[texture(0)]],
                      device float const &fadeMultiplier [[buffer(0)]],
                      uint2 gid [[thread_position_in_grid]]) {
     
-    float4 oldColor = input.read(gid);
-    oldColor = oldColor * fadeMultiplier;
-    oldColor.a = 0;
-    output.write(oldColor, gid);
+    float4 color = input.read(gid);
+    color.r = color.r * fadeMultiplier;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0;
+    output.write(color, gid);
 }
 
 vertex MetaballVertexOutput metaballs_vertex(device LiquidUniforms const &uniforms [[buffer(0)]],
@@ -109,8 +111,9 @@ fragment float4 metaballs_fragment(device LiquidUniforms const &uniforms [[buffe
     float alpha = 1 - smoothstep(0, 1, alphaRadius);
     float green = in.color.r * (1 - smoothstep(0, 1, movementRadius));
     float blue = in.color.g * (1 - smoothstep(0, 1, movementRadius));
+    float velocity = min(1.0, in.velocity / 10000);
     
-    return float4(alpha, green, blue, 0);
+    return float4(alpha, green, blue, velocity);
 }
 
 kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[texture(0)]],
@@ -133,16 +136,23 @@ kernel void threshold_filter(texture2d<float, access::sample> alphaInput [[textu
     float alpha = alphaColor.r;
     float green = alphaColor.g;
     float blue = alphaColor.b;
+    float velocity = alphaColor.a;
     
     if (alpha > threshold) {
         float4 col;
         
         if (abs(green - 0.5) < movementColorThreshold && abs(blue - 0.5) < movementColorThreshold) {
-            col = float4(materialAuxColor) / 255.0;
-            col.a = 1;
+            col.rgb = float4(materialAuxColor).rgb / 255.0;
         } else {
-            col = float4(oldColor.rgb, 1);
+            col.rgb = oldColor.rgb;
         }
+        
+        // apply velocity
+        col.r *= velocity + 1;
+        col.g *= 0.7 * velocity + 1;
+        col.b *= 0.3 * velocity + 1;
+        
+        col.a = 1;
         output.write(col, gid);
         return;
     }

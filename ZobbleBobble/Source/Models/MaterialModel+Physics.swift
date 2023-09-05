@@ -23,9 +23,9 @@ extension MaterialType {
     public var gravityScale: CGFloat {
         switch self {
         case .dust:
-            return 0.5
+            return 0.6
         case .water, .acid:
-            return 0.7
+            return 0.8
         default:
             return 1.0
         }

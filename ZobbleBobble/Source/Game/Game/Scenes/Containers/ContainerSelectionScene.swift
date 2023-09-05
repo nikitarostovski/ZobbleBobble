@@ -59,7 +59,7 @@ final class ContainerSelectionScene: Scene {
         
         return containers.enumerated().map { i, container in
             let view = GUIView()
-            view.backgroundColor = .init(rgb: 0x00FF00, a: 100)
+//            view.backgroundColor = .init(rgb: 0x00FF00, a: 100)
             view.onLayout = { [weak self] _ in
                 guard let self = self else { return .zero }
                 return CGRect(x: CGFloat(i) + paddingHorizontal,
@@ -86,7 +86,7 @@ final class ContainerSelectionScene: Scene {
     private lazy var scrollView: GUIScrollView = {
         let view = GUIScrollView(subviews: containerCardViews)
         view.contentSize.width = CGFloat(view.subviews.count)
-        view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
+//        view.backgroundColor = .init(rgb: 0xFF0000, a: 100)
         
         view.onLayout = { [weak self] _ in
             guard let self = self else { return .zero }
@@ -111,7 +111,7 @@ final class ContainerSelectionScene: Scene {
     
     private lazy var containerBackgroundView: GUIView = {
         let view = GUIView()
-        view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
+//        view.backgroundColor = .init(rgb: 0x0000FF, a: 63)
         view.onLayout = { [weak self] view in
             guard let self = self else { return .zero }
             

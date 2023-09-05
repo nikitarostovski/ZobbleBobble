@@ -84,16 +84,16 @@ class Renderer: NSObject, MTKViewDelegate {
     private var sceneRenderers = [SceneRenderer]()
     
     private var shaderOptions = ShaderOptions(bloom: Settings.Graphics.postprocessingEnabled ? 1 : 0, // 1
-                                              bloomRadiusR: 4.0, // 1.0
-                                              bloomRadiusG: 4.0, // 1.0
-                                              bloomRadiusB: 4.0, // 1.0
-                                              bloomBrightness: 0.6, // 0.4
+                                              bloomRadiusR: 1.0, // 1.0
+                                              bloomRadiusG: 1.0, // 1.0
+                                              bloomRadiusB: 1.0, // 1.0
+                                              bloomBrightness: 0.4, // 0.4
                                               bloomWeight: 1.21, // 1.21
                                               dotMask: Settings.Graphics.postprocessingEnabled ? 1 : 0, // 1
                                               dotMaskBrightness: 0.7, // 0.7
                                               scanlines: Settings.Graphics.postprocessingEnabled ? 2 : 0, // 2
-                                              scanlineBrightness: 0.15, // 0.55
-                                              scanlineWeight: 0.07, // 0.11
+                                              scanlineBrightness: 0.55, // 0.55
+                                              scanlineWeight: 0.11, // 0.11
                                               disalignment: 0, // 1
                                               disalignmentH: 0.002, // 0.002
                                               disalignmentV: 0.002) // 0.002

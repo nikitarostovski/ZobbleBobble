@@ -129,7 +129,7 @@ class SceneRenderer {
         backgroundColorBufferProvider = BufferProvider(device: device,
                                                        inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<SIMD4<UInt8>>.stride)
-        upscaleSamplerState = device.nearestSampler
+        upscaleSamplerState = device.linearSampler
         finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
 
         do {
