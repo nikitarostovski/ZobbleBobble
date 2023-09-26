@@ -67,7 +67,7 @@ final class PlanetScene: Scene {
                       height: buttonHeight)
     }
     
-    private let physicsWorld: PhysicsWorld
+    private let physicsWorld: LiquidFunWorld
     private let terrain: TerrainBody?
     private var gun: GunBody
     private var container: ContainerBody
@@ -75,27 +75,32 @@ final class PlanetScene: Scene {
     
     private var animation: TimerAnimation?
     
+    private let worldWidth: Int
+    private let worldHeight: Int
+    
     override var visibleBodies: [any Body] {
-        let result: [(any Body)?] = [gui, gun, terrain, missle, container]
+        let result: [(any Body)?] = [gui, terrain]//[gui, gun, terrain, missle, container]
         return result.compactMap { $0 }
     }
     
     override init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         guard let player = game?.player, let planet = player.selectedPlanet, let container = player.selectedContainer else { fatalError() }
         
-        let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
+        let height = Int(Settings.Camera.sceneHeight)
+        let width = Int(size.width * CGFloat(height) / size.height)
+        let world = LiquidFunWorld(width: width,
+                                   height: height,
                                    rotationStep: planet.speed.radians / 60.0,
                                    gravityRadius: planet.gravityRadius,
                                    gravityCenter: levelCenterPoint * Settings.Physics.scale)
         self.physicsWorld = world
         
-        let planetMaterials = planet.uniqueMaterials
-        let containerMaterials = player.selectedContainer?.uniqueMaterials ?? []
-        let uniqueMaterials = Array(Set(planetMaterials + containerMaterials))
+        self.worldWidth = width
+        self.worldHeight = height
         
         let containerBody = ContainerBody(container: container, frame: .zero)
         self.container = containerBody
-        self.terrain = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
+        self.terrain = TerrainBody(physicsWorld: world)
         self.gun = GunBody(player: player, container: containerBody, frame: .zero)
         self.gameState = .normal
         
@@ -158,7 +163,7 @@ final class PlanetScene: Scene {
     
     override func update(_ time: CFTimeInterval) {
         if gameState != .paused  {
-            physicsWorld.update(time)
+            physicsWorld.step(time)
         }
     }
     
@@ -250,36 +255,31 @@ final class PlanetScene: Scene {
 
         userInteractionEnabled = false
 
-        missle.positions.enumerated().forEach { [weak self] i, center in
-            let particle = missle.missleModel.particles[i]
-            let material = particle.material
-            
-            let flags = material.physicsFlags
-            let isStatic = false
-            let gravityScale = material.gravityScale
-            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.freezeThresholdModifier
-            let staticContactBehavior = material.becomesLiquidOnContact
-
-            var pos = CGPoint(x: CGFloat(center.x) * Settings.Physics.scale,
-                              y: CGFloat(center.y) * Settings.Physics.scale)
-
-            let dist = pos.distance(to: .zero)
-            let angle = pos.angle(to: .zero) * .pi / 180 + .pi
-
-            pos.x = dist * cos(angle)
-            pos.y = dist * sin(angle)
-
-            let color = particle.movementColor
-
-            self?.physicsWorld.addParticle(withPosition: pos,
-                                           color: color,
-                                           flags: flags,
-                                           isStatic: isStatic,
-                                           gravityScale: gravityScale,
-                                           freezeVelocityThreshold: freezeVelocityThreshold,
-                                           becomesLiquidOnContact: staticContactBehavior,
-                                           explosionRadius: material.explosionRadius,
-                                           shootImpulse: missle.missleModel.startImpulse)
-        }
+//        missle.positions.enumerated().forEach { [weak self] i, center in
+//            let particle = missle.missleModel.particles[i]
+//            let material = particle.material
+//
+//            let flags = material.physicsFlags
+//            let isStatic = false
+//            let gravityScale = material.gravityScale
+//            let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.freezeThresholdModifier
+//            let staticContactBehavior = material.becomesLiquidOnContact
+//
+//            var pos = CGPoint(x: CGFloat(center.x),
+//                              y: CGFloat(center.y))
+//
+//            let dist = pos.distance(to: .zero)
+//            let angle = pos.angle(to: .zero) * .pi / 180 + .pi
+//
+//            pos.x = dist * cos(angle)
+//            pos.y = dist * sin(angle)
+//
+//            let color = particle.movementColor
+//
+//            let x = Int(pos.x)
+//            let y = Int(pos.y)
+//            let e = Sand(x: x, y: y)
+//            self?.physicsWorld.add(element: e, x: x, y: y)
+//        }
     }
 }

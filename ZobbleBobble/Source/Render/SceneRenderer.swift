@@ -39,9 +39,10 @@ class SceneRenderer {
     private var containerNodes = [ContainerNode]()
     private var gunNodes = [GunNode]()
     private var guiNodes = [GUINode]()
+    private var cellsNodes = [CellsNode]()
     
     private var allNodes: [Node] {
-        liquidNodes + gunNodes + containerNodes + guiNodes
+        cellsNodes + liquidNodes + gunNodes + containerNodes + guiNodes
     }
     
     init(scene: Scene?, device: MTLDevice, renderSize: CGSize, gameTextureSize: CGSize) {
@@ -171,6 +172,7 @@ class SceneRenderer {
             }
             if !found {
                 liquidNodes.removeAll(where: { $0 === node })
+                cellsNodes.removeAll(where: { $0 === node })
                 guiNodes.removeAll(where: { $0 === node })
                 gunNodes.removeAll(where: { $0 === node })
                 containerNodes.removeAll(where: { $0 === node })
@@ -191,6 +193,10 @@ class SceneRenderer {
                 if let node = LiquidNode(device, renderSize: gameTextureSize, material: material, body: body as? LiquidBody) {
                     liquidNodes.append(node)
                 }
+            }
+        case is TerrainBody:
+            if let node = CellsNode(device, renderSize: renderSize, body: body as? TerrainBody) {
+                cellsNodes.append(node)
             }
         case is GUIBody:
             let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)

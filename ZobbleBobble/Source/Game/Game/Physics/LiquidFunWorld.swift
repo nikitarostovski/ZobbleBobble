@@ -8,14 +8,17 @@
 import Foundation
 import ZobblePhysics
 
-class LiquidFunWorld: PhysicsWorld {
+class LiquidFunWorld {
     private let queue = DispatchQueue(label: "liquidfunworld.update", qos: .userInteractive)
     
     private let world: ZPWorld
     private let particleRadius: CGFloat
     
-    init(particleRadius: CGFloat, rotationStep: CGFloat, gravityRadius: CGFloat, gravityCenter: CGPoint) {
-        self.particleRadius = particleRadius
+    private var matrix: CellularMatrix
+    
+    init(width: Int, height: Int, rotationStep: CGFloat, gravityRadius: CGFloat, gravityCenter: CGPoint) {
+        self.particleRadius = 0.5
+        
         let def = ZPWorldDef()
         def.shotImpulseModifier = Settings.Physics.missleShotImpulseModifier
         def.gravityScale = float32(Settings.Physics.gravityModifier)
@@ -30,43 +33,43 @@ class LiquidFunWorld: PhysicsWorld {
         def.powderStrength = 2
         
         self.world = ZPWorld(worldDef: def)
+        self.matrix = CellularMatrix(width: width, height: height)
+        
+        
+//        for y in 0..<height {
+//            for x in 0..<width {
+//                if x == 0 || y == 0 || x == width - 1 || y == height - 1 {
+//                    self.matrix.set(x, y, Stone(x: x, y: y))
+//                }
+//            }
+//        }
+//
+//        let squareSize = 20
+//
+//        for i in (-squareSize / 2)..<(squareSize / 2) {
+//            for j in (-squareSize / 2)..<(squareSize / 2) {
+//                let x = width / 2 + i
+//                let y = height / 2 + j
+//                self.matrix.set(x, y, Sand(x: x, y: y))
+//            }
+//        }
     }
     
-    func getRenderData() -> RenderData? {
-        var result: RenderData?
-        
-        let group = DispatchGroup()
-        group.enter()
-        world.requestRenderData { [particleRadius] count, positions, velocities, colors in
-            if count > 0, let positions = positions, let velocities = velocities, let colors = colors {
-                result = (particleRadius: Float(particleRadius),
-                          liquidCount: Int(count),
-                          liquidPositions: positions,
-                          liquidVelocities: velocities,
-                          liquidColors: colors)
-            }
-            group.leave()
-        }
-        group.wait()
-        
-        return result
-    }
-    
-    func update(_ time: CFTimeInterval) {
-        queue.async { [weak self] in
-            guard let self = self else { return }
+    func step(_ time: CFTimeInterval) {
+//        queue.async { [weak self] in
+//            guard let self = self else { return }
             autoreleasepool {
                 self.world.worldStep(time,
                                      velocityIterations: Int32(Settings.Physics.velocityIterations),
                                      positionIterations: Int32(Settings.Physics.positionIterations),
                                      particleIterations: Int32(Settings.Physics.particleIterations))
             }
-        }
+//        }
     }
     
     func addParticle(withPosition: CGPoint, color: SIMD4<UInt8>, flags: UInt32, isStatic: Bool, gravityScale: CGFloat, freezeVelocityThreshold: CGFloat, becomesLiquidOnContact: Bool, explosionRadius: CGFloat, shootImpulse: CGFloat) {
-        queue.async { [weak self] in
-            self?.world.addParticle(withPosition: withPosition,
+//        queue.async { [weak self] in
+            self.world.addParticle(withPosition: withPosition,
                                     color: CGRect(color),
                                     flags: flags,
                                     isStatic: isStatic,
@@ -75,6 +78,23 @@ class LiquidFunWorld: PhysicsWorld {
                                     becomesLiquidOnContact: becomesLiquidOnContact,
                                     explosionRadius: explosionRadius,
                                     shootImpulse: shootImpulse)
+//        }
+    }
+    
+    var renderData: CellsRenderData? {
+        autoreleasepool {
+            updateMatrix()
+        }
+        return lastRenderData
+    }
+    
+    private var lastRenderData: CellsRenderData?
+    
+    private func updateMatrix() {
+        world.requestRenderData { [weak self] count, positions, colors, velocities in
+            guard let self = self else { return }
+            let texture = matrix.update(count: Int(count), positions: positions, colors: colors, velocities: velocities)
+            lastRenderData = CellsRenderData(gridTexture: texture)
         }
     }
 }

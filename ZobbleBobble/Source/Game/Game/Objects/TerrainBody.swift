@@ -7,37 +7,16 @@
 
 import Foundation
 
-class TerrainBody: LiquidBody {
-    let liquidFadeModifier: Float
-    
-    weak var physicsWorld: PhysicsWorld?
-    
-    private var actualRenderData: LiquidRenderData?
-    
-    override var renderData: LiquidRenderData? {
-        get {
-            if let liquidPhysicsData = physicsWorld?.getRenderData() {
-                actualRenderData = .init(particleRadius: liquidPhysicsData.particleRadius,
-                                         liquidFadeModifier: liquidFadeModifier,
-                                         scale: Float(Settings.Physics.scale),
-                                         liquidCount: liquidPhysicsData.liquidCount,
-                                         liquidPositions: liquidPhysicsData.liquidPositions,
-                                         liquidVelocities: liquidPhysicsData.liquidVelocities,
-                                         liquidColors: liquidPhysicsData.liquidColors)
-            }
-            return actualRenderData
-        }
-        set {
-            actualRenderData = newValue
-        }
+class TerrainBody: Body {
+    var userInteractive: Bool { false }
+
+    private weak var physicsWorld: LiquidFunWorld?
+
+    var renderData: CellsRenderData? {
+        physicsWorld?.renderData
     }
-    
-    init(liquidFadeModifier: Float = Settings.Graphics.fadeMultiplier, physicsWorld: PhysicsWorld?, uniqueMaterials: [MaterialType]) {
+
+    init(physicsWorld: LiquidFunWorld?) {
         self.physicsWorld = physicsWorld
-        self.liquidFadeModifier = liquidFadeModifier
-        
-        super.init()
-        
-        self.uniqueMaterials = uniqueMaterials
     }
 }

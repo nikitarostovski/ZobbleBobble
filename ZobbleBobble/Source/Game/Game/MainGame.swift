@@ -8,9 +8,9 @@
 import Foundation
 
 final class MainGame: RenderDataSource {
-    private(set) var safeArea: CGRect = .zero
-    private(set) var screenSize: CGSize = .zero
-    private(set) var screenScale: CGFloat = 1
+    private(set) var safeArea: CGRect
+    private(set) var screenSize: CGSize
+    private(set) var screenScale: CGFloat
     
     private(set) var visibleScenes: [Scene]
     private(set) var player: PlayerModel
@@ -20,7 +20,10 @@ final class MainGame: RenderDataSource {
     
     // MARK: - Methods
     
-    init() {
+    init(screenSize: CGSize = .zero, safeArea: CGRect = .zero, screenScale: CGFloat = 1) {
+        self.safeArea = safeArea
+        self.screenSize = screenSize
+        self.screenScale = screenScale
         self.player = PlayerModel()
         self.visibleScenes = []
         self.planetService = PlanetService()
@@ -29,8 +32,8 @@ final class MainGame: RenderDataSource {
         configurePlayer()
         
 //        let rootScene = PlanetSelectionScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
-        let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
-//        let rootScene = PlanetScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
+//        let rootScene = ControlCenterScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
+        let rootScene = PlanetScene(game: self, size: screenSize, safeArea: safeArea, screenScale: screenScale, opacity: 1)
         rootScene.transitionDelegate = self
         visibleScenes = [rootScene]
     }

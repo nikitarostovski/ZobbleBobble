@@ -28,8 +28,8 @@ final class ThreadHelper {
     }
     
     private static func makeThreadGroups(state: MTLComputePipelineState, width: Int, height: Int) -> (MTLSize, MTLSize) {
-        let threadgroupsPerGrid = MTLSize(width: 8, height: 8, depth: 1)
-        let threadsPerThreadgroup = MTLSize(width: max(1, width / threadgroupsPerGrid.width),
+        let threadgroupsPerGrid = MTLSize(width: 16, height: 16, depth: 1)
+        let threadsPerThreadgroup = MTLSize(width: width / threadgroupsPerGrid.width,
                                             height: max(1, height / threadgroupsPerGrid.height),
                                             depth: 1)
         return (threadsPerThreadgroup, threadgroupsPerGrid)

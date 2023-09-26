@@ -8,12 +8,11 @@
 import Foundation
 import Blueprints
 
-let inputPath = "/Users/rost/Dev/ZobbleBobble/LevelConverter/Images"
-let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
+let inputPath = "/Users/nrostovskiy/Dev/ZobbleBobble/LevelConverter/Images"
+let outputPath = URL(filePath: "/Users/nrostovskiy/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
-let radius: CGFloat = 2
-let planetScale: CGFloat = 1.5
-let missleScale: CGFloat = 0.5
+let planetScale: CGFloat = 1
+let missleScale: CGFloat = 1
 
 for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
     let inputPath = inputPath.appending("/\(folder)")
@@ -25,7 +24,6 @@ for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
         let url = URL(fileURLWithPath: "\(inputPath)/\(s)")
         
         guard let sampler = ImageSampler(file: url) else { return nil }
-        let particleStride: CGFloat = radius * 2 * 0.75
         
         let width = Int(CGFloat(sampler.width) * scale)
         let height = Int(CGFloat(sampler.height) * scale)
@@ -34,8 +32,8 @@ for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
         var samplingPoints = [CGPoint]()
         var boundingRadius: CGFloat = 0
         
-        for y in stride(from: floor(aabb.minY / particleStride) * particleStride, to: aabb.maxY, by: particleStride) {
-            for x in stride(from: floor(aabb.minX / particleStride) * particleStride, to: aabb.maxX, by: particleStride) {
+        for y in stride(from: floor(aabb.minY / 1) * 1, to: aabb.maxY, by: 1) {
+            for x in stride(from: floor(aabb.minX / 1) * 1, to: aabb.maxX, by: 1) {
                 let samplingPoint = CGPoint(x: x / aabb.width, y: y / aabb.height)
                 samplingPoints.append(samplingPoint)
                 

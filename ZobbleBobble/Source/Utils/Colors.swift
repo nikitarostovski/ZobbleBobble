@@ -39,15 +39,15 @@ public enum Colors {
     }
     
     public enum Materials {
-        public static let organic: SIMD4<UInt8> = .init(rgb: 0x89A810, a: 0)
-        public static let rock: SIMD4<UInt8> = .init(rgb: 0x907289, a: 1)
-        public static let metal: SIMD4<UInt8> = .init(rgb: 0x767677, a: 2)
-        public static let magma: SIMD4<UInt8> = .init(rgb: 0xF74533, a: 3)
-        public static let sand: SIMD4<UInt8> = .init(rgb: 0xFFCD64, a: 4)
-        public static let water: SIMD4<UInt8> = .init(rgb: 0x5350FD, a: 5)
-        public static let acid: SIMD4<UInt8> = .init(rgb: 0x44DD20, a: 6)
-        public static let dust: SIMD4<UInt8> = .init(rgb: 0x777777, a: 7)
-        public static let oil: SIMD4<UInt8> = .init(rgb: 0xC74632, a: 8)
+        public static let organic: SIMD4<UInt8> = .init(rgb: 0x89A810)
+        public static let rock: SIMD4<UInt8> = .init(rgb: 0x907289)
+        public static let metal: SIMD4<UInt8> = .init(rgb: 0x767677)
+        public static let magma: SIMD4<UInt8> = .init(rgb: 0xF74533)
+        public static let sand: SIMD4<UInt8> = .init(rgb: 0xFFCD64)
+        public static let water: SIMD4<UInt8> = .init(rgb: 0x5350FD)
+        public static let acid: SIMD4<UInt8> = .init(rgb: 0x44DD20)
+        public static let dust: SIMD4<UInt8> = .init(rgb: 0x777777)
+        public static let oil: SIMD4<UInt8> = .init(rgb: 0xC74632)
     }
     
     public enum Background {

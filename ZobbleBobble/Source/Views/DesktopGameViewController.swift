@@ -65,8 +65,6 @@ final class GameViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        game = MainGame()
-        
         view.addSubview(renderView)
         NSLayoutConstraint.activate([
             NSLayoutConstraint(item: renderView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
@@ -78,6 +76,12 @@ final class GameViewController: NSViewController {
     
     override func viewDidLayout() {
         super.viewDidLayout()
+        if game == nil, renderView.bounds.width > 0 {
+            let scale = NSScreen.main?.backingScaleFactor ?? 1
+            let safeArea = safeAreaRectangle
+            let size = CGSize(width: renderView.frame.width * scale, height: renderView.frame.height * scale)
+            game = MainGame(screenSize: size, safeArea: safeArea, screenScale: scale)
+        }
         updateGameSizeData()
     }
     
