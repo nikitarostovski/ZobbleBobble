@@ -8,12 +8,12 @@
 import Foundation
 import Blueprints
 
-let inputPath = "/Users/rost/Dev/ZobbleBobble/LevelConverter/Images"
-let outputPath = URL(filePath: "/Users/rost/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
+let inputPath = "/Users/nrostovskiy/Dev/ZobbleBobble/LevelConverter/Images"
+let outputPath = URL(filePath: "/Users/nrostovskiy/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
-let radius: CGFloat = 2
-let planetScale: CGFloat = 1.5
-let missleScale: CGFloat = 0.5
+let radius: CGFloat = 0.5
+let planetScale: CGFloat = 0.25
+let missleScale: CGFloat = 0.15
 
 for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
     let inputPath = inputPath.appending("/\(folder)")

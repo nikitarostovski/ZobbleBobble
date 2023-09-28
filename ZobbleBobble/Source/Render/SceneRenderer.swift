@@ -35,13 +35,13 @@ class SceneRenderer {
     /// Size of downscaled gameplay texture
     private var gameTextureSize: CGSize
     
-    private var liquidNodes = [LiquidNode]()
+    private var terrainNodes = [TerrainNode]()
     private var containerNodes = [ContainerNode]()
     private var gunNodes = [GunNode]()
     private var guiNodes = [GUINode]()
     
     private var allNodes: [Node] {
-        liquidNodes + gunNodes + containerNodes + guiNodes
+        terrainNodes + gunNodes + containerNodes + guiNodes
     }
     
     init(scene: Scene?, device: MTLDevice, renderSize: CGSize, gameTextureSize: CGSize) {
@@ -129,7 +129,7 @@ class SceneRenderer {
         backgroundColorBufferProvider = BufferProvider(device: device,
                                                        inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<SIMD4<UInt8>>.stride)
-        upscaleSamplerState = device.linearSampler
+        upscaleSamplerState = device.nearestSampler
         finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
 
         do {
@@ -170,7 +170,7 @@ class SceneRenderer {
                 }
             }
             if !found {
-                liquidNodes.removeAll(where: { $0 === node })
+                terrainNodes.removeAll(where: { $0 === node })
                 guiNodes.removeAll(where: { $0 === node })
                 gunNodes.removeAll(where: { $0 === node })
                 containerNodes.removeAll(where: { $0 === node })
@@ -187,10 +187,8 @@ class SceneRenderer {
             let node = GunNode(device, renderSize: gameTextureSize, body: body as? GunBody)
             gunNodes.append(node)
         case is LiquidBody:
-            for material in body.uniqueMaterials {
-                if let node = LiquidNode(device, renderSize: gameTextureSize, material: material, body: body as? LiquidBody) {
-                    liquidNodes.append(node)
-                }
+            if let node = TerrainNode(device, renderSize: gameTextureSize, body: body as? LiquidBody) {
+                terrainNodes.append(node)
             }
         case is GUIBody:
             let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)

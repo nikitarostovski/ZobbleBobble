@@ -12,6 +12,7 @@ public struct ParticleModel: Codable {
     public let y: CGFloat
     public let material: MaterialType
     public let movementColor: SIMD4<UInt8>
+    public var renderColor: SIMD4<UInt8>
     
     public var position: CGPoint { CGPoint(x: x, y: y) }
 }

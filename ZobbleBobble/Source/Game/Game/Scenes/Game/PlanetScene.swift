@@ -83,9 +83,9 @@ final class PlanetScene: Scene {
     override init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         guard let player = game?.player, let planet = player.selectedPlanet, let container = player.selectedContainer else { fatalError() }
         
-        let world = LiquidFunWorld(particleRadius: planet.particleRadius * Settings.Physics.scale,
+        let world = LiquidFunWorld(particleRadius: Settings.Physics.particleRadius * Settings.Physics.scale,
                                    rotationStep: planet.speed.radians / 60.0,
-                                   gravityRadius: planet.gravityRadius,
+                                   gravityRadius: planet.gravityRadius * Settings.Physics.scale,
                                    gravityCenter: levelCenterPoint * Settings.Physics.scale)
         self.physicsWorld = world
         
@@ -182,7 +182,7 @@ final class PlanetScene: Scene {
             let gravityScale = material.gravityScale
             let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.freezeThresholdModifier
             let staticContactBehavior = material.becomesLiquidOnContact
-            let color = chunk.particles[i].movementColor
+            let color = chunk.particles[i].renderColor
 
             physicsWorld.addParticle(withPosition: center,
                                      color: color,
@@ -269,7 +269,7 @@ final class PlanetScene: Scene {
             pos.x = dist * cos(angle)
             pos.y = dist * sin(angle)
 
-            let color = particle.movementColor
+            let color = particle.renderColor
 
             self?.physicsWorld.addParticle(withPosition: pos,
                                            color: color,

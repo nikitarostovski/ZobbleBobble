@@ -71,7 +71,7 @@ class MissleBody: LiquidBody {
         var newVelocities: [SIMD2<Float32>] = []
         
         for i in 0..<readyPositions.count {
-            let color = missleModel.particles[i].movementColor
+            let color = missleModel.particles[i].renderColor
             let speedModifier = speedModifiers[i]
             let idle = idlePositions[i]
             let ready = readyPositions[i]

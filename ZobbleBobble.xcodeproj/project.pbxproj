@@ -27,7 +27,6 @@
 		112CD16B2A77D4EA0098D324 /* Body.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD16A2A77D4EA0098D324 /* Body.swift */; };
 		112CD16D2A77D5360098D324 /* TerrainBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD16C2A77D5360098D324 /* TerrainBody.swift */; };
 		112CD1712A77DEC60098D324 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD1702A77DEC60098D324 /* Renderer.swift */; };
-		112CD1762A77DFA00098D324 /* LiquidNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD1752A77DFA00098D324 /* LiquidNode.swift */; };
 		112CD17B2A7919010098D324 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112CD17A2A7919010098D324 /* Node.swift */; };
 		113228F62A8252A600CA8F49 /* MTLDevice+MTLTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113228F52A8252A600CA8F49 /* MTLDevice+MTLTexture.swift */; };
 		113228F82A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113228F72A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift */; };
@@ -247,6 +246,8 @@
 		11EC8C072A10DCDD000F322C /* ThreadHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8C062A10DCDD000F322C /* ThreadHelper.swift */; };
 		11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */; };
 		11FEFEFF295DEA7A00528A1C /* MainGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FEFEFE295DEA7A00528A1C /* MainGame.swift */; };
+		8D2D39E32AC30EE8002886EE /* TerrainNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D39E22AC30EE8002886EE /* TerrainNode.swift */; };
+		8D2D39E52AC3105E002886EE /* Terrain.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D39E42AC3105E002886EE /* Terrain.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -562,6 +563,8 @@
 		11EC8C062A10DCDD000F322C /* ThreadHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadHelper.swift; sourceTree = "<group>"; };
 		11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = OffscreenLiquid.metal; sourceTree = "<group>"; };
 		11FEFEFE295DEA7A00528A1C /* MainGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainGame.swift; sourceTree = "<group>"; };
+		8D2D39E22AC30EE8002886EE /* TerrainNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainNode.swift; sourceTree = "<group>"; };
+		8D2D39E42AC3105E002886EE /* Terrain.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Terrain.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -727,6 +730,7 @@
 				110DB2662A8FB956002DEEAD /* ContainerNode.swift */,
 				114D42832A977B2E00D0D153 /* GunNode.swift */,
 				112CD1752A77DFA00098D324 /* LiquidNode.swift */,
+				8D2D39E22AC30EE8002886EE /* TerrainNode.swift */,
 				11889DF32A8CF47C00F8216B /* GUINode.swift */,
 			);
 			path = Nodes;
@@ -886,6 +890,7 @@
 				11B3FD0A297FBC540058FFEB /* CommonShaders.h */,
 				1190952729549010006EE970 /* CommonShaders.metal */,
 				11FEFEF529589B0700528A1C /* OffscreenLiquid.metal */,
+				8D2D39E42AC3105E002886EE /* Terrain.metal */,
 				110DB2682A8FB97F002DEEAD /* GunShaders.metal */,
 				114D427F2A974F9E00D0D153 /* ContainerShaders.metal */,
 				11889DF72A8CF55300F8216B /* GUIShaders.metal */,
@@ -1472,6 +1477,7 @@
 				113228F82A8256E800CA8F49 /* MTLDevice+MTLSamplerState.swift in Sources */,
 				11889DF02A8CE8A600F8216B /* TransitionTarget.swift in Sources */,
 				115BAEF92A95F8D90069A5B0 /* RubberBand.swift in Sources */,
+				8D2D39E52AC3105E002886EE /* Terrain.metal in Sources */,
 				11BDF3E92A91DAE0005F78E2 /* SceneRenderer.swift in Sources */,
 				114D427E2A974EAB00D0D153 /* GunBody.swift in Sources */,
 				11A5C8C12A93C8F500817D68 /* ParticleModel+Blueprints.swift in Sources */,
@@ -1554,9 +1560,9 @@
 				11B3FD0D298012330058FFEB /* Settings.swift in Sources */,
 				116D7D812A8681F0007ED1DD /* CRT.metal in Sources */,
 				11A5C8C52A93CAB200817D68 /* MaterialModel+Blueprints.swift in Sources */,
+				8D2D39E32AC30EE8002886EE /* TerrainNode.swift in Sources */,
 				113E8B992A94B3E0002EBC60 /* StaticTerrainBody.swift in Sources */,
 				117B3F352A9328C200C25EE7 /* PlanetService.swift in Sources */,
-				112CD1762A77DFA00098D324 /* LiquidNode.swift in Sources */,
 				11FEFEF629589B0700528A1C /* OffscreenLiquid.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

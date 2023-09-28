@@ -41,5 +41,9 @@ extension ParticleModel {
         self.y = blueprint.y
         self.material = material
         self.movementColor = movementColorGeneration.make(blueprint, material)
+        
+        var renderColor = material.color
+        renderColor.w = 255
+        self.renderColor = renderColor
     }
 }
