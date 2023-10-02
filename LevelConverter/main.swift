@@ -12,10 +12,16 @@ let inputPath = "/Users/nrostovskiy/Dev/ZobbleBobble/LevelConverter/Images"
 let outputPath = URL(filePath: "/Users/nrostovskiy/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
 let radius: CGFloat = 0.5
-let planetScale: CGFloat = 0.25
+let planetScale: CGFloat = 0.5
 let missleScale: CGFloat = 0.15
 
-for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
+let coreRadiusScale: CGFloat = 0.45
+
+for (generateCore, scale, folder) in [
+    (false, missleScale, "Missles"),
+    (true, planetScale, "Planets")
+]
+{
     let inputPath = inputPath.appending("/\(folder)")
     
     let files = (try? FileManager.default.contentsOfDirectory(atPath: inputPath)) ?? []
@@ -30,6 +36,8 @@ for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
         let width = Int(CGFloat(sampler.width) * scale)
         let height = Int(CGFloat(sampler.height) * scale)
         let aabb = CGRect(x: 0, y: 0, width: width, height: height)
+        
+        let coreRadius = CGFloat(width + height) / 2 * coreRadiusScale
         
         var samplingPoints = [CGPoint]()
         var boundingRadius: CGFloat = 0
@@ -49,15 +57,25 @@ for (scale, folder) in [(missleScale, "Missles"), (planetScale, "Planets")] {
             let possibleMaterials = MaterialCategory.possibleMaterialCategories(for: color)
             guard !possibleMaterials.isEmpty else { return nil }
             
-            let positions = samplintPoints.map {
+            let positions: [ParticleBlueprintModel] = samplintPoints.compactMap {
                 let xConverted = (($0.x * aabb.width) - aabb.width / 2)
                 let yConverted = (($0.y * aabb.height) - aabb.height / 2)
+                
+                let distanceToCenter = sqrt(pow((xConverted - 0), 2) + pow((yConverted - 0), 2))
+                if generateCore && distanceToCenter <= coreRadius {
+                    return nil
+                }
                 return ParticleBlueprintModel(x: xConverted, y: yConverted)
             }
             return .init(positions: positions, possibleMaterialCategories: possibleMaterials)
         }
         guard !groups.isEmpty else { return nil }
-        return ChunkBlueprintModel(particleGroups: groups, boundingRadius: boundingRadius)
+        
+        var core: CoreBlueprintModel?
+        if generateCore {
+            core = CoreBlueprintModel(x: 0, y: 0, radius: coreRadius)
+        }
+        return ChunkBlueprintModel(core: core, particleGroups: groups, boundingRadius: boundingRadius)
     }
     
     if let outputData: Data = try? JSONEncoder().encode(chunks) {

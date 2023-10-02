@@ -35,13 +35,14 @@ class SceneRenderer {
     /// Size of downscaled gameplay texture
     private var gameTextureSize: CGSize
     
+    private var coreNodes = [CoreNode]()
     private var terrainNodes = [TerrainNode]()
     private var containerNodes = [ContainerNode]()
     private var gunNodes = [GunNode]()
     private var guiNodes = [GUINode]()
     
     private var allNodes: [Node] {
-        terrainNodes + gunNodes + containerNodes + guiNodes
+        terrainNodes + coreNodes + gunNodes + containerNodes + guiNodes
     }
     
     init(scene: Scene?, device: MTLDevice, renderSize: CGSize, gameTextureSize: CGSize) {
@@ -170,6 +171,7 @@ class SceneRenderer {
                 }
             }
             if !found {
+                coreNodes.removeAll(where: { $0 === node })
                 terrainNodes.removeAll(where: { $0 === node })
                 guiNodes.removeAll(where: { $0 === node })
                 gunNodes.removeAll(where: { $0 === node })
@@ -189,6 +191,10 @@ class SceneRenderer {
         case is LiquidBody:
             if let node = TerrainNode(device, renderSize: gameTextureSize, body: body as? LiquidBody) {
                 terrainNodes.append(node)
+            }
+        case is CoreBody:
+            if let node = CoreNode(device, renderSize: gameTextureSize, body: body as? CoreBody) {
+                coreNodes.append(node)
             }
         case is GUIBody:
             let node = GUINode(device, renderSize: renderSize, body: body as? GUIBody)

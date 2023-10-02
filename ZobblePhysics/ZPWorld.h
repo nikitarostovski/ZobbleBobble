@@ -8,7 +8,14 @@
 #import <Foundation/Foundation.h>
 #import "ZPWorldDef.h"
 
-typedef void (^RenderDataPassBlock)(int, void*, void *, void *);
+typedef void (^RenderDataPassBlock)(int,    // paricle count
+                                    void *, // particle positions
+                                    void *, // particle velocities
+                                    void *, // paricle colors
+                                    int,    // circle count
+                                    void *, // circle positions
+                                    void *, // circle radii
+                                    void *);// circle colors
 
 @class ZPBody;
 
@@ -30,6 +37,15 @@ PositionIterations:(int)positionIterations
 ParticleIterations:(int)particleIterations;
 
 - (void)requestRenderDataWithCompletionHandler:(RenderDataPassBlock)completion;
+
+/// Adds a circle shaped object
+/// - Parameters:
+///   - position: circle center
+///   - radius: radius
+///   - color: fill color
+- (void)addCircleWithCenter:(CGPoint)position
+                     Radius:(CGFloat)radius
+                      Color:(CGRect)color;
 
 /// Adds a particle with given parameters
 /// - Parameters:

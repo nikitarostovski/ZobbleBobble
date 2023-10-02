@@ -32,12 +32,10 @@ class TerrainBody: LiquidBody {
         }
     }
     
-    init(liquidFadeModifier: Float = Settings.Graphics.fadeMultiplier, physicsWorld: PhysicsWorld?, uniqueMaterials: [MaterialType]) {
+    init(liquidFadeModifier: Float = Settings.Graphics.fadeMultiplier, physicsWorld: PhysicsWorld?) {
         self.physicsWorld = physicsWorld
         self.liquidFadeModifier = liquidFadeModifier
         
         super.init()
-        
-        self.uniqueMaterials = uniqueMaterials
     }
 }

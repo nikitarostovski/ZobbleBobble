@@ -16,7 +16,7 @@ enum Settings {
     
     // TODO: Rename to `Scene`
     enum Camera {
-        static let sceneHeight: CGFloat = 300
+        static let sceneHeight: CGFloat = 512
         
         static let levelCameraScale: CGFloat = 1
         static let levelsMenuCameraScale: CGFloat = 2
@@ -38,7 +38,7 @@ enum Settings {
     }
     
     enum Physics {
-        static let scale: CGFloat = 20
+        static let scale: CGFloat = 2
         static let particleRadius: CGFloat = 0.5
         
         static let maxParticleCount = 10_000
@@ -62,7 +62,7 @@ enum Settings {
         
         static let inflightBufferCount = 3
         
-        static let postprocessingEnabled = false//!Settings.isDebug
+        static let postprocessingEnabled = !Settings.isDebug
         static let dotMaskType: DotMask.MaskType = .trisectedShifted
     }
 }

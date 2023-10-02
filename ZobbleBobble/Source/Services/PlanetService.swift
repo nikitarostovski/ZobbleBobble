@@ -26,12 +26,18 @@ final class PlanetService {
                                       totalParticleAmountLimit: .init(value: 2000, fine: 1),
                                       outerSpaceLimit: .init(value: .init(), fine: 1))
         
-        let chunks = [chunkService.generateChunk(options: [.solidOnly])]
         let number = UInt8.random(in: UInt8.min...UInt8.max)
+        
+        let chunkData = [chunkService.generateChunk(options: [.solidOnly])]
+        let chunks = chunkData
+            .map { $0.0 }
+        let cores = chunkData
+            .compactMap { $0.1 }
         
         let planet = PlanetModel(name: "Planet #\(number)",
                                  price: 125,
                                  speed: 60,
+                                 core: cores.first,
                                  chunks: chunks,
                                  limits: limits,
                                  gravityRadius: gravityRadius,
@@ -39,4 +45,6 @@ final class PlanetService {
                                  particleRadius: Settings.Physics.particleRadius)
         return planet
     }
+    
+    
 }

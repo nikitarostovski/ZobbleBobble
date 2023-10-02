@@ -68,6 +68,7 @@ final class PlanetScene: Scene {
     }
     
     private let physicsWorld: PhysicsWorld
+    private let core: CoreBody?
     private let terrain: TerrainBody?
     private var gun: GunBody
     private var container: ContainerBody
@@ -76,7 +77,7 @@ final class PlanetScene: Scene {
     private var animation: TimerAnimation?
     
     override var visibleBodies: [any Body] {
-        let result: [(any Body)?] = [gui, gun, terrain, missle, container]
+        let result: [(any Body)?] = [gui, gun, terrain, core, missle, container]
         return result.compactMap { $0 }
     }
     
@@ -89,18 +90,18 @@ final class PlanetScene: Scene {
                                    gravityCenter: levelCenterPoint * Settings.Physics.scale)
         self.physicsWorld = world
         
-        let planetMaterials = planet.uniqueMaterials
-        let containerMaterials = player.selectedContainer?.uniqueMaterials ?? []
-        let uniqueMaterials = Array(Set(planetMaterials + containerMaterials))
-        
         let containerBody = ContainerBody(container: container, frame: .zero)
         self.container = containerBody
-        self.terrain = TerrainBody(physicsWorld: world, uniqueMaterials: uniqueMaterials)
+        self.terrain = TerrainBody(physicsWorld: world)
+        self.core = CoreBody(physicsWorld: world)
         self.gun = GunBody(player: player, container: containerBody, frame: .zero)
         self.gameState = .normal
         
         super.init(game: game, size: size, safeArea: safeArea, screenScale: screenScale, opacity: opacity)
         
+        planet.core.map { [weak self] core in
+            self?.spawnCore(core)
+        }
         planet.chunks.forEach { [weak self] chunk in
             self?.spawnChunk(chunk)
         }
@@ -168,6 +169,13 @@ final class PlanetScene: Scene {
         launchCurrentMissle(to: pos)
         spawnNextMissle()
         return true
+    }
+    
+    private func spawnCore(_ core: CoreModel) {
+        let x = (core.x + levelCenterPoint.x) * Settings.Physics.scale
+        let y = (core.y + levelCenterPoint.y) * Settings.Physics.scale
+        let r = core.radius * Settings.Physics.scale
+        physicsWorld.addCircle(withPosition: CGPoint(x: x, y: y), radius: r, color: .one)
     }
 
     private func spawnChunk(_ chunk: ChunkModel) {

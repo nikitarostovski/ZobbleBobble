@@ -23,8 +23,6 @@ class StaticTerrainBody: LiquidBody {
         self.chunks = chunks
         super.init()
         
-        uniqueMaterials = Array(Set(chunks.flatMap { $0.particles.map { $0.material } }))
-        
         updateTerrainPositions()
     }
     

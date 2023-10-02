@@ -7,17 +7,6 @@
 
 import Foundation
 
-/// Blueprint is a simplified particle description, not full. Used to generate an actual particle procedurally
-public struct ParticleBlueprintModel: Codable {
-    public let x: CGFloat
-    public let y: CGFloat
-    
-    public init(x: CGFloat, y: CGFloat) {
-        self.x = x
-        self.y = y
-    }
-}
-
 /// Blueprint is a simplified chunk description, not full. Used to generate an actual chunk procedurally
 public struct ChunkBlueprintModel: Codable {
     public struct FuzzyParticleGroup: Codable {
@@ -30,10 +19,12 @@ public struct ChunkBlueprintModel: Codable {
         }
     }
     
+    public let core: CoreBlueprintModel?
     public let particleGroups: [FuzzyParticleGroup]
     public let boundingRadius: CGFloat
     
-    public init(particleGroups: [FuzzyParticleGroup], boundingRadius: CGFloat) {
+    public init(core: CoreBlueprintModel?, particleGroups: [FuzzyParticleGroup], boundingRadius: CGFloat) {
+        self.core = core
         self.particleGroups = particleGroups
         self.boundingRadius = boundingRadius
     }

@@ -12,10 +12,13 @@ protocol PhysicsWorld: AnyObject {
                             liquidCount: Int,
                             liquidPositions: UnsafeMutableRawPointer,
                             liquidVelocities: UnsafeMutableRawPointer,
-                            liquidColors: UnsafeMutableRawPointer)
+                            liquidColors: UnsafeMutableRawPointer,
+                            core: CoreRenderData?)
     
     func update(_ time: CFTimeInterval)
     func getRenderData() -> RenderData?
+    
+    func addCircle(withPosition: CGPoint, radius: CGFloat, color: SIMD4<UInt8>)
     
     func addParticle(withPosition: CGPoint,
                      color: SIMD4<UInt8>,

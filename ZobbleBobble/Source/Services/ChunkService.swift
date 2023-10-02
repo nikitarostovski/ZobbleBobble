@@ -31,10 +31,11 @@ final class ChunkService {
         print("\(blueprints.count) blueprints loaded from '\(file).json'")
     }
     
-    func generateChunk(options: [GenerationOption] = []) -> ChunkModel {
+    func generateChunk(options: [GenerationOption] = []) -> (ChunkModel, CoreModel?) {
         let blueprint = blueprints.randomElement()!
         let startImpulse = CGFloat.random(in: 1...3)
-        return ChunkModel(blueprint: blueprint,
+        
+        let chunkModel = ChunkModel(blueprint: blueprint,
                           startImpulse: startImpulse,
                           materialChoice: .custom( { materials in
             var materials = materials
@@ -48,5 +49,9 @@ final class ChunkService {
             }
             return materials.randomElement()!
         }))
+        
+        let coreModel = blueprint.core.map { CoreModel(blueprint: $0) }
+        
+        return (chunkModel, coreModel)
     }
 }

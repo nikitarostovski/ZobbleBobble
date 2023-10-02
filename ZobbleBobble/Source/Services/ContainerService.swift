@@ -19,7 +19,10 @@ final class ContainerService {
     
     private func generateContainer(for player: PlayerModel, options: [ChunkService.GenerationOption]) -> ContainerModel {
         let count = 48
-        let chunks = (0..<count).map { _ in self.chunkService.generateChunk(options: options) }
+        let chunkData = (0..<count)
+            .map { _ in self.chunkService.generateChunk(options: options) }
+        let chunks = chunkData
+            .map { $0.0 }
         let container = ContainerModel(missles: chunks, reward: 640)
         return container
     }

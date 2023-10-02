@@ -14,6 +14,8 @@ class LiquidFunWorld: PhysicsWorld {
     private let world: ZPWorld
     private let particleRadius: CGFloat
     
+    private var coreRenderData: CoreRenderData?
+    
     init(particleRadius: CGFloat, rotationStep: CGFloat, gravityRadius: CGFloat, gravityCenter: CGPoint) {
         self.particleRadius = particleRadius
         let def = ZPWorldDef()
@@ -37,13 +39,21 @@ class LiquidFunWorld: PhysicsWorld {
         
         let group = DispatchGroup()
         group.enter()
-        world.requestRenderData { [particleRadius] count, positions, velocities, colors in
-            if count > 0, let positions = positions, let velocities = velocities, let colors = colors {
+        
+        world.requestRenderData { [weak self] particleCount, particlePositions, particleVelocities, particleColors, _, _, _, _ in
+            guard let self = self else { return }
+            if particleCount > 0,
+               let particlePositions = particlePositions,
+               let particleVelocities = particleVelocities,
+               let particleColors = particleColors {
+                
                 result = (particleRadius: Float(particleRadius),
-                          liquidCount: Int(count),
-                          liquidPositions: positions,
-                          liquidVelocities: velocities,
-                          liquidColors: colors)
+                          liquidCount: Int(particleCount),
+                          liquidPositions: particlePositions,
+                          liquidVelocities: particleVelocities,
+                          liquidColors: particleColors,
+                          core: coreRenderData
+                )
             }
             group.leave()
         }
@@ -61,6 +71,19 @@ class LiquidFunWorld: PhysicsWorld {
                                      positionIterations: Int32(Settings.Physics.positionIterations),
                                      particleIterations: Int32(Settings.Physics.particleIterations))
             }
+        }
+    }
+    
+    func addCircle(withPosition: CGPoint, radius: CGFloat, color: SIMD4<UInt8>) {
+        queue.async { [weak self] in
+            self?.coreRenderData = .init(
+                core: .init(
+                    center: .init(Float(withPosition.x), Float(withPosition.y)),
+                    radius: Float(radius)
+                ),
+                scale: Float(Settings.Physics.scale)
+            )
+            self?.world.addCircle(withCenter: withPosition, radius: radius, color: CGRect(color))
         }
     }
     

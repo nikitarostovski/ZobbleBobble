@@ -34,6 +34,8 @@ class PlanetModel: Codable {
     let price: UInt64
     /// Rotation speed, degrees per second
     var speed: CGFloat
+    /// Planet core. Circle-shaped object that can not be destructed
+    var core: CoreModel?
     /// Set of initial material chunks
     var chunks: [ChunkModel]
     /// Gravity force will attract particles within gravity field of this radius to the planet center
@@ -51,6 +53,7 @@ class PlanetModel: Codable {
         case name
         case price
         case speed
+        case core
         case chunks
         case gravityRadius
         case gravityStrength
@@ -58,10 +61,11 @@ class PlanetModel: Codable {
         case limits
     }
     
-    init(name: String, price: UInt64, speed: CGFloat, chunks: [ChunkModel], limits: LimitationsModel?, gravityRadius: CGFloat, gravityStrength: CGFloat, particleRadius: CGFloat) {
+    init(name: String, price: UInt64, speed: CGFloat, core: CoreModel?, chunks: [ChunkModel], limits: LimitationsModel?, gravityRadius: CGFloat, gravityStrength: CGFloat, particleRadius: CGFloat) {
         self.name = name
         self.price = price
         self.speed = speed
+        self.core = core
         self.chunks = chunks
         self.gravityRadius = gravityRadius
         self.gravityStrength = gravityStrength
@@ -76,6 +80,7 @@ class PlanetModel: Codable {
         self.name = try container.decode(String.self, forKey: .name)
         self.price = try container.decode(UInt64.self, forKey: .price)
         self.speed = try container.decode(CGFloat.self, forKey: .speed)
+        self.core = try container.decode(CoreModel.self, forKey: .core)
         self.chunks = try container.decode([ChunkModel].self, forKey: .chunks)
         self.gravityRadius = try container.decode(CGFloat.self, forKey: .gravityRadius)
         self.gravityStrength = try container.decode(CGFloat.self, forKey: .gravityStrength)

@@ -3,7 +3,7 @@
         "radius": 230,
         "levels": [
             {
-                "rotationPerSecond": 40,
+                "rotationPerSecond": 10,
                 "gravityRadius": 180,
                 "initialChunks": [
                     {

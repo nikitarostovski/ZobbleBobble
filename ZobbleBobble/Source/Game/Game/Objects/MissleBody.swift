@@ -37,8 +37,6 @@ class MissleBody: LiquidBody {
         
         super.init()
         
-        uniqueMaterials = Array(Set(missleModel.particles.map { $0.material }))
-        
         updateTargetPositions()
         updateMisslePosition(0)
     }

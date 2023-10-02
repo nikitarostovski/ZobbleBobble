@@ -45,16 +45,35 @@ static float kExplosiveImpulse = 1050000;
 - (void)requestRenderDataWithCompletionHandler:(RenderDataPassBlock)completion {
     [_syncLock lock];
     
+    b2World *_world = (b2World *)self.world;
     b2ParticleSystem *_system = (b2ParticleSystem *)self.particleSystem;
     
     int liquidCount = _system->GetParticleCount();
-    void* liquidPositions = _system->GetPositionBuffer();
+    void *liquidPositions = _system->GetPositionBuffer();
     void *liquidVelocities = _system->GetVelocityBuffer();
     void *liquidColors = _system->GetColorBuffer();
     
+    int circleCount = 0;
+    b2Vec2 *circlePositions = new b2Vec2[_world->GetBodyCount()];
+    float *circleRadii = new float[_world->GetBodyCount()];
+    b2Color *circleColors = new b2Color[_world->GetBodyCount()];
+    for (b2Body* b = _world->GetBodyList(); b; b = b->GetNext()) {
+        b2Vec2 pos = b->GetPosition();
+        b2Fixture *f = b->GetFixtureList();
+        b2CircleShape *shape = (b2CircleShape *)f->GetShape();
+        
+        if (shape == NULL) { continue; }
+        
+        float radius = shape->m_radius;
+        circlePositions[circleCount] = pos;
+        circleRadii[circleCount] = radius;
+        circleColors[circleCount] = b2Color(255, 255, 0);
+        
+        circleCount++;
+    }
     [_syncLock unlock];
     
-    completion(liquidCount, liquidPositions, liquidVelocities, liquidColors);
+    completion(liquidCount, liquidPositions, liquidVelocities, liquidColors, circleCount, circlePositions, circleRadii, circleColors);
 }
 
 - (id)initWithWorldDef:(ZPWorldDef *)def {
@@ -294,6 +313,26 @@ ParticleIterations:(int)particleIterations {
         }
     }
     [_particlesToAdd removeAllObjects];
+}
+
+- (void)addCircleWithCenter:(CGPoint)position
+                     Radius:(CGFloat)radius
+                      Color:(CGRect)color {
+    // TODO: delayed initialization
+    b2World *_world = (b2World *)self.world;
+    
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_kinematicBody;
+    bodyDef.position.Set(position.x, position.y);
+    b2Body *dynamicBody = _world->CreateBody(&bodyDef);
+    
+    b2CircleShape circleShape;
+    circleShape.m_p.Set(0, 0);
+    circleShape.m_radius = radius;
+    
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &circleShape;
+    dynamicBody->CreateFixture(&fixtureDef);
 }
 
 - (void)addParticleWithPosition:(CGPoint)position
