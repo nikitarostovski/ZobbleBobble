@@ -9,9 +9,11 @@
 #include "CommonShaders.h"
 using namespace metal;
 
-#define COLOR_CORE float4(0.9, 0.9, 0.9, 1)
-#define COLOR_MANTLE float4(0.85, 0.8, 0.15, 1)
-#define COLOR_CRUST float4(0.9, 0.5, 0.25, 1)
+#define COLOR_CORE              float4(255.0/255.0, 219/255.0, 0, 1)
+#define COLOR_MANTLE_START      float4(255.0/255.0, 169.0/255.0, 4.0/255.0, 1)
+#define COLOR_MANTLE_END        float4(238.0/255.0, 123.0/255.0, 6.0/255.0, 1)
+#define COLOR_CRUST_START       float4(161.0/255.0, 36.0/255.0, 36.0/255.0, 1)
+#define COLOR_CRUST_END         float4(64.0/255.0, 11.0/255.0, 11.0/255.0, 1)
 
 struct CoreUniforms {
     float cameraScale;
@@ -56,15 +58,11 @@ kernel void draw_core(texture2d<float, access::write> output [[texture(0)]],
     if (distToCore <= threshold1) {
         color = COLOR_CORE;
     } else if (distToCore <= threshold2) {
-        color = COLOR_MANTLE;
-        float m = (threshold2 - distToCore) / (threshold2 - threshold1) * 2;
-        m = min(1.0, max(0.7, m));
-        color.rgb *= m;
+        float p = 1 - (threshold2 - distToCore) / (threshold2 - threshold1);
+        color = mix(COLOR_MANTLE_START, COLOR_MANTLE_END, float4(p));
     } else {
-        color = COLOR_CRUST;
-        float m = (radius - distToCore) / (radius - threshold2) * 1;
-        m = min(1.0, max(0.2, m));
-        color.rgb *= m;
+        float p = 1 - (radius - distToCore) / (radius - threshold2);
+        color = mix(COLOR_CRUST_START, COLOR_CRUST_END, float4(p));
     }
     output.write(color, gid);
 }

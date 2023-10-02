@@ -16,21 +16,13 @@ enum Settings {
     
     // TODO: Rename to `Scene`
     enum Camera {
-        static let sceneHeight: CGFloat = 512
+        static let sceneHeight: CGFloat = 699
         
-        static let levelCameraScale: CGFloat = 1
-        static let levelsMenuCameraScale: CGFloat = 2
-        static let packsMenuCameraScale: CGFloat = 3
-        
-        static let levelCenterOffset: CGFloat = -40
-        static let gunCenterOffset: CGFloat = 150
+        static let levelCenterOffset: CGFloat = -50
+        static let gunCenterOffset: CGFloat = 250
         
         static let gunRadius: CGFloat = 30
-        static let gunMissleCenterOffset: CGFloat = 10
-        static let gunMissleDeadZone: CGFloat = 20
         
-        static let missleRadiusShiftInsideStar: CGFloat = 3
-        static let missleAngleShiftInsideStar = CGFloat(5).radians
         static let missleParticleMaxSpeedModifier: CGFloat = 2
         
         static let sceneTransitionDuration: Double = 0.15
@@ -41,7 +33,7 @@ enum Settings {
         static let scale: CGFloat = 2
         static let particleRadius: CGFloat = 0.5
         
-        static let maxParticleCount = 10_000
+        static let maxParticleCount = 100_000
         static let maxMaterialCount = 50
         
         static let velocityIterations = 6

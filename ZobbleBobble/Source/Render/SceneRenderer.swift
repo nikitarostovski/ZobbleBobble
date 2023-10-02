@@ -23,7 +23,8 @@ class SceneRenderer {
     private var backgroundColorBufferProvider: BufferProvider!
     private var alphaBufferProvider: BufferProvider!
     private var blendModeBuffer: MTLBuffer?
-    private var upscaleSamplerState: MTLSamplerState?
+    private var mergeSampler: MTLSamplerState?
+    private var upscaleSampler: MTLSamplerState?
     
     private var finalTexture: MTLTexture?
     private var mergeTexture: MTLTexture?
@@ -94,13 +95,13 @@ class SceneRenderer {
         computeEncoder.setTextures(allTextures, range: 1..<(textureCount + 1))
         computeEncoder.setBuffer(textureCountBuffer, offset: 0, index: 0)
         computeEncoder.setBuffer(blendModeBuffer, offset: 0, index: 1)
-        computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
+        computeEncoder.setSamplerState(mergeSampler, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: mergePipelineState, width: finalTexture.width, height: finalTexture.height)
         
         computeEncoder.setComputePipelineState(upscalePipelineState)
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
-        computeEncoder.setSamplerState(upscaleSamplerState, index: 0)
+        computeEncoder.setSamplerState(upscaleSampler, index: 0)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: upscalePipelineState, width: finalTexture.width, height: finalTexture.height)
         
         if scene.opacity < 1 {
@@ -130,7 +131,8 @@ class SceneRenderer {
         backgroundColorBufferProvider = BufferProvider(device: device,
                                                        inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                        bufferSize: MemoryLayout<SIMD4<UInt8>>.stride)
-        upscaleSamplerState = device.nearestSampler
+        mergeSampler = device.nearestSampler
+        upscaleSampler = device.linearSampler
         finalTexture = device.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
 
         do {

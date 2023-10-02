@@ -12,8 +12,8 @@ let inputPath = "/Users/nrostovskiy/Dev/ZobbleBobble/LevelConverter/Images"
 let outputPath = URL(filePath: "/Users/nrostovskiy/Dev/ZobbleBobble/ZobbleBobble/Resource/JSON")
 
 let radius: CGFloat = 0.5
-let planetScale: CGFloat = 0.5
-let missleScale: CGFloat = 0.15
+let planetScale: CGFloat = 1
+let missleScale: CGFloat = 0.25
 
 let coreRadiusScale: CGFloat = 0.45
 
