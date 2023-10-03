@@ -11,8 +11,9 @@ struct CoreRenderData {
     struct Core {
         let center: SIMD2<Float>
         let radius: Float
+        var rotation: Float
     }
     
-    let core: Core
+    var core: Core
     let scale: Float
 }

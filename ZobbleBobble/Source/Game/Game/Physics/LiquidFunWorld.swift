@@ -13,11 +13,14 @@ class LiquidFunWorld: PhysicsWorld {
     
     private let world: ZPWorld
     private let particleRadius: CGFloat
+    private let rotationStep: CGFloat
     
     private var coreRenderData: CoreRenderData?
     
     init(particleRadius: CGFloat, rotationStep: CGFloat, gravityRadius: CGFloat, gravityCenter: CGPoint) {
         self.particleRadius = particleRadius
+        self.rotationStep = rotationStep
+        
         let def = ZPWorldDef()
         def.shotImpulseModifier = Settings.Physics.missleShotImpulseModifier
         def.gravityScale = float32(Settings.Physics.gravityModifier)
@@ -66,6 +69,7 @@ class LiquidFunWorld: PhysicsWorld {
         queue.async { [weak self] in
             guard let self = self else { return }
             autoreleasepool {
+                self.coreRenderData?.core.rotation += Float(self.rotationStep)
                 self.world.worldStep(time,
                                      velocityIterations: Int32(Settings.Physics.velocityIterations),
                                      positionIterations: Int32(Settings.Physics.positionIterations),
@@ -79,7 +83,8 @@ class LiquidFunWorld: PhysicsWorld {
             self?.coreRenderData = .init(
                 core: .init(
                     center: .init(Float(withPosition.x), Float(withPosition.y)),
-                    radius: Float(radius)
+                    radius: Float(radius),
+                    rotation: 0
                 ),
                 scale: Float(Settings.Physics.scale)
             )
