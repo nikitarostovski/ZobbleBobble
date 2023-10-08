@@ -7,6 +7,7 @@
 
 import MetalKit
 import MetalPerformanceShaders
+import ZobblePhysics
 
 class TerrainNode: BaseNode<LiquidBody> {
     struct Uniforms {
@@ -22,9 +23,7 @@ class TerrainNode: BaseNode<LiquidBody> {
         try! device!.makeComputePipelineState(function: device!.makeDefaultLibrary()!.makeFunction(name: "clear_terrain")!)
     }()
     
-    let positionBufferProvider: BufferProvider
-    let velocityBufferProvider: BufferProvider
-    let colorBufferProvider: BufferProvider
+    let particleBufferProvider: BufferProvider
     let uniformsBufferProvider: BufferProvider
     
     var finalTexture: MTLTexture?
@@ -32,15 +31,9 @@ class TerrainNode: BaseNode<LiquidBody> {
     let renderSize: CGSize
     
     init?(_ device: MTLDevice?, renderSize: CGSize, body: LiquidBody?) {
-        self.positionBufferProvider = BufferProvider(device: device,
+        self.particleBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.Physics.maxParticleCount)
-        self.velocityBufferProvider = BufferProvider(device: device,
-                                                     inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                     bufferSize: MemoryLayout<SIMD2<Float32>>.stride * Settings.Physics.maxParticleCount)
-        self.colorBufferProvider = BufferProvider(device: device,
-                                                  inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                  bufferSize: MemoryLayout<SIMD4<UInt8>>.stride * Settings.Physics.maxParticleCount)
+                                                     bufferSize: MemoryLayout<ZobblePhysics.ZobbleBody>.stride * Settings.Physics.maxParticleCount)
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
@@ -60,35 +53,19 @@ class TerrainNode: BaseNode<LiquidBody> {
         
         guard let renderData = body?.renderData else { return nil }
         
-        
-        
-        let vertices = renderData.liquidPositions
-        let velocities = renderData.liquidVelocities
-        let colors = renderData.liquidColors
-
-        let pointCount = renderData.liquidCount
+        let particles = renderData.particles
+        let pointCount = renderData.count
         
         var uniforms = Uniforms(cameraScale: cameraScale / renderData.scale, camera: camera)
 
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
 
-        _ = positionBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let positionBuffer = positionBufferProvider.nextUniformsBuffer(data: vertices,
-                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * pointCount)
-
-        _ = velocityBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let velocityBuffer = velocityBufferProvider.nextUniformsBuffer(data: velocities,
-                                                                       length: MemoryLayout<SIMD2<Float32>>.stride * pointCount)
-
-        _ = colorBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let colorBuffer = colorBufferProvider.nextUniformsBuffer(data: colors,
-                                                                 length: MemoryLayout<SIMD4<UInt8>>.stride * pointCount)
-
+        _ = particleBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
+        let particleBuffer = particleBufferProvider.nextUniformsBuffer(data: particles,
+                                                                       length: MemoryLayout<ZobblePhysics.ZobbleBody>.stride * pointCount)
         commandBuffer.addCompletedHandler { _ in
-            self.positionBufferProvider.avaliableResourcesSemaphore.signal()
-            self.velocityBufferProvider.avaliableResourcesSemaphore.signal()
-            self.colorBufferProvider.avaliableResourcesSemaphore.signal()
+            self.particleBufferProvider.avaliableResourcesSemaphore.signal()
             self.uniformsBufferProvider.avaliableResourcesSemaphore.signal()
         }
 
@@ -110,9 +87,7 @@ class TerrainNode: BaseNode<LiquidBody> {
         computeEncoder.setTexture(finalTexture, index: 0)
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
-        computeEncoder.setBuffer(positionBuffer, offset: 0, index: 1)
-        computeEncoder.setBuffer(velocityBuffer, offset: 0, index: 2)
-        computeEncoder.setBuffer(colorBuffer, offset: 0, index: 3)
+        computeEncoder.setBuffer(particleBuffer, offset: 0, index: 1)
         ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: drawPipelineState, width: pointCount, height: 1)
 
         computeEncoder.endEncoding()

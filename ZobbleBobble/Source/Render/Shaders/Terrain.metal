@@ -14,6 +14,13 @@ struct TerrainUniforms {
     float2 camera;
 };
 
+struct Particle {
+    float2 lastPos;
+    float2 pos;
+    float2 acc;
+    uchar4 color;
+};
+
 float4 blend(float4 oldColor, float4 newColor) {
     oldColor.rgb = rgb2hsv(oldColor.rgb);
     newColor.rgb = rgb2hsv(newColor.rgb);
@@ -29,15 +36,14 @@ kernel void clear_terrain(texture2d<float, access::write> output [[texture(0)]],
 kernel void draw_terrain(texture2d<float, access::read> input [[texture(0)]],
                          texture2d<float, access::write> output [[texture(1)]],
                          device TerrainUniforms const &uniforms [[buffer(0)]],
-                         device float2 const* positions [[buffer(1)]],
-                         device float2 const* velocities [[buffer(2)]],
-                         device uchar4 const* colors [[buffer(3)]],
+                         device Particle const* particles [[buffer(1)]],
                          uint2 gid [[thread_position_in_grid]]) {
     
-    uchar4 col = colors[gid.x];
-    float2 pos = positions[gid.x] * uniforms.cameraScale;
+    Particle particle = particles[gid.x];
+    uchar4 col = particle.color;
+    float2 pos = particle.pos * uniforms.cameraScale;
     
-    float2 textureSize = float2(output.get_width(), output.get_height());
+    float2 textureSize = float2(0);//float2(output.get_width(), output.get_height());
     
     ushort2 pixel = ushort2(pos + textureSize / 2);
     float4 oldColor = input.read(pixel);

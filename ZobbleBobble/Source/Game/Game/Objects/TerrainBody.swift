@@ -17,13 +17,11 @@ class TerrainBody: LiquidBody {
     override var renderData: LiquidRenderData? {
         get {
             if let liquidPhysicsData = physicsWorld?.getRenderData() {
-                actualRenderData = .init(particleRadius: liquidPhysicsData.particleRadius,
+                actualRenderData = .init(particleRadius: liquidPhysicsData.radius,
                                          liquidFadeModifier: liquidFadeModifier,
-                                         scale: Float(Settings.Physics.scale),
-                                         liquidCount: liquidPhysicsData.liquidCount,
-                                         liquidPositions: liquidPhysicsData.liquidPositions,
-                                         liquidVelocities: liquidPhysicsData.liquidVelocities,
-                                         liquidColors: liquidPhysicsData.liquidColors)
+                                         scale: 1,
+                                         count: liquidPhysicsData.count,
+                                         particles: liquidPhysicsData.particles)
             }
             return actualRenderData
         }

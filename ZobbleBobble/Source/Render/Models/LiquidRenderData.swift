@@ -12,8 +12,6 @@ struct LiquidRenderData {
     let liquidFadeModifier: Float
     let scale: Float
     
-    let liquidCount: Int
-    let liquidPositions: UnsafeMutableRawPointer
-    let liquidVelocities: UnsafeMutableRawPointer
-    let liquidColors: UnsafeMutableRawPointer
+    let count: Int
+    let particles: UnsafeRawPointer?
 }

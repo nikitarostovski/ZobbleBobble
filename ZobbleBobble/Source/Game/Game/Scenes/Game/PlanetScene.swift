@@ -84,10 +84,15 @@ final class PlanetScene: Scene {
     override init(game: Game?, size: CGSize, safeArea: CGRect, screenScale: CGFloat, opacity: Float = 0) {
         guard let player = game?.player, let planet = player.selectedPlanet, let container = player.selectedContainer else { fatalError() }
         
-        let world = LiquidFunWorld(particleRadius: Settings.Physics.particleRadius * Settings.Physics.scale,
-                                   rotationStep: planet.speed.radians / 60.0,
-                                   gravityRadius: planet.gravityRadius * Settings.Physics.scale,
-                                   gravityCenter: levelCenterPoint * Settings.Physics.scale)
+        let height = Settings.Camera.sceneHeight
+        let worldSize = CGSize(width: size.width / size.height * height,
+                               height: height)
+        
+        let world = PhysicsWorld(size: worldSize,
+                                 particleRadius: Settings.Physics.particleRadius,
+                                 rotationStep: planet.speed.radians / 60.0,
+                                 gravityRadius: planet.gravityRadius,
+                                 gravityCenter: levelCenterPoint)
         self.physicsWorld = world
         
         let containerBody = ContainerBody(container: container, frame: .zero)
@@ -172,17 +177,15 @@ final class PlanetScene: Scene {
     }
     
     private func spawnCore(_ core: CoreModel) {
-        let x = (core.x + levelCenterPoint.x) * Settings.Physics.scale
-        let y = (core.y + levelCenterPoint.y) * Settings.Physics.scale
-        let r = core.radius * Settings.Physics.scale
-        physicsWorld.addCircle(withPosition: CGPoint(x: x, y: y), radius: r, color: .one)
+        let x = (core.x + levelCenterPoint.x)
+        let y = (core.y + levelCenterPoint.y)
+        let r = core.radius
+        physicsWorld.addCircle(withPosition: CGPoint(x: x, y: y), radius: r, color: .init(255, 255, 255, 255))
     }
 
     private func spawnChunk(_ chunk: ChunkModel) {
         for i in 0 ..< chunk.particles.count {
-            var center = chunk.particles[i].position + levelCenterPoint
-            center.x *= Settings.Physics.scale
-            center.y *= Settings.Physics.scale
+            let center = chunk.particles[i].position + levelCenterPoint
             let material = chunk.particles[i].material
 
             let flags = material.physicsFlags
@@ -192,15 +195,7 @@ final class PlanetScene: Scene {
             let staticContactBehavior = material.becomesLiquidOnContact
             let color = chunk.particles[i].renderColor
 
-            physicsWorld.addParticle(withPosition: center,
-                                     color: color,
-                                     flags: flags,
-                                     isStatic: isStatic,
-                                     gravityScale: gravityScale,
-                                     freezeVelocityThreshold: freezeVelocityThreshold,
-                                     becomesLiquidOnContact: staticContactBehavior,
-                                     explosionRadius: material.explosionRadius,
-                                     shootImpulse: 0)
+            physicsWorld.addParticle(center, color)
         }
     }
 
@@ -259,6 +254,8 @@ final class PlanetScene: Scene {
         userInteractionEnabled = false
 
         missle.positions.enumerated().forEach { [weak self] i, center in
+            guard let self = self else { return }
+            
             let particle = missle.missleModel.particles[i]
             let material = particle.material
             
@@ -268,8 +265,8 @@ final class PlanetScene: Scene {
             let freezeVelocityThreshold = material.freezeVelocityThreshold * Settings.Physics.freezeThresholdModifier
             let staticContactBehavior = material.becomesLiquidOnContact
 
-            var pos = CGPoint(x: CGFloat(center.x) * Settings.Physics.scale,
-                              y: CGFloat(center.y) * Settings.Physics.scale)
+            var pos = CGPoint(x: CGFloat(center.x),
+                              y: CGFloat(center.y))
 
             let dist = pos.distance(to: .zero)
             let angle = pos.angle(to: .zero) * .pi / 180 + .pi
@@ -279,15 +276,7 @@ final class PlanetScene: Scene {
 
             let color = particle.renderColor
 
-            self?.physicsWorld.addParticle(withPosition: pos,
-                                           color: color,
-                                           flags: flags,
-                                           isStatic: isStatic,
-                                           gravityScale: gravityScale,
-                                           freezeVelocityThreshold: freezeVelocityThreshold,
-                                           becomesLiquidOnContact: staticContactBehavior,
-                                           explosionRadius: material.explosionRadius,
-                                           shootImpulse: missle.missleModel.startImpulse)
+            physicsWorld.addParticle(pos, color)
         }
     }
 }
