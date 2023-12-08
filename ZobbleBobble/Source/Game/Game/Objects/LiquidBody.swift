@@ -9,6 +9,6 @@ import Foundation
 
 class LiquidBody: Body {
     var userInteractive: Bool = false
-    var renderData: LiquidRenderData? = nil
+    var renderData: TerrainRenderData? = nil
     var uniqueMaterials: [MaterialType] = []
 }

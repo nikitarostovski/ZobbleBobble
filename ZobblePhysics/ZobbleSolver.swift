@@ -8,83 +8,15 @@
 import Foundation
 import Dispatch
 
-@propertyWrapper public struct ThreadSafe<T> {
-    private var _value: T
-    private let lock = NSLock()
-    private let queue: DispatchQueue
-
-    public var wrappedValue: T {
-        get {
-            queue.sync { _value }
-        }
-        _modify {
-            lock.lock()
-            var tmp: T = _value
-
-            defer {
-                _value = tmp
-                lock.unlock()
-            }
-
-            yield &tmp
-        }
-    }
-
-    public init(wrappedValue: T, queue: DispatchQueue? = nil) {
-        self._value = wrappedValue
-        self.queue = queue ?? DispatchQueue(label: "ThreadSafe \(String(typeName: T.self))")
-    }
-}
-
-// Helper extension to name the queue after the property wrapper's type.
-public extension String {
-    init(typeName thing: Any.Type) {
-        let describingString = String(describing: thing)
-        let name = describingString.components(separatedBy: ".").last ?? ""
-
-        self.init(stringLiteral: name)
-    }
-}
-
-@propertyWrapper struct Atomic<Value> {
-    private typealias os_unfair_lock_t = UnsafeMutablePointer<os_unfair_lock_s>
-    private var lock: os_unfair_lock_t
-    var value: Value
-
-    init(wrappedValue: Value) {
-        self.value = wrappedValue
-
-        var lock: os_unfair_lock_t
-        lock = UnsafeMutablePointer<os_unfair_lock_s>.allocate(capacity: 1)
-        lock.initialize(to: os_unfair_lock())
-        self.lock = lock
-    }
-
-    var wrappedValue: Value {
-        get {
-            os_unfair_lock_lock(lock)
-            let result = value
-            os_unfair_lock_unlock(lock)
-            return result
-        }
-        set {
-            os_unfair_lock_lock(lock)
-            value = newValue
-            os_unfair_lock_unlock(lock)
-        }
-    }
-}
-
-
 class ZobbleSolver {
-    private let queue = DispatchQueue(label: "ZobbblePhysics.solver")//, attributes: .concurrent)
+    private let queue = DispatchQueue(label: "ZobbblePhysics.solver", attributes: .concurrent)
     
     private let gravity: CGPoint = .init(x: -5, y: -20)
     
     private var _objects = ContiguousArray<ZobbleBody>()
     var objects: ContiguousArray<ZobbleBody> {
         get {
-            return queue.sync(flags: .barrier, execute: {
+            return queue.sync(execute: {
                 return _objects
             })
         }
@@ -105,8 +37,9 @@ class ZobbleSolver {
     init(size: CGSize) {
         self.worldBounds = .init(origin: .zero, size: size)
         self.grid = CollisionGrid(width: Int(size.width), height: Int(size.height))
-        self.threadPool = PThreadPool(threadCount: 8)
-//        self.threadPool = DispatchPool(threadCount: 12)
+//        self.threadPool = PThreadPool(threadCount: 10)
+//        self.threadPool = DispatchPool(threadCount: 1)
+        self.threadPool = MonoThreadPool(threadCount: 1)
         grid.clear()
     }
     
@@ -160,7 +93,8 @@ class ZobbleSolver {
         }
     }
 
-    private func processCell(_ c: CollisionCell, _ index: Int) {
+    private func processCell(_ c: CollisionCell?, _ index: Int) {
+        guard let c = c else { return }
         for atomIdx in c.objects {
             let indices = [
                 index - 1,
@@ -174,9 +108,7 @@ class ZobbleSolver {
                 index - grid.height + 1
             ]
             for index in indices {
-                grid.getCell(at: index) { [weak self] cell in
-                    self?.checkAtomCellCollisions(atomIdx, cell)
-                }
+                checkAtomCellCollisions(atomIdx, grid.get(index))
             }
         }
     }
@@ -186,10 +118,7 @@ class ZobbleSolver {
         let end = (i + 1) * sliceSize
         
         for idx in start..<end {
-            grid.getCell(at: idx) { [weak self] cell in
-                guard let cell = cell, let self = self else { return }
-                self.processCell(cell, idx)
-            }
+            processCell(grid.get(idx), idx)
         }
     }
 

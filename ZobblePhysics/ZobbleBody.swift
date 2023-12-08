@@ -8,7 +8,7 @@
 import Foundation
 
 public struct ZobbleBody {
-    private var lastPosition: SIMD2<Float>
+    var lastPosition: SIMD2<Float>
     var position: SIMD2<Float> {
         didSet {
             lastPosition = oldValue

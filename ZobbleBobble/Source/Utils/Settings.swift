@@ -16,12 +16,12 @@ enum Settings {
     
     // TODO: Rename to `Scene`
     enum Camera {
-        static let sceneHeight: CGFloat = 100 //699
+        static let sceneHeight: CGFloat = 699
         
-        static let levelCenterOffset: CGFloat = 0//-50
-        static let gunCenterOffset: CGFloat = 50//250
+        static let levelCenterOffset: CGFloat = -50
+        static let gunCenterOffset: CGFloat = 250
         
-        static let gunRadius: CGFloat = 10//30
+        static let gunRadius: CGFloat = 30
         
         static let missleParticleMaxSpeedModifier: CGFloat = 2
         

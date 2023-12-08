@@ -15,6 +15,13 @@ class TerrainNode: BaseNode<LiquidBody> {
         let camera: SIMD2<Float32>
     }
     
+    struct Particle {
+        let lastPos: SIMD2<Float>
+        let pos: SIMD2<Float>
+        let acc: SIMD2<Float>
+//        let lastPos: SIMD2<Float>
+    }
+    
     private lazy var drawPipelineState: MTLComputePipelineState? = {
         try! device!.makeComputePipelineState(function: device!.makeDefaultLibrary()!.makeFunction(name: "draw_terrain")!)
     }()
@@ -26,23 +33,30 @@ class TerrainNode: BaseNode<LiquidBody> {
     let particleBufferProvider: BufferProvider
     let uniformsBufferProvider: BufferProvider
     
-    var finalTexture: MTLTexture?
+    var particleBuffer: MTLBuffer?
+    var particleCount: Int = 0
     
+    var finalTexture: MTLTexture?
+    var uniforms: Uniforms
     let renderSize: CGSize
     
     init?(_ device: MTLDevice?, renderSize: CGSize, body: LiquidBody?) {
         self.particleBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
-                                                     bufferSize: MemoryLayout<ZobblePhysics.ZobbleBody>.stride * Settings.Physics.maxParticleCount)
+                                                     bufferSize: MemoryLayout<Particle>.stride * Settings.Physics.maxParticleCount)
         self.uniformsBufferProvider = BufferProvider(device: device,
                                                      inflightBuffersCount: Settings.Graphics.inflightBufferCount,
                                                      bufferSize: MemoryLayout<Uniforms>.stride)
         
         self.renderSize = renderSize
+        self.uniforms = .init(cameraScale: 1, camera: .zero)
         
         super.init()
         
         self.body = body
+        if let body = body as? TerrainBody {
+            body.delegate = self
+        }
         self.device = device
         self.finalTexture = device?.makeTexture(width: Int(renderSize.width), height: Int(renderSize.height))
     }
@@ -51,21 +65,20 @@ class TerrainNode: BaseNode<LiquidBody> {
                          cameraScale: Float32,
                          camera: SIMD2<Float32>) -> MTLTexture? {
         
-        guard let renderData = body?.renderData else { return nil }
+        if !(body is TerrainBody), let renderData = body?.renderData {
+            updateParticleBuffer(from: renderData.particles, particleCount: renderData.count)
+        }
         
-        let particles = renderData.particles
-        let pointCount = renderData.count
+        guard let particleBuffer = particleBuffer, particleCount > 0 else { return nil }
+        self.uniforms = .init(cameraScale: cameraScale, camera: camera)
         
-        var uniforms = Uniforms(cameraScale: cameraScale / renderData.scale, camera: camera)
+        var uniforms = Uniforms(cameraScale: cameraScale, camera: camera)
 
         _ = uniformsBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
         let uniformsBuffer = uniformsBufferProvider.nextUniformsBuffer(data: &uniforms, length: MemoryLayout<Uniforms>.stride)
 
-        _ = particleBufferProvider.avaliableResourcesSemaphore.wait(timeout: .distantFuture)
-        let particleBuffer = particleBufferProvider.nextUniformsBuffer(data: particles,
-                                                                       length: MemoryLayout<ZobblePhysics.ZobbleBody>.stride * pointCount)
+        
         commandBuffer.addCompletedHandler { _ in
-            self.particleBufferProvider.avaliableResourcesSemaphore.signal()
             self.uniformsBufferProvider.avaliableResourcesSemaphore.signal()
         }
 
@@ -88,9 +101,25 @@ class TerrainNode: BaseNode<LiquidBody> {
         computeEncoder.setTexture(finalTexture, index: 1)
         computeEncoder.setBuffer(uniformsBuffer, offset: 0, index: 0)
         computeEncoder.setBuffer(particleBuffer, offset: 0, index: 1)
-        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: drawPipelineState, width: pointCount, height: 1)
+        ThreadHelper.dispatchAuto(device: device, encoder: computeEncoder, state: drawPipelineState, width: particleCount, height: 1)
 
         computeEncoder.endEncoding()
         return finalTexture
+    }
+}
+
+extension TerrainNode: TerrainBodyDelegate {
+    func terrainBodyDidUpdate(particles: UnsafeRawPointer?, particleCount: Int) {
+        updateParticleBuffer(from: particles, particleCount: particleCount)
+    }
+    
+    private func updateParticleBuffer(from particles: UnsafeRawPointer?, particleCount: Int) {
+        guard let particles = particles, particleCount > 0 else { return }
+        
+        let bufferSize = MemoryLayout<Particle>.stride * particleCount
+        let buffer = device?.makeBuffer(bytes: particles, length: bufferSize)
+        
+        self.particleBuffer = buffer
+        self.particleCount = particleCount
     }
 }

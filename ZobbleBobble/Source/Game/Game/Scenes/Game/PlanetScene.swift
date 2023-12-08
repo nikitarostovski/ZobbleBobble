@@ -162,12 +162,6 @@ final class PlanetScene: Scene {
         updateLayout()
     }
     
-    override func update(_ time: CFTimeInterval) {
-        if gameState != .paused  {
-            physicsWorld.update(time)
-        }
-    }
-    
     override func onTouchUp(pos: CGPoint) -> Bool {
         guard userInteractionEnabled, !super.onTouchUp(pos: pos), gameState == .normal else { return false }
         

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LiquidRenderData {
+struct TerrainRenderData {
     let particleRadius: Float
     let liquidFadeModifier: Float
     let scale: Float

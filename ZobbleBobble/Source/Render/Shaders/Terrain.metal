@@ -40,14 +40,14 @@ kernel void draw_terrain(texture2d<float, access::read> input [[texture(0)]],
                          uint2 gid [[thread_position_in_grid]]) {
     
     Particle particle = particles[gid.x];
-    uchar4 col = particle.color;
+//    uchar4 col = particle.color;
     float2 pos = particle.pos * uniforms.cameraScale;
     
     float2 textureSize = float2(0);//float2(output.get_width(), output.get_height());
     
     ushort2 pixel = ushort2(pos + textureSize / 2);
     float4 oldColor = input.read(pixel);
-    float4 newColor = float4(col) / 255;
+    float4 newColor = float4(1);//float4(col) / 255;
     
     float4 color;
     if (oldColor.a < 0.001) {

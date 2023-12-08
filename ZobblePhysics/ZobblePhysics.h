@@ -14,3 +14,5 @@ FOUNDATION_EXPORT double ZobblePhysicsVersionNumber;
 FOUNDATION_EXPORT const unsigned char ZobblePhysicsVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <ZobblePhysics/PublicHeader.h>
+
+#import "ZobbleWorld.h"

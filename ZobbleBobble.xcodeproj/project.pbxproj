@@ -123,17 +123,19 @@
 		11EC8BF12A10AD80000F322C /* CGPoint+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1126C23C277A2B4600C26BEC /* CGPoint+Utilities.swift */; };
 		11EC8C072A10DCDD000F322C /* ThreadHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EC8C062A10DCDD000F322C /* ThreadHelper.swift */; };
 		11FEFEFF295DEA7A00528A1C /* MainGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FEFEFE295DEA7A00528A1C /* MainGame.swift */; };
+		8D06603A2AD412D3003BA044 /* ZobbleWorld.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8D064F1E2AD31D94003BA044 /* ZobbleWorld.mm */; };
+		8D06603B2AD41319003BA044 /* physics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8D064F212AD3D12C003BA044 /* physics.hpp */; };
+		8D06603C2AD41319003BA044 /* thread_pool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8D44D2F22AD2AB38006EB463 /* thread_pool.hpp */; };
+		8D06603D2AD41319003BA044 /* collision_grid.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF841B2AD2941900E7572E /* collision_grid.hpp */; };
+		8D06603E2AD41319003BA044 /* physic_object.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF841E2AD2951A00E7572E /* physic_object.hpp */; };
+		8D06603F2AD41319003BA044 /* vec.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF841C2AD2944700E7572E /* vec.hpp */; };
+		8D0660402AD41319003BA044 /* grid.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF841D2AD2944F00E7572E /* grid.hpp */; };
+		8D0660412AD41319003BA044 /* index_vector.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF84202AD2957E00E7572E /* index_vector.hpp */; };
+		8D0660422AD41319003BA044 /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF84212AD295B600E7572E /* utils.hpp */; };
+		8D0660432AD41319003BA044 /* math.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 8DDF84312AD2972A00E7572E /* math.hpp */; };
+		8D0660442AD4134B003BA044 /* ZobbleWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D064F1D2AD31D94003BA044 /* ZobbleWorld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8D2D39E32AC30EE8002886EE /* TerrainNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D39E22AC30EE8002886EE /* TerrainNode.swift */; };
 		8D2D39E52AC3105E002886EE /* Terrain.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D39E42AC3105E002886EE /* Terrain.metal */; };
-		8DBB15062ACC0EF200B11815 /* ZobbleWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB15052ACC0EF200B11815 /* ZobbleWorld.swift */; };
-		8DBB15082ACC0EFC00B11815 /* ZobbleBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB15072ACC0EFC00B11815 /* ZobbleBody.swift */; };
-		8DBB150A2ACC105300B11815 /* CGPoint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB15092ACC105300B11815 /* CGPoint+Utils.swift */; };
-		8DBB150C2ACC118000B11815 /* CollisionGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB150B2ACC118000B11815 /* CollisionGrid.swift */; };
-		8DBB150E2ACC118800B11815 /* CollisionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB150D2ACC118800B11815 /* CollisionCell.swift */; };
-		8DBB15102ACC3B5100B11815 /* ThreadPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB150F2ACC3B5100B11815 /* ThreadPool.swift */; };
-		8DBB15122ACC45C100B11815 /* ZobbleSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DBB15112ACC45C100B11815 /* ZobbleSolver.swift */; };
-		8DDF840C2AD1661600E7572E /* PThreadPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDF840B2AD1661600E7572E /* PThreadPool.swift */; };
-		8DDF840E2AD19CC900E7572E /* DispatchPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDF840D2AD19CC900E7572E /* DispatchPool.swift */; };
 		8DEF5F512AC6A8BB002275D7 /* ParticleBlueprintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF5F502AC6A8BB002275D7 /* ParticleBlueprintModel.swift */; };
 		8DEF5F532AC6A8DB002275D7 /* CoreBlueprintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF5F522AC6A8DB002275D7 /* CoreBlueprintModel.swift */; };
 		8DEF5F552AC6ABB6002275D7 /* CoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF5F542AC6ABB6002275D7 /* CoreModel.swift */; };
@@ -329,21 +331,33 @@
 		11C39E932A13AF8D007B0371 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		11CB5AD12A8D33F000043A06 /* GUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUIView.swift; sourceTree = "<group>"; };
 		11DFF32E2927BB3B001EA051 /* ZobblePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZobblePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		11DFF3302927BB3B001EA051 /* ZobblePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobblePhysics.h; sourceTree = "<group>"; };
+		11DFF3302927BB3B001EA051 /* ZobblePhysics.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = ZobblePhysics.h; sourceTree = "<group>"; };
 		11E0CBD728AE266D00D24C5C /* Project.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Project.md; sourceTree = "<group>"; };
 		11EC8C062A10DCDD000F322C /* ThreadHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadHelper.swift; sourceTree = "<group>"; };
 		11FEFEFE295DEA7A00528A1C /* MainGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainGame.swift; sourceTree = "<group>"; };
+		8D064F1D2AD31D94003BA044 /* ZobbleWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZobbleWorld.h; sourceTree = "<group>"; };
+		8D064F1E2AD31D94003BA044 /* ZobbleWorld.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ZobbleWorld.mm; sourceTree = "<group>"; };
+		8D064F212AD3D12C003BA044 /* physics.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = physics.hpp; sourceTree = "<group>"; };
+		8D0650112AD3DECE003BA044 /* ZobbleBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZobbleBody.swift; sourceTree = "<group>"; };
+		8D0650122AD3DECE003BA044 /* PThreadPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PThreadPool.swift; sourceTree = "<group>"; };
+		8D0650132AD3DECE003BA044 /* ZobbleSolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZobbleSolver.swift; sourceTree = "<group>"; };
+		8D0650142AD3DECE003BA044 /* ThreadPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadPool.swift; sourceTree = "<group>"; };
+		8D0650152AD3DECE003BA044 /* DispatchPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchPool.swift; sourceTree = "<group>"; };
+		8D0650162AD3DECE003BA044 /* ZobbleWorld.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZobbleWorld.swift; sourceTree = "<group>"; };
+		8D06501D2AD3DF25003BA044 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
+		8D06501F2AD3DF44003BA044 /* CollisionGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollisionGrid.swift; sourceTree = "<group>"; };
+		8D0650202AD3DF44003BA044 /* CollisionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollisionCell.swift; sourceTree = "<group>"; };
+		8D0660382AD40E33003BA044 /* MonoThreadPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonoThreadPool.swift; sourceTree = "<group>"; };
 		8D2D39E22AC30EE8002886EE /* TerrainNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainNode.swift; sourceTree = "<group>"; };
 		8D2D39E42AC3105E002886EE /* Terrain.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Terrain.metal; sourceTree = "<group>"; };
-		8DBB15052ACC0EF200B11815 /* ZobbleWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZobbleWorld.swift; sourceTree = "<group>"; };
-		8DBB15072ACC0EFC00B11815 /* ZobbleBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZobbleBody.swift; sourceTree = "<group>"; };
-		8DBB15092ACC105300B11815 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
-		8DBB150B2ACC118000B11815 /* CollisionGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionGrid.swift; sourceTree = "<group>"; };
-		8DBB150D2ACC118800B11815 /* CollisionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionCell.swift; sourceTree = "<group>"; };
-		8DBB150F2ACC3B5100B11815 /* ThreadPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadPool.swift; sourceTree = "<group>"; };
-		8DBB15112ACC45C100B11815 /* ZobbleSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZobbleSolver.swift; sourceTree = "<group>"; };
-		8DDF840B2AD1661600E7572E /* PThreadPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PThreadPool.swift; sourceTree = "<group>"; };
-		8DDF840D2AD19CC900E7572E /* DispatchPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchPool.swift; sourceTree = "<group>"; };
+		8D44D2F22AD2AB38006EB463 /* thread_pool.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = thread_pool.hpp; sourceTree = "<group>"; };
+		8DDF841B2AD2941900E7572E /* collision_grid.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = collision_grid.hpp; sourceTree = "<group>"; };
+		8DDF841C2AD2944700E7572E /* vec.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = vec.hpp; sourceTree = "<group>"; };
+		8DDF841D2AD2944F00E7572E /* grid.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = grid.hpp; sourceTree = "<group>"; };
+		8DDF841E2AD2951A00E7572E /* physic_object.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = physic_object.hpp; sourceTree = "<group>"; };
+		8DDF84202AD2957E00E7572E /* index_vector.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = index_vector.hpp; sourceTree = "<group>"; };
+		8DDF84212AD295B600E7572E /* utils.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
+		8DDF84312AD2972A00E7572E /* math.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = math.hpp; sourceTree = "<group>"; };
 		8DEF5F502AC6A8BB002275D7 /* ParticleBlueprintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleBlueprintModel.swift; sourceTree = "<group>"; };
 		8DEF5F522AC6A8DB002275D7 /* CoreBlueprintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreBlueprintModel.swift; sourceTree = "<group>"; };
 		8DEF5F542AC6ABB6002275D7 /* CoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreModel.swift; sourceTree = "<group>"; };
@@ -788,15 +802,27 @@
 			isa = PBXGroup;
 			children = (
 				11DFF3302927BB3B001EA051 /* ZobblePhysics.h */,
-				8DBB15052ACC0EF200B11815 /* ZobbleWorld.swift */,
-				8DBB15112ACC45C100B11815 /* ZobbleSolver.swift */,
-				8DBB15072ACC0EFC00B11815 /* ZobbleBody.swift */,
-				8DBB150B2ACC118000B11815 /* CollisionGrid.swift */,
-				8DBB150D2ACC118800B11815 /* CollisionCell.swift */,
-				8DBB15092ACC105300B11815 /* CGPoint+Utils.swift */,
-				8DBB150F2ACC3B5100B11815 /* ThreadPool.swift */,
-				8DDF840B2AD1661600E7572E /* PThreadPool.swift */,
-				8DDF840D2AD19CC900E7572E /* DispatchPool.swift */,
+				8D06501D2AD3DF25003BA044 /* CGPoint+Utils.swift */,
+				8D0650202AD3DF44003BA044 /* CollisionCell.swift */,
+				8D06501F2AD3DF44003BA044 /* CollisionGrid.swift */,
+				8D0650142AD3DECE003BA044 /* ThreadPool.swift */,
+				8D0650152AD3DECE003BA044 /* DispatchPool.swift */,
+				8D0650122AD3DECE003BA044 /* PThreadPool.swift */,
+				8D0660382AD40E33003BA044 /* MonoThreadPool.swift */,
+				8D0650112AD3DECE003BA044 /* ZobbleBody.swift */,
+				8D0650132AD3DECE003BA044 /* ZobbleSolver.swift */,
+				8D0650162AD3DECE003BA044 /* ZobbleWorld.swift */,
+				8D064F1D2AD31D94003BA044 /* ZobbleWorld.h */,
+				8D064F1E2AD31D94003BA044 /* ZobbleWorld.mm */,
+				8D064F212AD3D12C003BA044 /* physics.hpp */,
+				8D44D2F22AD2AB38006EB463 /* thread_pool.hpp */,
+				8DDF841B2AD2941900E7572E /* collision_grid.hpp */,
+				8DDF841E2AD2951A00E7572E /* physic_object.hpp */,
+				8DDF841C2AD2944700E7572E /* vec.hpp */,
+				8DDF841D2AD2944F00E7572E /* grid.hpp */,
+				8DDF84202AD2957E00E7572E /* index_vector.hpp */,
+				8DDF84212AD295B600E7572E /* utils.hpp */,
+				8DDF84312AD2972A00E7572E /* math.hpp */,
 			);
 			path = ZobblePhysics;
 			sourceTree = "<group>";
@@ -825,6 +851,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				11DFF3312927BB3B001EA051 /* ZobblePhysics.h in Headers */,
+				8D0660442AD4134B003BA044 /* ZobbleWorld.h in Headers */,
+				8D06603B2AD41319003BA044 /* physics.hpp in Headers */,
+				8D06603C2AD41319003BA044 /* thread_pool.hpp in Headers */,
+				8D06603D2AD41319003BA044 /* collision_grid.hpp in Headers */,
+				8D06603E2AD41319003BA044 /* physic_object.hpp in Headers */,
+				8D06603F2AD41319003BA044 /* vec.hpp in Headers */,
+				8D0660402AD41319003BA044 /* grid.hpp in Headers */,
+				8D0660412AD41319003BA044 /* index_vector.hpp in Headers */,
+				8D0660422AD41319003BA044 /* utils.hpp in Headers */,
+				8D0660432AD41319003BA044 /* math.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1155,15 +1191,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DBB150C2ACC118000B11815 /* CollisionGrid.swift in Sources */,
-				8DBB15062ACC0EF200B11815 /* ZobbleWorld.swift in Sources */,
-				8DDF840E2AD19CC900E7572E /* DispatchPool.swift in Sources */,
-				8DBB150E2ACC118800B11815 /* CollisionCell.swift in Sources */,
-				8DBB15102ACC3B5100B11815 /* ThreadPool.swift in Sources */,
-				8DBB15082ACC0EFC00B11815 /* ZobbleBody.swift in Sources */,
-				8DBB15122ACC45C100B11815 /* ZobbleSolver.swift in Sources */,
-				8DBB150A2ACC105300B11815 /* CGPoint+Utils.swift in Sources */,
-				8DDF840C2AD1661600E7572E /* PThreadPool.swift in Sources */,
+				8D06603A2AD412D3003BA044 /* ZobbleWorld.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1608,6 +1636,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_CPP_STATIC_DESTRUCTORS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
@@ -1648,6 +1677,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_CPP_STATIC_DESTRUCTORS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
